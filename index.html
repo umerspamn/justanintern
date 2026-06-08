@@ -1,0 +1,3035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Just An Intern — Student Career Platform for Jobs & Internships</title>
+<meta name="description" content="Just An Intern is a student-first career ecosystem for Pakistan and South Asia. Build ATS-ready CVs, explore career predictor insights, and prepare for internships and entry-level jobs with practical guidance."/>
+<meta name="keywords" content="student jobs Pakistan, internship platform, ATS CV builder, career predictor, fresh graduate jobs, entry level jobs, internship preparation, Just An Intern"/>
+<meta name="author" content="Just An Intern"/>
+<meta name="robots" content="index,follow"/>
+<meta property="og:title" content="Just An Intern — Student Career Platform"/>
+<meta property="og:description" content="One platform for students entering the job market: CV maker, career predictor, and practical internship/job guidance."/>
+<meta property="og:type" content="website"/>
+<meta property="og:locale" content="en_PK"/>
+<meta name="geo.region" content="PK"/>
+<meta name="geo.placename" content="Pakistan"/>
+<script>
+(() => {
+  const token = localStorage.getItem('cvforge_token');
+  if (!token) {
+    window.location.href = 'auth.html?redirect=index.html';
+  }
+})();
+</script>
+
+<!--
+  ═══════════════════════════════════════════════════════
+  EC2 DEPLOYMENT — ASSET PATHS
+  ───────────────────────────────────────────────────────
+  All external dependencies are loaded from the local
+  /assets/ folder so the app works with no outbound
+  internet from the EC2 instance.
+
+  Run setup.sh once after uploading to populate assets/:
+    bash setup.sh
+
+  Folder structure on EC2:
+    /var/www/cvforge/
+      index.html          ← this file
+      assets/
+        js/
+          html2pdf.bundle.min.js
+        css/
+          plus-jakarta-sans.css
+        fonts/
+          PlusJakartaSans-*.woff2   (referenced by the CSS)
+  ═══════════════════════════════════════════════════════
+-->
+
+<!-- Google Fonts: self-hosted via assets/css/plus-jakarta-sans.css -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<!-- html2pdf.js — self-hosted -->
+
+
+<!--
+  ═══════════════════════════════════════════════════════
+  FIREBASE REMOVED — EC2 / localStorage deployment
+  ───────────────────────────────────────────────────────
+  The following Firebase SDK scripts were removed:
+    - firebase-app-compat.js
+    - firebase-firestore-compat.js
+    - firebase-auth-compat.js     (was commented out)
+    - firebase-analytics-compat.js (was commented out)
+    - firebase-config.js          (API keys file)
+    - firebase-service.js         (Firestore logic)
+
+  All CV data is now stored in browser localStorage only.
+  To re-add Firebase later, restore these script tags and
+  the two JS files (firebase-config.js, firebase-service.js).
+  ═══════════════════════════════════════════════════════
+-->
+<style>
+/* ─────────────────────────────────────
+   DESIGN TOKENS
+───────────────────────────────────── */
+:root{
+  --bg:#090B0F;
+  --s0:#0D1018;--s1:#131720;--s2:#181D28;--s3:#1E2433;--s4:#242A3A;--s5:#2A3044;
+  --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.17);
+  --t0:#F0F2F8;--t1:#B8BECC;--t2:#7A8299;--t3:#4A5166;
+  --blue:#4F7AFF;--blue2:#6B93FF;--blue3:#3A62E8;--bd:rgba(79,122,255,.15);--bg_blue:rgba(79,122,255,.08);
+  --green:#22C55E;--gd:rgba(34,197,94,.12);--gt:rgba(34,197,94,.7);
+  --amber:#F59E0B;--ad:rgba(245,158,11,.12);
+  --red:#EF4444;--rd:rgba(239,68,68,.12);
+  --purple:#A78BFA;--pd:rgba(167,139,250,.12);
+  --cyan:#06B6D4;
+  --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --pw:390px;--th:54px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.2);
+  --shadow:0 4px 12px rgba(0,0,0,.4),0 2px 4px rgba(0,0,0,.3);
+  --shadow-lg:0 16px 40px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.4);
+  --shadow-xl:0 32px 80px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.5);
+}
+
+/* ─────────────────────────────────────
+   RESET + BASE
+───────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--b3)}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t0);font-size:14px;line-height:1.5;overflow:hidden}
+::selection{background:rgba(79,122,255,.3);color:#fff}
+a{color:var(--blue2);text-decoration:none}
+
+/* ─────────────────────────────────────
+   TOPBAR
+───────────────────────────────────── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--th);z-index:400;
+  background:rgba(9,11,15,.88);backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{
+  width:32px;height:32px;border-radius:var(--r8);
+  background:linear-gradient(135deg,#3A62E8,#6B93FF);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#fff;
+  box-shadow:0 0 0 1px rgba(79,122,255,.4),0 4px 16px rgba(79,122,255,.35);
+  animation:logo-glow-topbar 4s ease-in-out infinite;
+}
+@keyframes logo-glow-topbar{
+  0%,100%{box-shadow:0 0 0 1px rgba(79,122,255,.4),0 4px 16px rgba(79,122,255,.3)}
+  50%{box-shadow:0 0 0 1px rgba(79,122,255,.6),0 4px 20px rgba(79,122,255,.55)}
+}
+.brand-name{font-size:15px;font-weight:800;color:var(--t0);letter-spacing:-.3px}
+.brand-chip{
+  font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--blue2);background:var(--bg_blue);
+  padding:2px 7px;border-radius:20px;border:1px solid var(--bd);
+}
+.top-r{display:flex;align-items:center;gap:8px;overflow-x:auto;max-width:72vw;padding-bottom:2px}
+
+/* ─────────────────────────────────────
+   ECOSYSTEM HOME OVERLAY
+───────────────────────────────────── */
+#ecosystem-home{
+  position:fixed;inset:var(--th) 0 0 0;z-index:350;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(79,122,255,.14) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 20%, rgba(34,197,94,.07) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 80%, rgba(167,139,250,.07) 0%, transparent 35%),
+    linear-gradient(180deg,#0A0D16 0%, #090B0F 100%);
+  overflow-y:auto;
+  padding:28px;
+}
+#ecosystem-home.hidden{display:none}
+
+/* dot grid overlay for eco-home */
+#ecosystem-home::before{
+  content:'';position:fixed;inset:var(--th) 0 0 0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:30px 30px;pointer-events:none;z-index:-1;
+}
+
+/* ── ECO ANIMATIONS ── */
+@keyframes eco-fade-up{
+  from{opacity:0;transform:translateY(22px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.eco-wrap{max-width:1180px;margin:0 auto;display:grid;gap:20px}
+
+/* ── ECO HERO ── */
+.eco-hero{
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(79,122,255,.12) 0%,transparent 50%),
+    linear-gradient(135deg,var(--s1) 0%,rgba(79,122,255,.06) 100%);
+  border:1.5px solid var(--bd);border-radius:var(--r20);
+  padding:36px 32px;position:relative;overflow:hidden;
+  animation:eco-fade-up .7s var(--ease) forwards;
+}
+.eco-hero::after{
+  content:'';position:absolute;top:0;right:0;bottom:0;width:45%;
+  background:radial-gradient(ellipse at 100% 50%,rgba(79,122,255,.08),transparent 70%);
+  pointer-events:none;
+}
+.eco-kicker{
+  font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--blue2);display:inline-flex;align-items:center;gap:7px;
+  margin-bottom:12px;
+}
+.eco-kicker::before{
+  content:'';width:20px;height:2px;
+  background:linear-gradient(90deg,var(--blue),transparent);
+  border-radius:1px;
+}
+.eco-title{
+  font-size:clamp(24px,4vw,42px);font-weight:800;
+  line-height:1.1;margin-bottom:12px;letter-spacing:-.6px;
+}
+.eco-title .grad{
+  background:linear-gradient(135deg,#6B93FF 0%,#A78BFA 60%,#60C9FF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.eco-sub{color:var(--t1);max-width:680px;line-height:1.7;font-size:15px}
+.eco-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+
+/* ── ECO GRID ── */
+.eco-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+
+/* ── ECO CARDS ── */
+.eco-card{
+  background:var(--s1);
+  border:1.5px solid var(--b1);border-radius:var(--r16);
+  padding:22px 20px;
+  display:flex;flex-direction:column;gap:0;min-height:190px;
+  transition:all .25s var(--ease);position:relative;overflow:hidden;
+  cursor:default;
+  animation:eco-fade-up .6s var(--ease) forwards;opacity:0;
+}
+.eco-card:nth-child(1){animation-delay:.1s}
+.eco-card:nth-child(2){animation-delay:.18s}
+.eco-card:nth-child(3){animation-delay:.26s}
+.eco-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(79,122,255,.0),rgba(79,122,255,.05));
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.eco-card:hover{
+  border-color:rgba(79,122,255,.35);
+  box-shadow:0 8px 32px rgba(79,122,255,.12);
+  transform:translateY(-3px);
+}
+.eco-card:hover::before{opacity:1}
+.eco-card-ico{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;font-size:20px;
+  transition:transform .2s var(--spring);
+}
+.eco-card:hover .eco-card-ico{transform:scale(1.1)}
+.eco-card-ico.blue{background:rgba(79,122,255,.14);border:1px solid rgba(79,122,255,.22)}
+.eco-card-ico.green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
+.eco-card-ico.purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.22)}
+.eco-card h3{font-size:17px;font-weight:800;color:var(--t0);margin-bottom:7px;letter-spacing:-.2px}
+.eco-card p{font-size:13px;color:var(--t2);line-height:1.6;flex:1;margin-bottom:16px}
+.eco-card .mini{
+  margin-top:auto;font-size:10px;color:var(--blue2);
+  font-weight:600;letter-spacing:.3px;
+  display:flex;align-items:center;gap:5px;
+}
+.eco-card .mini::before{content:'→';opacity:.6}
+.eco-card-actions{display:flex;gap:6px;margin-top:12px}
+
+/* ── ECO AD SLOT ── */
+.eco-ad{
+  border:1.5px dashed var(--b1);background:rgba(255,255,255,.015);
+  border-radius:var(--r12);color:var(--t3);
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:14px;min-height:90px;
+  font-size:11px;letter-spacing:.3px;
+}
+
+/* ── ECO SEO ── */
+.eco-seo{
+  background:var(--s1);border:1.5px solid var(--b1);
+  border-radius:var(--r16);padding:24px;
+  animation:eco-fade-up .6s .35s var(--ease) forwards;opacity:0;
+}
+.eco-seo h2{font-size:19px;font-weight:800;letter-spacing:-.2px;margin-bottom:12px;color:var(--t0)}
+.eco-seo p{color:var(--t1);font-size:13px;line-height:1.75;margin-bottom:10px}
+.eco-seo p:last-child{margin-bottom:0}
+
+/* ── ECO FEATURE STRIP ── */
+.eco-strip{
+  display:flex;gap:0;
+  background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r16);
+  overflow:hidden;
+  animation:eco-fade-up .6s .08s var(--ease) forwards;opacity:0;
+}
+.eco-strip-item{
+  flex:1;padding:18px 20px;
+  display:flex;align-items:center;gap:12px;
+  border-right:1px solid var(--b1);
+  transition:background .2s;
+}
+.eco-strip-item:last-child{border-right:none}
+.eco-strip-item:hover{background:var(--s2)}
+.eco-strip-ico{font-size:24px;flex-shrink:0}
+.eco-strip-text strong{display:block;font-size:13px;font-weight:700;color:var(--t0);margin-bottom:2px}
+.eco-strip-text span{font-size:11px;color:var(--t2)}
+
+@media(max-width:980px){
+  .eco-grid{grid-template-columns:1fr 1fr}
+  .eco-strip{flex-wrap:wrap}
+  .eco-strip-item{min-width:50%;border-right:none;border-bottom:1px solid var(--b1)}
+}
+@media(max-width:640px){
+  #ecosystem-home{padding:14px}
+  .eco-hero{padding:22px 18px}
+  .eco-grid{grid-template-columns:1fr}
+  .eco-strip{display:none}
+}
+
+/* ─────────────────────────────────────
+   BUTTON SYSTEM
+───────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 14px;border-radius:var(--r8);
+  font-size:12px;font-weight:700;font-family:var(--font);
+  cursor:pointer;border:1px solid transparent;
+  transition:all .15s var(--ease);white-space:nowrap;letter-spacing:.1px;
+  position:relative;overflow:hidden;
+}
+.btn svg{width:13px;height:13px;flex-shrink:0}
+.btn-ghost{background:transparent;color:var(--t1);border-color:var(--b2)}
+.btn-ghost:hover{background:var(--s2);border-color:var(--b3);color:var(--t0);transform:translateY(-1px)}
+.btn-primary{
+  background:linear-gradient(135deg,#3A62E8,#5B87FF);
+  color:#fff;border-color:rgba(79,122,255,.4);
+  box-shadow:0 2px 10px rgba(79,122,255,.35);
+}
+.btn-primary:hover{background:linear-gradient(135deg,#4B73F9,#6B97FF);box-shadow:0 4px 20px rgba(79,122,255,.5);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px}
+/* Icon button */
+.ib{
+  width:28px;height:28px;padding:0;border-radius:var(--r6);
+  background:transparent;border:1px solid transparent;color:var(--t3);
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-family:var(--font);transition:all .13s;flex-shrink:0;
+}
+.ib:hover{background:var(--s3);border-color:var(--b2);color:var(--t1)}
+.ib.del:hover{background:var(--rd);border-color:rgba(239,68,68,.3);color:var(--red)}
+/* Add button */
+.addb{
+  width:100%;padding:10px;
+  border:1.5px dashed var(--b2);border-radius:var(--r10);
+  background:transparent;color:var(--t3);font-family:var(--font);
+  font-size:12px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:all .18s var(--ease);letter-spacing:.1px;
+  margin-top:4px;
+}
+.addb:hover{border-color:var(--blue);color:var(--blue2);background:var(--bg_blue);transform:translateY(-1px)}
+.addb:active{transform:translateY(0)}
+
+/* ─────────────────────────────────────
+   LAYOUT
+───────────────────────────────────── */
+#app{display:flex;height:100vh;padding-top:var(--th);overflow:hidden}
+#panel{
+  width:var(--pw);flex-shrink:0;background:var(--s0);
+  border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden;
+}
+#pv{flex:1;overflow-y:auto;background:linear-gradient(180deg,var(--bg) 0%,#0C0F16 100%);padding:28px 24px;display:flex;flex-direction:column;align-items:center}
+
+/* ─────────────────────────────────────
+   TABS
+───────────────────────────────────── */
+#tabs{
+  display:flex;border-bottom:1px solid var(--b1);background:var(--s0);
+  flex-shrink:0;padding:0 12px;
+}
+.tab{
+  padding:12px 10px;font-size:11px;font-weight:700;letter-spacing:.4px;
+  color:var(--t3);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all .18s;text-transform:uppercase;
+}
+.tab.active{color:var(--blue2);border-color:var(--blue)}
+.tab:hover:not(.active){color:var(--t1)}
+.tpanel{display:none;flex:1;overflow-y:auto;padding:14px 14px 48px}
+.tpanel.active{display:block}
+
+/* ─────────────────────────────────────
+   FORM ELEMENTS
+───────────────────────────────────── */
+.fg{margin-bottom:12px;position:relative}
+.fg:last-child{margin-bottom:0}
+.fl{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--t2);margin-bottom:5px;
+}
+.fl .req{color:var(--red);line-height:1}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+
+/* Base input styles */
+.inp,textarea,select{
+  width:100%;padding:9px 11px;
+  background:var(--s2);border:1.5px solid var(--b1);
+  border-radius:var(--r8);color:var(--t0);
+  font-family:var(--font);font-size:12.5px;outline:none;
+  transition:border-color .18s,background .18s,box-shadow .18s;
+  -webkit-appearance:none;line-height:1.5;
+}
+.inp:hover,textarea:hover{border-color:var(--b2);background:var(--s3)}
+.inp:focus,textarea:focus,select:focus{
+  border-color:var(--blue);background:var(--s3);
+  box-shadow:0 0 0 3px rgba(79,122,255,.12);
+}
+.inp::placeholder,textarea::placeholder{color:var(--t3)}
+textarea{resize:vertical;min-height:76px;line-height:1.6}
+select{cursor:pointer;background:var(--s2);border:1.5px solid var(--b1)}
+select option{background:var(--s2);color:var(--t0)}
+.inp.ok{border-color:rgba(34,197,94,.5)}
+.inp.err{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.04)}
+
+.fhint{font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5}
+.fhint.warn{color:var(--amber)}
+.fhint.ok{color:var(--green)}
+
+/* ─────────────────────────────────────
+   CUSTOM MONTH PICKER
+   Fully custom — clicking anywhere on the
+   field opens the dropdown, no browser icon
+───────────────────────────────────── */
+.mp-wrap{position:relative;width:100%}
+.mp-input{
+  width:100%;padding:9px 11px;
+  background:var(--s2);border:1.5px solid var(--b1);
+  border-radius:var(--r8);color:var(--t0);
+  font-family:var(--font);font-size:12.5px;
+  cursor:pointer;user-select:none;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:border-color .18s,background .18s,box-shadow .18s;
+}
+.mp-input:hover{border-color:var(--b2);background:var(--s3)}
+.mp-input.open{border-color:var(--blue);background:var(--s3);box-shadow:0 0 0 3px rgba(79,122,255,.12)}
+.mp-input-text{font-size:12.5px}
+.mp-input-text.placeholder{color:var(--t3)}
+.mp-chevron{
+  width:16px;height:16px;color:var(--t2);flex-shrink:0;
+  transition:transform .2s var(--ease);
+}
+.mp-input.open .mp-chevron{transform:rotate(180deg)}
+
+.mp-drop{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:500;
+  background:var(--s1);border:1.5px solid var(--b2);border-radius:var(--r12);
+  box-shadow:var(--shadow-lg);overflow:hidden;
+  opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;
+  transition:all .2s var(--ease);
+}
+.mp-drop.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+.mp-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 12px;border-bottom:1px solid var(--b1);
+}
+.mp-year{font-size:13px;font-weight:700;color:var(--t0)}
+.mp-nav-btn{
+  width:28px;height:28px;border-radius:var(--r6);border:1px solid var(--b1);
+  background:transparent;color:var(--t1);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  transition:all .13s;font-family:var(--font);
+}
+.mp-nav-btn:hover{background:var(--s3);border-color:var(--b2);color:var(--t0)}
+.mp-months{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:10px}
+.mp-month{
+  padding:8px 4px;text-align:center;border-radius:var(--r6);
+  font-size:11px;font-weight:600;cursor:pointer;color:var(--t1);
+  border:1px solid transparent;transition:all .12s;
+}
+.mp-month:hover{background:var(--s3);color:var(--t0);border-color:var(--b1)}
+.mp-month.sel{background:var(--blue);color:#fff;border-color:var(--blue3);box-shadow:0 2px 8px rgba(79,122,255,.35)}
+.mp-clear{
+  padding:8px 12px;border-top:1px solid var(--b1);text-align:center;
+  font-size:11px;color:var(--t3);cursor:pointer;transition:all .13s;
+}
+.mp-clear:hover{background:var(--s2);color:var(--red)}
+
+/* ─────────────────────────────────────
+   SECTION BLOCKS (collapsible)
+───────────────────────────────────── */
+.sb{
+  margin-bottom:8px;border-radius:var(--r12);
+  border:1.5px solid var(--b1);overflow:hidden;
+  transition:border-color .2s,box-shadow .2s;
+}
+.sb:hover{border-color:var(--b2)}
+.sb.done{border-color:rgba(34,197,94,.25)}
+.sbh{
+  padding:11px 13px;background:var(--s1);
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none;transition:background .13s;
+}
+.sbh:hover{background:var(--s2)}
+.sbhl{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--t0)}
+.sbico{
+  width:26px;height:26px;border-radius:var(--r6);
+  display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;
+}
+.sb-badge{
+  margin-left:6px;font-size:9px;font-weight:700;padding:2px 6px;
+  border-radius:20px;background:var(--gd);color:var(--green);
+  border:1px solid rgba(34,197,94,.2);
+}
+.sbbody{padding:13px;border-top:1px solid var(--b0)}
+.sbbody.shut{display:none}
+
+/* ─────────────────────────────────────
+   CARD ITEMS
+───────────────────────────────────── */
+.ci{
+  border:1.5px solid var(--b1);border-radius:var(--r10);
+  margin-bottom:7px;overflow:hidden;transition:all .15s;
+}
+.ci:hover{border-color:var(--b2);box-shadow:var(--shadow-sm)}
+.cih{
+  padding:9px 11px;background:var(--s1);
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;transition:background .12s;
+}
+.cih:hover{background:var(--s2)}
+.ci-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.ci-ico{
+  width:28px;height:28px;border-radius:var(--r6);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  flex-shrink:0;
+}
+.ci-texts{flex:1;min-width:0}
+.cil{font-size:12px;font-weight:600;color:var(--t0);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ci-sub{font-size:10px;color:var(--t2);margin-top:1px}
+.cib{padding:12px;border-top:1px solid var(--b0);display:none}
+.cib.open{display:block}
+
+/* ─────────────────────────────────────
+   SKILL LEVEL BARS
+   Large, easy to tap/click, 40px wide each
+───────────────────────────────────── */
+.skill-block{
+  border:1.5px solid var(--b1);border-radius:var(--r12);
+  margin-bottom:10px;overflow:visible;transition:all .15s;
+  position:relative;
+}
+.skill-block:hover{border-color:var(--b2)}
+.skill-block.active-edit{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,122,255,.08)}
+.skill-head{padding:11px 13px;background:var(--s1);display:flex;align-items:center;gap:10px;border-radius:var(--r12) var(--r12) 0 0}
+.skill-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:all .2s}
+.skill-name-inp{
+  flex:1;background:transparent;border:none;padding:0;
+  font-size:13px;font-weight:700;color:var(--t0);outline:none;font-family:var(--font);
+}
+.skill-name-inp::placeholder{color:var(--t3);font-weight:400}
+.skill-name-inp:focus{color:#fff}
+.skill-body{padding:12px 13px;border-top:1px solid var(--b0)}
+
+/* LEVEL BARS — the key improvement */
+.level-section{margin-bottom:14px}
+.level-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.level-label-val{font-size:10px;font-weight:600;color:var(--blue2);letter-spacing:0;text-transform:none}
+.level-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.level-bar{
+  /* BIG bars — easy to tap */
+  height:36px;border-radius:var(--r8);
+  background:var(--s3);border:1.5px solid var(--b1);
+  cursor:pointer;transition:all .18s var(--spring);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;letter-spacing:.3px;
+  color:transparent;user-select:none;position:relative;overflow:hidden;
+}
+.level-bar::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--blue3),var(--blue2));
+  opacity:0;transition:opacity .18s;
+}
+.level-bar.on{
+  background:var(--s4);border-color:var(--blue);color:var(--blue2);
+  box-shadow:0 2px 8px rgba(79,122,255,.2);
+}
+.level-bar.on::before{opacity:.15}
+.level-bar:hover{border-color:var(--blue2);transform:translateY(-2px);box-shadow:0 4px 12px rgba(79,122,255,.25)}
+.level-bar:hover .lb-text{color:var(--t0)}
+.level-bar.on .lb-text{color:var(--blue2)}
+.lb-text{position:relative;z-index:1;font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--t3);transition:color .15s}
+
+/* active bar highlight ring */
+.level-bar.current{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,122,255,.15)}
+
+/* skill project list */
+.sp-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.sp-item{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--r8);
+  border:1.5px solid var(--b1);background:var(--s2);
+  cursor:pointer;transition:all .15s;font-size:12px;color:var(--t1);
+  user-select:none;
+}
+.sp-item:hover{border-color:rgba(79,122,255,.4);background:var(--bg_blue);color:var(--t0)}
+.sp-item.on{border-color:var(--blue);background:var(--bg_blue);color:var(--blue2)}
+.sp-check{
+  width:16px;height:16px;border-radius:4px;flex-shrink:0;
+  border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;
+  font-size:10px;transition:all .15s;background:transparent;
+}
+.sp-item.on .sp-check{background:var(--blue);border-color:var(--blue);color:#fff}
+.sp-empty{font-size:11px;color:var(--t3);text-align:center;padding:12px 0}
+
+/* color dots */
+.cprow{display:flex;gap:6px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--b0)}
+.cp{width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.cp:hover,.cp.s{border-color:#fff;transform:scale(1.25)}
+
+/* ─────────────────────────────────────
+   PROGRESS & COMPLETION INDICATORS
+───────────────────────────────────── */
+.section-fill-bar{
+  height:3px;background:var(--b1);border-radius:2px;margin:10px 0 14px;overflow:hidden;
+}
+.section-fill-progress{height:100%;border-radius:2px;transition:width .5s var(--ease);background:linear-gradient(90deg,var(--blue3),var(--blue2))}
+
+/* ─────────────────────────────────────
+   INLINE ATS RULER (preview top)
+───────────────────────────────────── */
+#ats-ruler{
+  width:100%;max-width:820px;margin-bottom:16px;
+  background:linear-gradient(135deg,var(--s1) 0%,rgba(79,122,255,.06) 100%);
+  border:1.5px solid var(--b2);border-radius:var(--r16);
+  padding:14px 18px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.ruler-ring{position:relative;width:54px;height:54px;flex-shrink:0}
+.ruler-ring svg{position:absolute;inset:0;width:100%;height:100%}
+.ruler-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ruler-num{font-size:16px;font-weight:800;color:#fff;line-height:1}
+.ruler-den{font-size:8px;color:var(--t3)}
+.ruler-meta{flex:1;min-width:100px}
+.ruler-grade{font-size:14px;font-weight:800;color:var(--t0)}
+.ruler-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.ruler-bar{height:3px;background:rgba(255,255,255,.07);border-radius:2px;margin-top:7px;overflow:hidden}
+.ruler-bf{height:100%;border-radius:2px;transition:width .8s var(--ease)}
+.ruler-chips{display:flex;flex-wrap:wrap;gap:5px;flex:2}
+.rchip{
+  padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;
+  border:1px solid transparent;display:flex;align-items:center;gap:4px;
+}
+.rchip.p{background:var(--gd);border-color:rgba(34,197,94,.2);color:var(--green)}
+.rchip.f{background:var(--rd);border-color:rgba(239,68,68,.2);color:var(--red)}
+.rchip.w{background:var(--ad);border-color:rgba(245,158,11,.2);color:var(--amber)}
+
+/* ─────────────────────────────────────
+   ATS PANEL
+───────────────────────────────────── */
+.ats-hero{
+  background:linear-gradient(135deg,var(--s2) 0%,var(--bg_blue) 100%);
+  border:1.5px solid var(--bd);border-radius:var(--r12);
+  padding:16px;margin-bottom:14px;
+}
+.ats-row{display:flex;align-items:center;gap:14px}
+.ats-ring{position:relative;width:74px;height:74px;flex-shrink:0}
+.ats-ring svg{position:absolute;inset:0;width:100%;height:100%}
+.ats-rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ats-n{font-size:22px;font-weight:800;color:#fff;line-height:1}
+.ats-d{font-size:9px;color:var(--t3)}
+.ats-grade{font-size:20px;font-weight:800;color:var(--t0)}
+.ats-gsub{font-size:11px;color:var(--t2);margin-top:2px}
+.ats-barp{height:4px;background:rgba(255,255,255,.07);border-radius:2px;margin-top:9px;overflow:hidden}
+.ats-bfp{height:100%;border-radius:2px;transition:width .8s var(--ease)}
+
+.chklist{display:flex;flex-direction:column;gap:5px}
+.chk{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--r8);border:1px solid transparent}
+.chk.pass{background:var(--gd);border-color:rgba(34,197,94,.15)}
+.chk.fail{background:var(--rd);border-color:rgba(239,68,68,.15)}
+.chk.warn{background:var(--ad);border-color:rgba(245,158,11,.15)}
+.chkico{font-size:12px;flex-shrink:0;margin-top:2px}
+.chkt{font-size:12px;font-weight:600;color:var(--t0);line-height:1.3}
+.chks{font-size:10px;color:var(--t2);margin-top:2px;line-height:1.4}
+
+.infobox{
+  border-radius:var(--r10);padding:11px 13px;margin-bottom:8px;
+  border:1px solid transparent;
+}
+.infobox-title{font-size:11px;font-weight:700;color:var(--t0);display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.infobox-body{font-size:11px;color:var(--t1);line-height:1.6}
+.infobox.info{background:var(--bg_blue);border-color:var(--bd)}
+.infobox.pass{background:var(--gd);border-color:rgba(34,197,94,.2)}
+.infobox.warn{background:var(--ad);border-color:rgba(245,158,11,.2)}
+.infobox.fail{background:var(--rd);border-color:rgba(239,68,68,.2)}
+.ats-stl{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);margin:14px 0 7px}
+
+/* ─────────────────────────────────────
+   TOGGLE
+───────────────────────────────────── */
+.tog{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--t1)}
+.tog input{display:none}
+.togt{width:32px;height:18px;border-radius:9px;background:var(--s4);position:relative;transition:background .2s;flex-shrink:0;border:1px solid var(--b2)}
+.tog input:checked ~ .togt{background:var(--blue);border-color:var(--blue3)}
+.togk{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s var(--spring);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tog input:checked ~ .togt .togk{transform:translateX(14px)}
+
+/* ─────────────────────────────────────
+   HELPER ATOMS
+───────────────────────────────────── */
+.sep{height:1px;background:var(--b0);margin:11px 0}
+.sep2{height:1px;background:var(--b1);margin:13px 0}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid transparent}
+.tag-blue{background:var(--bg_blue);color:var(--blue2);border-color:var(--bd)}
+.tag-green{background:var(--gd);color:var(--green);border-color:rgba(34,197,94,.2)}
+.empty-state{text-align:center;padding:16px;color:var(--t3);font-size:11px;line-height:1.7}
+.empty-state strong{display:block;font-size:13px;color:var(--t2);margin-bottom:4px}
+
+/* ─────────────────────────────────────
+   NOTIFICATION
+───────────────────────────────────── */
+#notif{
+  position:fixed;bottom:22px;right:22px;z-index:999;
+  padding:11px 18px;border-radius:var(--r12);font-size:12px;font-weight:700;
+  background:var(--s2);border:1.5px solid rgba(34,197,94,.4);color:var(--green);
+  box-shadow:var(--shadow-lg),0 0 0 1px rgba(34,197,94,.1);
+  transform:translateY(60px) scale(.94);opacity:0;
+  transition:all .4s var(--spring);pointer-events:none;
+  display:flex;align-items:center;gap:8px;
+  backdrop-filter:blur(10px);
+}
+#notif.show{transform:translateY(0) scale(1);opacity:1}
+#notif.err-notif{border-color:rgba(239,68,68,.4);color:var(--red)}
+
+/* ─────────────────────────────────────
+   CV DOCUMENT — ATS-CORRECT
+───────────────────────────────────── */
+#cv-preview{
+  width:100%;max-width:820px;background:#fff;
+  box-shadow:var(--shadow-xl),0 0 0 1px rgba(255,255,255,.05);
+  border-radius:4px;min-height:1060px;
+}
+#cv-doc{
+  font-family:'Calibri',Arial,sans-serif;
+  font-size:10.5pt;color:#111;line-height:1.42;
+  padding:.7in .75in;
+}
+.cv-name{font-size:24pt;font-weight:700;color:#0A0C10;letter-spacing:-.5px;line-height:1.05;margin-bottom:3px}
+.cv-jobtitle{font-size:11.5pt;color:#4A5568;font-weight:400;font-style:italic;margin-bottom:10px}
+.cv-contacts{font-size:9pt;color:#2D3748;padding:7px 0;border-top:2pt solid #0A0C10;border-bottom:.75pt solid #CBD5E0;margin-bottom:14px;line-height:1.7}
+.cv-contacts a{text-decoration:none}
+.cv-sec{margin-bottom:14px;page-break-inside:avoid}
+.cv-sech{font-size:9.5pt;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding-bottom:3px;margin-bottom:9px;border-bottom:1.5pt solid}
+.cv-sum{font-size:10pt;color:#1A202C;line-height:1.6}
+.cv-entry{margin-bottom:11px;page-break-inside:avoid}
+.cv-etop{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px;margin-bottom:1px}
+.cv-erole{font-size:11pt;font-weight:700;color:#0A0C10}
+.cv-edate{font-size:9pt;color:#718096;font-weight:600;white-space:nowrap}
+.cv-eorg{font-size:10pt;color:#2D3748;font-weight:600;margin-bottom:4px}
+.cv-bul{padding-left:16px;list-style:disc;margin-top:4px}
+.cv-bul li{font-size:9.5pt;color:#2D3748;line-height:1.55;margin-bottom:2px}
+.cv-skrow{display:flex;align-items:baseline;gap:8px;margin-bottom:5px;font-size:9.5pt}
+.cv-skcap{font-weight:700;color:#0A0C10;width:115px;flex-shrink:0}
+.cv-skval{color:#2D3748;line-height:1.5;flex:1}
+.cv-proj{margin-bottom:10px;page-break-inside:avoid}
+.cv-ptop{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
+.cv-pname{font-size:10.5pt;font-weight:700;color:#0A0C10}
+.cv-ptech{font-size:8.5pt;color:#718096;font-style:italic}
+.cv-pskills{font-size:8.5pt;color:#4A5568;margin-bottom:2px}
+.cv-pdesc{font-size:9.5pt;color:#2D3748;line-height:1.55}
+.cv-certrow{display:flex;justify-content:space-between;align-items:baseline;font-size:9.5pt;margin-bottom:5px}
+.cv-certn{font-weight:700;color:#0A0C10}
+.cv-certm{color:#718096;font-size:8.5pt}
+
+/* ─────────────────────────────────────
+   BULLET ANALYZER
+───────────────────────────────────── */
+.bullet-analyzer{
+  margin-top:10px;border:1.5px solid var(--b1);border-radius:var(--r10);
+  overflow:hidden;background:var(--s1);
+}
+.ba-header{
+  padding:8px 11px;background:var(--s2);border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--t2);
+}
+.ba-score-pill{
+  display:flex;align-items:center;gap:6px;padding:3px 8px;
+  border-radius:20px;font-size:11px;font-weight:800;letter-spacing:0;text-transform:none;
+  transition:all .3s var(--ease);
+}
+.ba-score-pill.high{background:var(--gd);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.ba-score-pill.mid{background:var(--ad);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.ba-score-pill.low{background:var(--rd);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.ba-bullets{padding:6px}
+.ba-bullet-row{
+  border-radius:var(--r8);margin-bottom:5px;overflow:hidden;
+  border:1px solid var(--b1);transition:border-color .2s;
+}
+.ba-bullet-row:last-child{margin-bottom:0}
+.ba-bullet-row.score-high{border-color:rgba(34,197,94,.2)}
+.ba-bullet-row.score-mid{border-color:rgba(245,158,11,.2)}
+.ba-bullet-row.score-low{border-color:rgba(239,68,68,.25)}
+.ba-bullet-top{
+  display:flex;align-items:flex-start;gap:8px;padding:7px 9px;
+  background:var(--s2);cursor:pointer;
+}
+.ba-bullet-top:hover{background:var(--s3)}
+.ba-score-badge{
+  flex-shrink:0;width:32px;height:20px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;margin-top:1px;
+}
+.score-high .ba-score-badge{background:var(--gd);color:var(--green)}
+.score-mid .ba-score-badge{background:var(--ad);color:var(--amber)}
+.score-low .ba-score-badge{background:var(--rd);color:var(--red)}
+.ba-bullet-text{font-size:11px;color:var(--t1);line-height:1.5;flex:1}
+.ba-expand-btn{
+  flex-shrink:0;width:18px;height:18px;border-radius:4px;
+  background:transparent;border:1px solid var(--b1);color:var(--t3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;cursor:pointer;transition:all .13s;margin-top:1px;
+}
+.ba-expand-btn:hover{background:var(--s4);color:var(--t1)}
+.ba-detail{
+  display:none;padding:8px 9px;background:var(--s1);
+  border-top:1px solid var(--b0);
+}
+.ba-detail.open{display:block}
+.ba-issues{display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
+.ba-issue{
+  display:flex;align-items:flex-start;gap:6px;
+  font-size:10.5px;color:var(--t2);line-height:1.45;
+  padding:4px 7px;border-radius:var(--r6);background:var(--s3);
+}
+.ba-issue-ico{flex-shrink:0;font-size:11px;margin-top:.5px}
+.ba-rewrite{
+  padding:8px 10px;border-radius:var(--r8);
+  background:linear-gradient(135deg,rgba(79,122,255,.08),rgba(79,122,255,.04));
+  border:1px solid rgba(79,122,255,.2);
+}
+.ba-rewrite-label{
+  font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--blue2);margin-bottom:5px;display:flex;align-items:center;gap:5px;
+}
+.ba-rewrite-text{font-size:11px;color:var(--t0);line-height:1.5;font-style:italic}
+.ba-apply-btn{
+  margin-top:7px;padding:5px 10px;border-radius:var(--r6);
+  background:var(--blue3);color:#fff;border:none;
+  font-family:var(--font);font-size:10px;font-weight:700;cursor:pointer;
+  transition:all .15s;display:inline-flex;align-items:center;gap:4px;
+}
+.ba-apply-btn:hover{background:var(--blue);transform:translateY(-1px)}
+.ba-empty{padding:10px;text-align:center;font-size:11px;color:var(--t3)}
+
+/* ─────────────────────────────────────
+   REJECTION WARNINGS PANEL
+───────────────────────────────────── */
+#rejection-panel{
+  width:100%;max-width:820px;margin-bottom:14px;
+  border-radius:var(--r12);overflow:hidden;
+  transition:all .4s var(--ease);
+}
+#rejection-panel.hidden{display:none}
+.rej-header{
+  padding:11px 16px;
+  background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(239,68,68,.08));
+  border:1.5px solid rgba(239,68,68,.3);border-bottom:none;
+  border-radius:var(--r12) var(--r12) 0 0;
+  display:flex;align-items:center;gap:10px;
+}
+.rej-title{font-size:13px;font-weight:800;color:var(--red);flex:1}
+.rej-count{
+  padding:3px 9px;border-radius:20px;
+  background:var(--rd);color:var(--red);
+  font-size:11px;font-weight:800;border:1px solid rgba(239,68,68,.3);
+}
+.rej-body{
+  border:1.5px solid rgba(239,68,68,.2);border-top:none;
+  border-radius:0 0 var(--r12) var(--r12);
+  background:rgba(239,68,68,.04);
+  padding:10px 14px;display:flex;flex-direction:column;gap:6px;
+}
+.rej-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 12px;border-radius:var(--r8);
+  background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);
+}
+.rej-ico{font-size:16px;flex-shrink:0;line-height:1}
+.rej-content{flex:1}
+.rej-label{font-size:12px;font-weight:700;color:var(--red);margin-bottom:2px}
+.rej-desc{font-size:11px;color:var(--t1);line-height:1.5}
+.rej-fix{
+  margin-top:5px;font-size:10px;font-weight:600;
+  color:var(--amber);display:flex;align-items:center;gap:4px;
+}
+
+/* ─────────────────────────────────────
+   IMPACT SCORE OVERLAY ON BULLETS
+───────────────────────────────────── */
+.bullets-wrap{position:relative}
+.impact-score-badge{
+  position:absolute;top:8px;right:8px;
+  padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;
+  pointer-events:none;transition:all .3s;
+}
+.impact-score-badge.high{background:var(--gd);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.impact-score-badge.mid{background:var(--ad);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.impact-score-badge.low{background:var(--rd);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.impact-score-badge.none{display:none}
+
+/* ─────────────────────────────────────
+   AD SLOT PLACEHOLDERS
+   These divs are empty now — swap in
+   your ad network <script> tags later.
+───────────────────────────────────── */
+.ad-slot{
+  width:100%;border-radius:var(--r8);
+  border:1.5px dashed rgba(255,255,255,.06);
+  background:rgba(255,255,255,.02);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t3);font-size:10px;font-weight:600;letter-spacing:.4px;
+  text-transform:uppercase;
+  /* Slots are hidden until ad code is injected */
+  display:none; /* TODO: change to flex when ads are live */
+}
+.ad-slot-top-banner{height:60px;margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none}
+.ad-slot-sidebar{min-height:250px;margin-top:16px}
+.ad-slot-post-download{min-height:90px;margin-top:14px;border-radius:var(--r12)}
+
+/* ─────────────────────────────────────
+   PUBLIC PROFILE TOGGLE
+───────────────────────────────────── */
+.public-toggle-wrap{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 13px;
+  background:linear-gradient(135deg,var(--s2),rgba(79,122,255,.05));
+  border:1.5px solid var(--bd);border-radius:var(--r10);margin-bottom:12px;
+}
+.public-toggle-info{flex:1}
+.public-toggle-title{font-size:12px;font-weight:700;color:var(--t0);display:flex;align-items:center;gap:6px}
+.public-toggle-sub{font-size:10px;color:var(--t2);margin-top:2px;line-height:1.4}
+.public-badge{
+  font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;
+  transition:all .3s;
+}
+.public-badge.pub{background:var(--gd);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.public-badge.priv{background:var(--b1);color:var(--t3);border:1px solid var(--b2)}
+
+/* ─────────────────────────────────────
+   FIREBASE SYNC STATUS (in topbar)
+───────────────────────────────────── */
+#cloud-status{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:600;color:var(--t3);
+  padding:4px 8px;border-radius:var(--r6);
+  border:1px solid transparent;transition:all .3s;
+  cursor:default;
+}
+#cloud-status.syncing{color:var(--blue2);border-color:var(--bd);background:var(--bg_blue)}
+#cloud-status.synced{color:var(--green);border-color:rgba(34,197,94,.2);background:var(--gd)}
+#cloud-status.offline{color:var(--t3);border-color:var(--b1)}
+#cloud-status.error{color:var(--amber);border-color:rgba(245,158,11,.2);background:var(--ad)}
+.cloud-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+#cloud-status.syncing .cloud-dot{animation:as-pulse .8s ease-in-out infinite}
+
+/* ─────────────────────────────────────
+   KEYWORDS CHIP DISPLAY
+───────────────────────────────────── */
+.kw-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.kw-chip{
+  padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;
+  background:var(--bg_blue);color:var(--blue2);border:1px solid var(--bd);
+  font-family:var(--font);
+}
+</style>
+</head>
+<body>
+
+<!-- ══ AD SLOT: TOP BANNER ══════════════════════════════════
+     TODO: Paste your ad network code inside this div.
+     Keep display:none until ads are live (controlled by .ad-slot CSS).
+     Recommended: Google AdSense, Carbon Ads, or direct sponsorship.
+     ═══════════════════════════════════════════════════════ -->
+<div id="ad-top-banner" class="ad-slot ad-slot-top-banner" aria-label="Advertisement">
+  <!-- AD CODE HERE -->
+</div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="brand">
+    <div class="brand-logo">CV</div>
+    <span class="brand-name">Just An Intern</span>
+    <span class="brand-chip">ATS 2025</span>
+  </div>
+  <div class="top-r">
+    <!-- ── SAVE STATUS INDICATOR ──────────────────────────────
+         FIREBASE REMOVED: was #cloud-status showing Firestore sync.
+         Now shows localStorage autosave status only.
+         ──────────────────────────────────────────────────── -->
+    <div id="cloud-status" class="offline" title="Autosave status (localStorage)">
+      <div class="cloud-dot"></div>
+      <span id="cloud-status-text">Ready</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showEcosystemHome()" title="Home dashboard">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7.5L8 2l6 5.5V14H2z"/><path d="M6 14V9h4v5"/></svg>Home
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="window.location.href='careerpredictor.html'" title="Open career predictor">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 13h12M3 11l3-3 2 2 4-5"/><circle cx="6" cy="8" r=".6"/><circle cx="8" cy="10" r=".6"/><circle cx="12" cy="5" r=".6"/></svg>Career Predictor
+    </button>
+    <div id="topbar-user" style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r8);font-size:12px;font-weight:600;color:var(--t1);flex-shrink:0;max-width:160px;overflow:hidden">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:12px;height:12px;flex-shrink:0"><circle cx="8" cy="5" r="2.5"/><path d="M3 13c.7-2 2.4-3 5-3s4.3 1 5 3"/></svg>
+      <span id="topbar-user-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">…</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="downloadJSON()" title="Download a backup copy of your CV data">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v9M5 8l3 3 3-3M2 13h12"/></svg>Backup
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('fi').click()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M8 3v10"/></svg>Load File
+    </button>
+    <input type="file" id="fi" accept=".json" style="display:none" onchange="loadJSON(event)"/>
+    <button class="btn btn-primary btn-sm" onclick="exportPDF()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 1h6l3 3v10a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1z"/><path d="M9 1v4h3M5.5 9.5h5M5.5 12h3.5"/></svg>Export PDF
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="logoutUser()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3H3v10h3"/><path d="M10 5l3 3-3 3"/><path d="M13 8H6"/></svg>Sign Out
+    </button>
+  </div>
+</div>
+
+<section id="ecosystem-home" aria-label="Just An Intern ecosystem home">
+  <div class="eco-wrap">
+
+    <div class="eco-ad">Ad Space — Top Banner (728×90 desktop / 320×100 mobile)</div>
+
+    <!-- HERO -->
+    <div class="eco-hero">
+      <div class="eco-kicker">Student Career Ecosystem · Pakistan &amp; South Asia</div>
+      <h1 class="eco-title">Launch your internship journey<br/><span class="grad">with confidence.</span></h1>
+      <p class="eco-sub">Just An Intern helps students and fresh graduates build ATS-ready CVs, discover career paths with AI, and connect with recruiters — completely free. Built for Pakistan and South Asia.</p>
+      <div class="eco-cta">
+        <button class="btn btn-primary" onclick="hideEcosystemHome()">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 1h6l3 3v10a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1z"/><path d="M9 1v4h3"/></svg>
+          Open CV Maker
+        </button>
+        <button class="btn btn-ghost" onclick="window.location.href='careerpredictor.html'">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 13h12M3 11l3-3 2 2 4-5"/></svg>
+          Career Predictor
+        </button>
+        <button class="btn btn-ghost" onclick="window.location.href='recruiter.html'">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="4"/><path d="M11 11l2.5 2.5"/></svg>
+          Recruiter Search
+        </button>
+      </div>
+    </div>
+
+    <!-- FEATURE STRIP -->
+    <div class="eco-strip">
+      <div class="eco-strip-item">
+        <div class="eco-strip-ico">⚡</div>
+        <div class="eco-strip-text">
+          <strong>ATS Score in Real Time</strong>
+          <span>See your score update as you type</span>
+        </div>
+      </div>
+      <div class="eco-strip-item">
+        <div class="eco-strip-ico">🎯</div>
+        <div class="eco-strip-text">
+          <strong>AI-Powered Bullet Rewriter</strong>
+          <span>Turn weak bullets into strong impact statements</span>
+        </div>
+      </div>
+      <div class="eco-strip-item">
+        <div class="eco-strip-ico">📤</div>
+        <div class="eco-strip-text">
+          <strong>One-Click PDF Export</strong>
+          <span>Download a clean, recruiter-ready PDF instantly</span>
+        </div>
+      </div>
+      <div class="eco-strip-item">
+        <div class="eco-strip-ico">🔍</div>
+        <div class="eco-strip-text">
+          <strong>Recruiter Visibility</strong>
+          <span>Make your profile searchable to real employers</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOL CARDS GRID -->
+    <div class="eco-grid">
+      <article class="eco-card">
+        <div class="eco-card-ico blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B93FF" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h3"/></svg>
+        </div>
+        <h3>ATS CV Maker</h3>
+        <p>Build a modern, ATS-optimized resume with live scoring, bullet analysis, and one-click PDF export.</p>
+        <div class="eco-card-actions">
+          <button class="btn btn-primary btn-sm" onclick="hideEcosystemHome()">Open CV Maker</button>
+        </div>
+        <span class="mini">Final-year students &amp; fresh graduates</span>
+      </article>
+      <article class="eco-card">
+        <div class="eco-card-ico green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>Career Predictor</h3>
+        <p>Get AI-driven career path guidance based on your skills, interests, and academic background.</p>
+        <div class="eco-card-actions">
+          <button class="btn btn-ghost btn-sm" onclick="window.location.href='careerpredictor.html'">Open Predictor</button>
+        </div>
+        <span class="mini">Stream selection &amp; role clarity</span>
+      </article>
+      <article class="eco-card">
+        <div class="eco-card-ico purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </div>
+        <h3>Recruiter Zone</h3>
+        <p>Make your profile discoverable. Recruiters search by skills, location, and years of experience.</p>
+        <div class="eco-card-actions">
+          <button class="btn btn-ghost btn-sm" onclick="window.location.href='recruiter.html'">Open Recruiter</button>
+        </div>
+        <span class="mini">Profile market fit &amp; visibility</span>
+      </article>
+    </div>
+
+    <div class="eco-ad">Ad Space — Mid Content (native / in-feed)</div>
+
+    <section class="eco-seo">
+      <h2>Career support designed for students entering the job market</h2>
+      <p>From Karachi to Lahore, Islamabad to Faisalabad, Just An Intern is created for students searching for internships, traineeships, and first jobs. Whether you are from pre-engineering, pre-medical, ICS, commerce, or arts, the platform helps you present your strengths clearly and prepare for competitive applications.</p>
+      <p>Use the CV builder to structure achievements in a recruiter-friendly format, then use the career predictor to identify practical next steps. Our goal is simple: reduce confusion, improve application quality, and help students transition into professional careers faster.</p>
+    </section>
+
+    <div class="eco-ad">Ad Space — Footer Banner (sticky mobile-friendly slot)</div>
+
+  </div>
+</section>
+
+<div id="app">
+
+<!-- ═══════════ PANEL ═══════════ -->
+<div id="panel">
+  <div id="tabs">
+    <div class="tab active" onclick="switchTab('edit')">Edit</div>
+    <div class="tab" onclick="switchTab('skills')">Skills</div>
+    <div class="tab" onclick="switchTab('ats')">ATS</div>
+    <div class="tab" onclick="switchTab('cfg')">Settings</div>
+  </div>
+
+  <!-- ─── EDIT TAB ─── -->
+  <div class="tpanel active" id="tab-edit">
+
+    <!-- Personal -->
+    <div class="sb" id="sb-pers">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl">
+          <div class="sbico" style="background:var(--bg_blue)">👤</div>
+          Personal Info
+          <span class="sb-badge" id="badge-pers" style="display:none">✓ Done</span>
+        </div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <div class="section-fill-bar"><div id="sfb-pers" class="section-fill-progress" style="width:0%"></div></div>
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">Full Name <span class="req">*</span></label>
+            <input class="inp" id="f-name" type="text" placeholder="Ahmed Ali" oninput="live()"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Job Title</label>
+            <input class="inp" id="f-title" type="text" placeholder="Cloud Engineer" oninput="live()"/>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">Phone <span class="req">*</span></label>
+            <input class="inp" id="f-phone" type="tel" placeholder="+92 300 0000000" oninput="live()"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Email <span class="req">*</span></label>
+            <input class="inp" id="f-email" type="email" placeholder="you@email.com" oninput="live()"/>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl">LinkedIn URL</label>
+          <input class="inp" id="f-linkedin" type="url" placeholder="https://linkedin.com/in/username" oninput="live()"/>
+        </div>
+        <div class="fg">
+          <label class="fl">GitHub URL</label>
+          <input class="inp" id="f-github" type="url" placeholder="https://github.com/username" oninput="live()"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Location</label>
+          <input class="inp" id="f-location" type="text" placeholder="Karachi, Pakistan" oninput="live()"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="sb">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--pd)">📝</div>Summary</div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <div class="fg">
+          <label class="fl">Professional Summary</label>
+          <textarea id="f-summary" rows="4" placeholder="Cloud Engineer with 2+ years deploying containerised workloads on AWS using Docker, Kubernetes, and Terraform…" oninput="live()"></textarea>
+          <div id="sum-hint" class="fhint">Aim for 50–100 words. Include your job title + key skills.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="sb">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--ad)">💼</div>Work Experience</div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <div id="exp-list"></div>
+        <button class="addb" onclick="addExp()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Add Position
+        </button>
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="sb">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--gd)">🎓</div>Education</div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <div id="edu-list"></div>
+        <button class="addb" onclick="addEdu()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Add Education
+        </button>
+      </div>
+    </div>
+
+    <!-- Certs -->
+    <div class="sb">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--pd)">🏆</div>Certifications</div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <div id="cert-list"></div>
+        <button class="addb" onclick="addCert()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Add Certification
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /tab-edit -->
+
+  <!-- ─── SKILLS TAB ─── -->
+  <div class="tpanel" id="tab-skills">
+
+    <div class="sb" style="margin-bottom:12px">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--bg_blue)">🚀</div>Projects</div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <p class="fhint" style="margin-bottom:10px">Add projects first — then link them to skills below. One project can be in many skills.</p>
+        <div id="proj-list"></div>
+        <button class="addb" onclick="addProj()">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8h10"/></svg>
+          Add Project
+        </button>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--t2)">Skill Groups</span>
+      <button class="btn btn-ghost btn-sm" onclick="addSkill()">+ Add Skill</button>
+    </div>
+    <div id="skill-list"></div>
+
+  </div><!-- /tab-skills -->
+
+  <!-- ─── ATS TAB ─── -->
+  <div class="tpanel" id="tab-ats">
+    <div class="ats-hero">
+      <div class="ats-row">
+        <div class="ats-ring">
+          <svg viewBox="0 0 74 74" style="transform:rotate(-90deg)">
+            <circle cx="37" cy="37" r="29" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="7"/>
+            <circle id="a-ring" cx="37" cy="37" r="29" fill="none" stroke="var(--green)" stroke-width="7"
+              stroke-dasharray="182.2" stroke-dashoffset="182.2" stroke-linecap="round"
+              style="transition:all .9s var(--ease)"/>
+          </svg>
+          <div class="ats-rc"><div class="ats-n" id="a-num">0</div><div class="ats-d">/100</div></div>
+        </div>
+        <div style="flex:1">
+          <div class="ats-grade" id="a-grade">—</div>
+          <div class="ats-gsub" id="a-gsub">Fill in your CV</div>
+          <div class="ats-barp"><div id="a-bfill" class="ats-bfp" style="width:0%;background:var(--green)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ats-stl">Compliance Checks</div>
+    <div class="chklist" id="a-checks"></div>
+
+    <div class="ats-stl">Rules Applied to Your CV</div>
+    <div class="infobox pass"><div class="infobox-title">✅ Single-column layout</div><div class="infobox-body">93% ATS parsing accuracy vs 86% for two-column. No parser confusion.</div></div>
+    <div class="infobox pass"><div class="infobox-title">✅ No icons in contact line</div><div class="infobox-body">Icons become ??? garbage in parsers. CV uses plain text labels: "Phone:", "Email:", "LinkedIn:".</div></div>
+    <div class="infobox pass"><div class="infobox-title">✅ No skill bars in output</div><div class="infobox-body">Graphical ratings are invisible to ATS. Skills output as keyword text: "DevOps: Docker, Kubernetes".</div></div>
+    <div class="infobox pass"><div class="infobox-title">✅ Standard section headings</div><div class="infobox-body">WORK EXPERIENCE, EDUCATION, SKILLS — exact strings ATS uses for segmentation.</div></div>
+    <div class="infobox pass"><div class="infobox-title">✅ MM/YYYY date format</div><div class="infobox-body">Dates output as 03/2024. Year-only dates cause ATS to credit minimal experience.</div></div>
+    <div class="infobox warn"><div class="infobox-title">⚠ Keyword matching (manual)</div><div class="infobox-body">Copy exact terms from job descriptions. "AWS" ≠ "Amazon Web Services" — include both forms in your skills and summary.</div></div>
+
+    <div class="ats-stl">Personalised Tips</div>
+    <div id="a-tips" style="background:var(--s2);border:1px solid var(--b1);border-radius:var(--r10);padding:12px;font-size:11px;color:var(--t1);line-height:1.8"></div>
+  </div>
+
+  <!-- ─── SETTINGS TAB ─── -->
+  <div class="tpanel" id="tab-cfg">
+
+    <!-- ── PUBLIC PROFILE TOGGLE ──────────────────────────────
+         ON  → calls POST /api/cv/public (writes to public_profiles table)
+         OFF → hides profile from recruiter search (is_visible = FALSE)
+         ──────────────────────────────────────────────────── -->
+    <div class="public-toggle-wrap">
+      <div class="public-toggle-info">
+        <div class="public-toggle-title">
+          🌐 Public Profile
+          <span class="public-badge priv" id="pub-badge">Private</span>
+        </div>
+        <div class="public-toggle-sub">Let recruiters find you by skills &amp; location.</div>
+      </div>
+      <label class="tog" style="margin-left:12px">
+        <input type="checkbox" id="public-toggle" onchange="onPublicToggle(this.checked)">
+        <div class="togt"><div class="togk"></div></div>
+      </label>
+    </div>
+
+    <!-- ── JOB PREFERENCES (stored in Firestore jobPreferences) ── -->
+    <div class="sb" style="margin-bottom:10px">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--gd)">🎯</div>Job Preferences</div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <p class="fhint" style="margin-bottom:10px">Saved to your profile. Used for recruiter matching (coming soon).</p>
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">Job Type</label>
+            <select id="jp-type" style="background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r8);color:var(--t0);padding:8px 11px;font-family:var(--font);font-size:12px;width:100%;outline:none" onchange="S.jobPreferences.jobType=this.value;live()">
+              <option value="">Select…</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Remote">Remote</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="fl">Preferred Role</label>
+            <input class="inp" id="jp-role" type="text" placeholder="Cloud Engineer" oninput="S.jobPreferences.preferredRole=this.value;live()"/>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="fg">
+            <label class="fl">Min. Salary</label>
+            <input class="inp" id="jp-salary" type="text" placeholder="1,200,000 PKR/yr" oninput="S.jobPreferences.minSalary=this.value;live()"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Available From</label>
+            <input class="inp" id="jp-avail" type="text" placeholder="Immediately" oninput="S.jobPreferences.availableFrom=this.value;live()"/>
+          </div>
+        </div>
+        <!-- TODO: Add more fields when recruiter matching algorithm is built -->
+      </div>
+    </div>
+
+    <!-- ── AUTO-EXTRACTED KEYWORDS ────────────────────────────
+         Pulled from skills + experience, stored in Firestore keywords[]
+         TODO: Weight by industry relevance via Cloud Function NLP
+         ──────────────────────────────────────────────────── -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t2);margin-bottom:6px">
+        Auto-Extracted Keywords
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--t3);margin-left:4px">synced to database · used for recruiter search</span>
+      </div>
+      <div id="kw-display" class="kw-chips">
+        <span style="font-size:11px;color:var(--t3)">Add skills and experience to see keywords…</span>
+      </div>
+    </div>
+
+    <div class="sep2"></div>
+
+    <div class="fg">
+      <label class="fl">CV Accent Color</label>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:5px">
+        <div class="cp s" data-c="#0A0C10" style="background:#0A0C10" onclick="setAccent(this)"></div>
+        <div class="cp" data-c="#1E3A5F" style="background:#1E3A5F" onclick="setAccent(this)"></div>
+        <div class="cp" data-c="#14532D" style="background:#14532D" onclick="setAccent(this)"></div>
+        <div class="cp" data-c="#3730A3" style="background:#3730A3" onclick="setAccent(this)"></div>
+        <div class="cp" data-c="#7C2D12" style="background:#7C2D12" onclick="setAccent(this)"></div>
+        <div class="cp" data-c="#374151" style="background:#374151" onclick="setAccent(this)"></div>
+        <input type="color" value="#0A0C10" style="width:28px;height:28px;padding:2px;border:1.5px solid var(--b2);border-radius:50%;cursor:pointer;background:var(--s2)" oninput="S.accent=this.value;rCV()"/>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Font Size</label>
+      <select style="background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r8);color:var(--t0);padding:8px 11px;font-family:var(--font);font-size:12.5px;width:100%" onchange="S.fs=+this.value;rCV()">
+        <option value="9">Small – 9pt</option>
+        <option value="10" selected>Standard – 10pt</option>
+        <option value="11">Large – 11pt</option>
+      </select>
+    </div>
+    <div class="sep2"></div>
+    <div class="fg">
+      <label class="fl" style="margin-bottom:10px">Visible Sections</label>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label class="tog"><input type="checkbox" checked onchange="S.show.summary=this.checked;rCV()"><div class="togt"><div class="togk"></div></div>Summary</label>
+        <label class="tog"><input type="checkbox" checked onchange="S.show.exp=this.checked;rCV()"><div class="togt"><div class="togk"></div></div>Work Experience</label>
+        <label class="tog"><input type="checkbox" checked onchange="S.show.edu=this.checked;rCV()"><div class="togt"><div class="togk"></div></div>Education</label>
+        <label class="tog"><input type="checkbox" checked onchange="S.show.skills=this.checked;rCV()"><div class="togt"><div class="togk"></div></div>Skills</label>
+        <label class="tog"><input type="checkbox" checked onchange="S.show.proj=this.checked;rCV()"><div class="togt"><div class="togk"></div></div>Projects</label>
+        <label class="tog"><input type="checkbox" checked onchange="S.show.cert=this.checked;rCV()"><div class="togt"><div class="togk"></div></div>Certifications</label>
+      </div>
+    </div>
+    <div class="sep2"></div>
+    <div class="infobox info">
+      <div class="infobox-title">☁️ EC2 / Static Hosting</div>
+      <div class="infobox-body">Single HTML file — upload to your EC2 instance or any static host. No server-side code required.</div>
+    </div>
+    <div class="sep2"></div>
+    <div class="infobox pass" style="margin-bottom:8px">
+      <div class="infobox-title">☁️ Dual Autosave Active</div>
+      <div class="infobox-body">Every keystroke saves to <strong>localStorage</strong> (instant) and syncs to the <strong>database</strong> (600ms debounce). Your CV is safe even if you lose your connection. Use <strong>Backup</strong> in the topbar for a local JSON copy.</div>
+    </div>
+    <button class="addb" onclick="if(confirm('Clear all data? This cannot be undone.')){clearAutosave();Object.assign(S,{name:'',title:'',phone:'',email:'',linkedin:'',github:'',location:'',summary:'',exp:[],edu:[],proj:[],cert:[],skills:[],accent:'#0A0C10',fs:10,isPublic:false,jobPreferences:{jobType:'',preferredRole:'',minSalary:'',availableFrom:''},show:{summary:1,exp:1,edu:1,skills:1,proj:1,cert:1}});['name','title','phone','email','linkedin','github','location','summary'].forEach(k=>{const i=g('f-'+k);if(i)i.value=''});renderExpList();renderEduList();renderProjList();renderCertList();renderSkillList();live();notif('All data cleared','r')}" style="color:var(--red);border-color:rgba(239,68,68,.3);margin-top:0">
+      🗑 Clear All Data &amp; Start Over
+    </button>
+  </div>
+
+</div><!-- /panel -->
+
+<!-- ═══════════ PREVIEW ═══════════ -->
+<div id="pv">
+  <!-- RECRUITER REJECTION WARNINGS — shows above ATS ruler when issues found -->
+  <div id="rejection-panel" class="hidden">
+    <div class="rej-header">
+      <span style="font-size:18px">🚨</span>
+      <div class="rej-title">Recruiter Will Reject This CV</div>
+      <span class="rej-count" id="rej-count">0 issues</span>
+    </div>
+    <div class="rej-body" id="rej-body"></div>
+  </div>
+
+  <div id="ats-ruler">
+    <div class="ruler-ring">
+      <svg viewBox="0 0 54 54" style="transform:rotate(-90deg)">
+        <circle cx="27" cy="27" r="21" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="5"/>
+        <circle id="r-ring" cx="27" cy="27" r="21" fill="none" stroke="var(--green)" stroke-width="5"
+          stroke-dasharray="131.9" stroke-dashoffset="131.9" stroke-linecap="round"
+          style="transition:all .8s var(--ease)"/>
+      </svg>
+      <div class="ruler-rc">
+        <div class="ruler-num" id="r-num">0</div>
+        <div class="ruler-den">/100</div>
+      </div>
+    </div>
+    <div class="ruler-meta">
+      <div class="ruler-grade" id="r-grade">ATS Score</div>
+      <div class="ruler-sub" id="r-sub">Fill in your details</div>
+      <div class="ruler-bar"><div id="r-bf" class="ruler-bf" style="width:0%;background:var(--green)"></div></div>
+    </div>
+    <div class="ruler-chips" id="r-chips"></div>
+  </div>
+  <div id="cv-preview"><div id="cv-doc"></div></div>
+
+  <!-- ══ AD SLOT: POST-DOWNLOAD ═══════════════════════════════
+       Shown after PDF export. Ideal for upsell or affiliate.
+       TODO: Show this div after exportPDF() completes.
+       TODO: Connect affiliate product (resume review service, LinkedIn optimizer)
+       ═════════════════════════════════════════════════════ -->
+  <div id="ad-post-download" class="ad-slot ad-slot-post-download" aria-label="Advertisement">
+    <!-- AD CODE / AFFILIATE OFFER HERE -->
+  </div>
+</div>
+
+<!-- ══ AD SLOT: SIDEBAR ═══════════════════════════════════════
+     Desktop-only sidebar. Add position:fixed logic when ready.
+     TODO: Connect Google AdSense display ad or affiliate banner
+     TODO: Hide on mobile (media query already prepared in CSS)
+     ═════════════════════════════════════════════════════════ -->
+<div id="ad-sidebar" class="ad-slot ad-slot-sidebar" aria-label="Advertisement" style="position:fixed;right:12px;top:calc(var(--th)+16px);width:160px;display:none">
+  <!-- AD CODE HERE — only shows on desktop when CSS display is changed to flex -->
+</div>
+
+</div><!-- /app -->
+<div id="notif"></div>
+
+<!-- MONTH PICKER DROPDOWN (shared, positioned by JS) -->
+<div id="mp-drop" class="mp-drop">
+  <div class="mp-nav">
+    <button class="mp-nav-btn" onclick="mpYear(-1)">‹</button>
+    <span class="mp-year" id="mp-year-lbl">2024</span>
+    <button class="mp-nav-btn" onclick="mpYear(1)">›</button>
+  </div>
+  <div class="mp-months" id="mp-months"></div>
+  <div class="mp-clear" onclick="mpClear()">Clear date</div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   API CONFIG + AUTH HELPERS
+══════════════════════════════════════════ */
+const API_BASE = localStorage.getItem('cvforge_api_base') || 'http://localhost:3000';
+const API = `${API_BASE}/api`;
+
+function getAuthHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('cvforge_token') || ''}`
+  };
+}
+
+/* Validate JWT with server, update topbar user name.
+   If token is expired/revoked → redirect to auth.
+   If API is offline → fall back to cached localStorage user. */
+async function initAuth() {
+  const token = localStorage.getItem('cvforge_token');
+  if (!token) {
+    window.location.href = 'auth.html?redirect=index.html';
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/auth/me`, { headers: getAuthHeaders() });
+    if (res.status === 401) {
+      localStorage.removeItem('cvforge_token');
+      localStorage.removeItem('cvforge_user');
+      window.location.href = 'auth.html?redirect=index.html';
+      return;
+    }
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('cvforge_user', JSON.stringify(data.user));
+        _updateTopbarUser(data.user);
+      }
+    }
+  } catch (_e) {
+    // API offline — use cached data so the app still works
+    const raw = localStorage.getItem('cvforge_user');
+    if (raw) {
+      try { _updateTopbarUser(JSON.parse(raw)); } catch (_) {}
+    }
+  }
+}
+
+function _updateTopbarUser(user) {
+  const el = document.getElementById('topbar-user-name');
+  if (!el) return;
+  el.textContent = user.fullName || user.full_name || 'User';
+}
+
+/* Save the full S object to the database (non-blocking — errors are silent
+   so they never interrupt the user's typing). */
+async function saveCVtoDB() {
+  const token = localStorage.getItem('cvforge_token');
+  if (!token) return;
+  const res = await fetch(`${API}/cv`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(S)
+  });
+  if (res.status === 401) {
+    localStorage.removeItem('cvforge_token');
+    localStorage.removeItem('cvforge_user');
+    window.location.href = 'auth.html';
+  }
+}
+
+/* ══════════════════════════════════════════
+   MONTH PICKER ENGINE
+   Custom dropdown — clicking anywhere on
+   the field triggers it (no browser icon)
+══════════════════════════════════════════ */
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let mpTarget=null; // current field object {key, id, type}
+let mpYear_=new Date().getFullYear();
+let mpOpenEl=null;
+
+function buildMonthGrid(val){
+  const grid=document.getElementById('mp-months');
+  const[selY,selM]=val?(val.split('-').map(Number)):[0,0];
+  grid.innerHTML=MONTHS.map((m,i)=>`
+    <div class="mp-month${(selY===mpYear_&&selM===i+1)?' sel':''}"
+      onclick="mpPick(${i+1})">${m}</div>`).join('');
+}
+function mpOpen(triggerEl, key, objId, type){
+  const drop=document.getElementById('mp-drop');
+  // toggle off if same
+  if(mpOpenEl===triggerEl){mpClose();return}
+  mpClose();
+  mpTarget={key,objId,type};
+  mpOpenEl=triggerEl;
+  // read current value
+  let val='';
+  if(type==='exp'){const e=S.exp.find(x=>x.id===objId);val=e?e[key]:''}
+  else if(type==='edu'){const e=S.edu.find(x=>x.id===objId);val=e?e[key]:''}
+  else if(type==='cert'){const c=S.cert.find(x=>x.id===objId);val=c?c[key]:''}
+  mpYear_=val?parseInt(val.split('-')[0]):new Date().getFullYear();
+  document.getElementById('mp-year-lbl').textContent=mpYear_;
+  buildMonthGrid(val);
+  // position
+  const rect=triggerEl.getBoundingClientRect();
+  drop.style.position='fixed';
+  drop.style.width=Math.max(rect.width,220)+'px';
+  drop.style.left=rect.left+'px';
+  let top=rect.bottom+6;
+  if(top+280>window.innerHeight) top=rect.top-286;
+  drop.style.top=top+'px';
+  drop.classList.add('open');
+  triggerEl.classList.add('open');
+  setTimeout(()=>document.addEventListener('click',mpOutside,{once:true,capture:true}),50);
+}
+function mpOutside(e){
+  const drop=document.getElementById('mp-drop');
+  if(!drop.contains(e.target)&&e.target!==mpOpenEl&&!mpOpenEl?.contains(e.target)){mpClose();}
+  else if(!drop.contains(e.target)){setTimeout(()=>document.addEventListener('click',mpOutside,{once:true,capture:true}),50);}
+}
+function mpClose(){
+  const drop=document.getElementById('mp-drop');
+  drop.classList.remove('open');
+  if(mpOpenEl)mpOpenEl.classList.remove('open');
+  mpOpenEl=null;mpTarget=null;
+}
+function mpYear(delta){
+  mpYear_+=delta;
+  document.getElementById('mp-year-lbl').textContent=mpYear_;
+  let val='';
+  if(mpTarget){
+    const{key,objId,type}=mpTarget;
+    if(type==='exp'){const e=S.exp.find(x=>x.id===objId);val=e?e[key]:''}
+    else if(type==='edu'){const e=S.edu.find(x=>x.id===objId);val=e?e[key]:''}
+    else if(type==='cert'){const c=S.cert.find(x=>x.id===objId);val=c?c[key]:''}
+  }
+  buildMonthGrid(val);
+}
+function mpPick(month){
+  if(!mpTarget)return;
+  const val=`${mpYear_}-${String(month).padStart(2,'0')}`;
+  const{key,objId,type}=mpTarget;
+  if(type==='exp'){const e=S.exp.find(x=>x.id===objId);if(e){e[key]=val;rebuildExpItem(objId);}}
+  else if(type==='edu'){const e=S.edu.find(x=>x.id===objId);if(e){e[key]=val;rebuildEduItem(objId);}}
+  else if(type==='cert'){const c=S.cert.find(x=>x.id===objId);if(c){c[key]=val;rebuildCertItem(objId);}}
+  // update display text
+  if(mpOpenEl){
+    const t=mpOpenEl.querySelector('.mp-input-text');
+    if(t){t.textContent=fmtM(val);t.classList.remove('placeholder')}
+  }
+  buildMonthGrid(val);
+  live();
+  mpClose();
+}
+function mpClear(){
+  if(!mpTarget)return;
+  const{key,objId,type}=mpTarget;
+  if(type==='exp'){const e=S.exp.find(x=>x.id===objId);if(e)e[key]=''}
+  else if(type==='edu'){const e=S.edu.find(x=>x.id===objId);if(e)e[key]=''}
+  else if(type==='cert'){const c=S.cert.find(x=>x.id===objId);if(c)c[key]=''}
+  if(mpOpenEl){const t=mpOpenEl.querySelector('.mp-input-text');if(t){t.textContent='Select date';t.classList.add('placeholder')}}
+  live();mpClose();
+}
+
+// Helper: render a month-picker trigger button
+function mpBtn(val, key, objId, type, label=''){
+  const display=val?fmtM(val):label||'Select date';
+  const isPlaceholder=!val;
+  return `<div class="mp-input" onclick="mpOpen(this,'${key}',${objId},'${type}')">
+    <span class="mp-input-text${isPlaceholder?' placeholder':''}">${display}</span>
+    <svg class="mp-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6l4 4 4-4"/></svg>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   GLOBAL STATE
+══════════════════════════════════════════ */
+const SKILL_COLORS=['#4F7AFF','#22C55E','#F59E0B','#A78BFA','#EF4444','#06B6D4','#F97316','#EC4899'];
+const LEVEL_NAMES=['','Beginner','Elementary','Intermediate','Proficient','Expert'];
+const S={
+  // Core CV fields (mapped to Firestore cvs/{userId})
+  name:'',title:'',phone:'',email:'',linkedin:'',github:'',location:'',summary:'',
+  exp:[],edu:[],proj:[],cert:[],skills:[],
+  // Firebase-specific fields
+  isPublic: false,                            // synced to public_profiles collection
+  jobPreferences:{                            // stored in Firestore jobPreferences object
+    jobType:'',preferredRole:'',
+    minSalary:'',availableFrom:'',
+  },
+  // UI-only (not stored in Firestore)
+  accent:'#0A0C10',fs:10,
+  show:{summary:1,exp:1,edu:1,skills:1,proj:1,cert:1}
+};
+const ID={exp:0,edu:0,proj:0,cert:0,skill:0};
+const g=id=>document.getElementById(id);
+const uid=k=>++ID[k];
+
+function fmtM(v){
+  if(!v)return'';
+  const[y,m]=v.split('-');
+  return String(m).padStart(2,'0')+'/'+y;
+}
+function dR(s,e,p){
+  const a=fmtM(s),b=p?'Present':fmtM(e);
+  return a&&b?a+' – '+b:a||b||'';
+}
+function notif(msg,t='g'){
+  const n=g('notif');
+  n.innerHTML=(t==='g'?'✓ ':t==='a'?'⏳ ':'✗ ')+msg;
+  n.style.borderColor=t==='r'?'rgba(239,68,68,.4)':t==='a'?'rgba(245,158,11,.4)':'rgba(34,197,94,.4)';
+  n.style.color=t==='r'?'var(--red)':t==='a'?'var(--amber)':'var(--green)';
+  n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),2600);
+}
+
+/* ══════════════════════════════════════════
+   TABS
+══════════════════════════════════════════ */
+function switchTab(id){
+  const ids=['edit','skills','ats','cfg'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',ids[i]===id);
+    g('tab-'+ids[i]).classList.toggle('active',ids[i]===id);
+  });
+  if(id==='ats')uATS();
+}
+
+/* ══════════════════════════════════════════
+   COLLAPSE
+══════════════════════════════════════════ */
+function toggleBlock(h){
+  const b=h.nextElementSibling,btn=h.querySelector('.ib'),open=!b.classList.contains('shut');
+  b.classList.toggle('shut',open);
+  if(btn)btn.textContent=open?'+':'−';
+}
+function toggleCard(bid){const b=g(bid);if(b)b.classList.toggle('open')}
+
+/* ══════════════════════════════════════════
+   LIVE SYNC
+══════════════════════════════════════════ */
+function sync(){
+  ['name','title','phone','email','linkedin','github','location','summary'].forEach(k=>{
+    const e=g('f-'+k);if(e)S[k]=e.value;
+  });
+}
+function live(){
+  sync();
+  rCV();
+  updateRuler();
+  updateSumHint();
+  updatePersProgress();
+  updateRejectionWarnings();
+  updateKeywordDisplay();  // refresh keyword chips in Settings tab
+  autoSave();              // debounced localStorage write (600ms)
+  // FIREBASE REMOVED: firebaseSave() was called here to sync to Firestore.
+  // To restore, re-add firebase-service.js and call: firebaseSave();
+}
+
+/* ══════════════════════════════════════════
+   AUTOSAVE ENGINE
+   Debounced localStorage write on every
+   keystroke. Status shown via #cloud-status
+   in the topbar (shared with Firebase status).
+══════════════════════════════════════════ */
+const LS_KEY='cvforge_autosave';
+let _asTimer=null;
+let _asLastHash='';
+
+function autoSave(){
+  clearTimeout(_asTimer);
+  setCloudStatus('syncing','Saving…');
+  _asTimer=setTimeout(async ()=>{
+    try{
+      const snapshot=JSON.stringify(S);
+      if(snapshot===_asLastHash){
+        setCloudStatus('synced','All saved');
+        return;
+      }
+      // 1. Save to localStorage immediately (fast, offline-first)
+      localStorage.setItem(LS_KEY,snapshot);
+      localStorage.setItem(LS_KEY+'_ts',Date.now().toString());
+      _asLastHash=snapshot;
+      const hhmm=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      setCloudStatus('synced','Saved '+hhmm);
+      // 2. Sync to database asynchronously — never blocks the user
+      saveCVtoDB().catch(()=>{});
+    }catch(e){
+      setCloudStatus('error','Save failed');
+    }
+  },600);
+}
+
+function loadAutosave(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return false;
+    const data=JSON.parse(raw);
+    Object.assign(S,data);
+    ['exp','edu','proj','cert'].forEach(t=>{ID[t]=(S[t]||[]).reduce((m,i)=>Math.max(m,i.id||0),0)});
+    ID.skill=(S.skills||[]).reduce((m,i)=>Math.max(m,i.id||0),0);
+    ['name','title','phone','email','linkedin','github','location','summary'].forEach(k=>{
+      const inp=g('f-'+k);if(inp)inp.value=S[k]||'';
+    });
+    renderExpList();renderEduList();renderProjList();renderCertList();renderSkillList();
+    live();renderAllBulletAnalyzers();
+    _asLastHash=raw;
+    const ts=localStorage.getItem(LS_KEY+'_ts');
+    if(ts){
+      const d=new Date(parseInt(ts));
+      const label=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      setCloudStatus('synced','Restored '+label);
+    }
+    return true;
+  }catch{return false}
+}
+
+function clearAutosave(){
+  localStorage.removeItem(LS_KEY);
+  localStorage.removeItem(LS_KEY+'_ts');
+  _asLastHash='';
+  setCloudStatus('offline','Cleared');
+}
+
+function updateSumHint(){
+  const w=S.summary.trim().split(/\s+/).filter(Boolean).length;
+  const h=g('sum-hint');if(!h)return;
+  if(!w){h.textContent='Aim for 50–100 words with your job title + key skills.';h.className='fhint';return}
+  if(w<30){h.textContent=`${w} words — keep going, aim for 50+`;h.className='fhint warn'}
+  else if(w<50){h.textContent=`${w} words — almost there, aim for 50+`;h.className='fhint warn'}
+  else if(w<=100){h.textContent=`${w} words — great length ✓`;h.className='fhint ok'}
+  else{h.textContent=`${w} words — consider trimming to 100 max`;h.className='fhint warn'}
+}
+
+function updatePersProgress(){
+  const fields=[S.name,S.phone,S.email,S.linkedin,S.github,S.location];
+  const done=fields.filter(Boolean).length;
+  const pct=Math.round((done/fields.length)*100);
+  const bar=g('sfb-pers');if(bar)bar.style.width=pct+'%';
+  const badge=g('badge-pers');if(badge){badge.style.display=done===fields.length?'inline':'none';}
+}
+
+/*
+ * ═══════════════════════════════════════════════════════
+ * FIREBASE REMOVED — functions below were removed:
+ *
+ *   firebaseSave()          — sent CV to Firestore via cloudAutoSave()
+ *   buildFirestorePayload() — mapped app state S to Firestore schema
+ *   calcYearsFromDates()    — computed experience years for Firestore
+ *
+ * All CV data is now persisted exclusively via localStorage (autoSave).
+ * The autosave key is: "cvforge_autosave"
+ *
+ * To restore Firebase: add firebase-service.js, then uncomment
+ * firebaseSave() in live() and restore the three functions below.
+ * ═══════════════════════════════════════════════════════
+ */
+
+/*
+ * FIREBASE REMOVED: setCloudStatus() previously reflected Firestore
+ * sync state (syncing | synced | offline | error). It now only reflects
+ * localStorage autosave state. The #cloud-status element in the topbar
+ * is reused as a general "save status" indicator.
+ * States used: 'syncing' (saving), 'synced' (saved ok), 'error', 'offline' (idle)
+ */
+function setCloudStatus(state, text){
+  const wrap=g('cloud-status');
+  const txt=g('cloud-status-text');
+  if(!wrap||!txt) return;
+  wrap.className=state;
+  txt.textContent=text;
+}
+
+/* ══════════════════════════════════════════
+   KEYWORD EXTRACTOR
+   FIREBASE REMOVED: previously called window.extractKeywords()
+   from firebase-service.js which also stored keywords in Firestore.
+   Now runs entirely in the browser — keywords are shown in the
+   Settings tab and saved to localStorage along with the rest of S.
+══════════════════════════════════════════ */
+function extractKeywordsLocal(skills=[], expObjs=[]){
+  const STOPWORDS=new Set(['and','the','of','in','at','for','with','a','an','to','on','is','are']);
+  const raw=[];
+  skills.forEach(s=>{ if(s) s.split(',').forEach(w=>raw.push(w.trim().toLowerCase())) });
+  expObjs.forEach(e=>{
+    if(e.title)   raw.push(...e.title.split(/\s+/).map(w=>w.toLowerCase()));
+    if(e.company) raw.push(e.company.toLowerCase());
+  });
+  return [...new Set(raw)]
+    .map(w=>w.replace(/[^a-z0-9+#.]/g,''))
+    .filter(w=>w.length>1 && !STOPWORDS.has(w));
+}
+
+/* ══════════════════════════════════════════
+   KEYWORD DISPLAY
+   Reads from current state S and renders chips.
+   Keywords are also saved in localStorage via autoSave.
+══════════════════════════════════════════ */
+function updateKeywordDisplay(){
+  const kd=g('kw-display');if(!kd) return;
+  // FIREBASE REMOVED: was: window.extractKeywords() from firebase-service.js
+  // Now uses local extractor above — purely browser-side.
+  const skillNames=S.skills.filter(sk=>sk.name).map(sk=>sk.name);
+  const expObjs=S.exp.map(e=>({title:e.role||'',company:e.company||''}));
+  const keywords=extractKeywordsLocal(skillNames, expObjs);
+  if(!keywords.length){
+    kd.innerHTML='<span style="font-size:11px;color:var(--t3)">Add skills and experience to see keywords…</span>';
+    return;
+  }
+  kd.innerHTML=keywords.slice(0,30).map(k=>`<span class="kw-chip">${k}</span>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   PUBLIC PROFILE TOGGLE
+   FIREBASE REMOVED: previously called window.setProfileVisibility()
+   from firebase-service.js which wrote to/deleted the
+   Firestore public_profiles/{userId} document.
+   Now saves isPublic to localStorage only via autoSave().
+   When Firebase is re-added, restore the setProfileVisibility() call.
+══════════════════════════════════════════ */
+function onPublicToggle(isPublic){
+  S.isPublic=isPublic;
+  const badge=g('pub-badge');
+  if(badge){
+    badge.textContent=isPublic?'Public':'Private';
+    badge.className='public-badge '+(isPublic?'pub':'priv');
+  }
+  autoSave();
+  // Sync visibility to database
+  const token=localStorage.getItem('cvforge_token');
+  if(token){
+    fetch(`${API}/cv/public`,{
+      method:'POST',
+      headers:getAuthHeaders(),
+      body:JSON.stringify({isPublic})
+    })
+    .then(r=>r.json())
+    .then(data=>{
+      if(data.success){
+        notif(isPublic?'Profile now visible to recruiters':'Profile set to private');
+      } else {
+        notif(data.error||'Could not update visibility','r');
+        // Revert UI if API rejected it
+        S.isPublic=!isPublic;
+        const b=g('pub-badge');if(b){b.textContent=!isPublic?'Public':'Private';b.className='public-badge '+(!isPublic?'pub':'priv')}
+        const pt=g('public-toggle');if(pt)pt.checked=!isPublic;
+      }
+    })
+    .catch(()=>{
+      notif(isPublic?'Profile public (API offline — syncs when reconnected)':'Profile private');
+    });
+  } else {
+    notif(isPublic?'Profile marked public (saved locally)':'Profile set to private');
+  }
+}
+
+/* ══════════════════════════════════════════
+   EXPERIENCE
+══════════════════════════════════════════ */
+function addExp(){
+  const id=uid('exp');
+  S.exp.push({id,role:'',company:'',loc:'',start:'',end:'',present:0,bullets:''});
+  renderExpList();
+  const b=g(`eb-${id}`);if(b)b.classList.add('open');
+  live();
+}
+function remExp(id){S.exp=S.exp.filter(x=>x.id!==id);renderExpList();live()}
+function expF(id,k,v){
+  const e=S.exp.find(x=>x.id===id);if(!e)return;
+  e[k]=v;
+  const l=g(`el-${id}`);if(l)l.textContent=e.role||e.company||'New Position';
+  const s=g(`es-${id}`);if(s)s.textContent=dR(e.start,e.end,e.present);
+  live();
+}
+function expP(id,v){
+  const e=S.exp.find(x=>x.id===id);if(!e)return;
+  e.present=v?1:0;
+  rebuildExpItem(id);live();
+}
+function rebuildExpItem(id){
+  const e=S.exp.find(x=>x.id===id);if(!e)return;
+  const l=g(`el-${id}`);if(l)l.textContent=e.role||e.company||'New Position';
+  const s=g(`es-${id}`);if(s)s.textContent=dR(e.start,e.end,e.present);
+  // update month picker displays
+  const startPicker=g(`ep-start-${id}`);
+  const endPicker=g(`ep-end-${id}`);
+  if(startPicker){const t=startPicker.querySelector('.mp-input-text');if(t){t.textContent=fmtM(e.start)||'Start date';t.className='mp-input-text'+(e.start?'':' placeholder')}}
+  if(endPicker){
+    const t=endPicker.querySelector('.mp-input-text');
+    if(t){t.textContent=e.present?'Present':(fmtM(e.end)||'End date');t.className='mp-input-text'+(e.end||e.present?'':' placeholder')}
+    endPicker.style.opacity=e.present?'.4':'1';
+    endPicker.style.pointerEvents=e.present?'none':'auto';
+  }
+}
+
+function renderExpList(){
+  const c=g('exp-list');c.innerHTML='';
+  if(!S.exp.length){c.innerHTML='<div class="empty-state"><strong>No experience yet</strong>Add your first position below</div>';return}
+  S.exp.forEach(e=>{
+    const d=document.createElement('div');d.className='ci';
+    d.innerHTML=`
+    <div class="cih" onclick="toggleCard('eb-${e.id}')">
+      <div class="ci-left">
+        <div class="ci-ico" style="background:var(--ad)">💼</div>
+        <div class="ci-texts">
+          <div class="cil" id="el-${e.id}">${e.role||e.company||'New Position'}</div>
+          <div class="ci-sub" id="es-${e.id}">${dR(e.start,e.end,e.present)||'Date not set'}</div>
+        </div>
+      </div>
+      <button class="ib del" onclick="event.stopPropagation();remExp(${e.id})">✕</button>
+    </div>
+    <div class="cib" id="eb-${e.id}">
+      <div class="frow">
+        <div class="fg"><label class="fl">Job Title <span class="req">*</span></label>
+          <input class="inp" type="text" value="${e.role}" placeholder="Cloud Engineer" oninput="expF(${e.id},'role',this.value)"/>
+        </div>
+        <div class="fg"><label class="fl">Company <span class="req">*</span></label>
+          <input class="inp" type="text" value="${e.company}" placeholder="Acme Corp" oninput="expF(${e.id},'company',this.value)"/>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Location</label>
+        <input class="inp" type="text" value="${e.loc}" placeholder="Karachi / Remote" oninput="expF(${e.id},'loc',this.value)"/>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Start Date</label>
+          <div class="mp-wrap" id="ep-start-${e.id}">${mpBtn(e.start,'start',e.id,'exp','Start date')}</div>
+        </div>
+        <div class="fg"><label class="fl">End Date</label>
+          <div class="mp-wrap" id="ep-end-${e.id}" style="${e.present?'opacity:.4;pointer-events:none':''}">
+            ${e.present?`<div class="mp-input"><span class="mp-input-text">Present</span></div>`:mpBtn(e.end,'end',e.id,'exp','End date')}
+          </div>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:14px">
+        <label class="tog"><input type="checkbox" ${e.present?'checked':''} onchange="expP(${e.id},this.checked)"><div class="togt"><div class="togk"></div></div>Currently working here</label>
+      </div>
+      <div class="fg">
+        <label class="fl">
+          Responsibilities
+          <span style="margin-left:auto;font-size:9px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--t3)">analysed live ↓</span>
+        </label>
+        <div class="bullets-wrap">
+          <textarea rows="4" id="bta-${e.id}" placeholder="• Built containerised microservices reducing deployment time by 40%&#10;• Automated CI/CD pipelines using GitHub Actions across 5 repos" oninput="expF(${e.id},'bullets',this.value);renderBulletAnalyzer(${e.id})">${e.bullets}</textarea>
+          <div class="impact-score-badge none" id="impact-badge-${e.id}"></div>
+        </div>
+        <div class="fhint">One per line. Start with an action verb + number for maximum impact.</div>
+      </div>
+      <div id="ba-${e.id}" class="bullet-analyzer" style="display:none"></div>
+    </div>`;
+    c.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════
+   EDUCATION
+══════════════════════════════════════════ */
+function addEdu(){
+  const id=uid('edu');
+  S.edu.push({id,degree:'',school:'',start:'',end:'',present:0,grade:'',field:''});
+  renderEduList();
+  const b=g(`edb-${id}`);if(b)b.classList.add('open');
+  live();
+}
+function remEdu(id){S.edu=S.edu.filter(x=>x.id!==id);renderEduList();live()}
+function eduF(id,k,v){
+  const e=S.edu.find(x=>x.id===id);if(!e)return;
+  e[k]=v;
+  const l=g(`edl-${id}`);if(l)l.textContent=e.degree||e.school||'New Education';
+  const s=g(`eds-${id}`);if(s)s.textContent=dR(e.start,e.end,e.present)||'Date not set';
+  live();
+}
+function eduP(id,v){
+  const e=S.edu.find(x=>x.id===id);if(!e)return;
+  e.present=v?1:0;rebuildEduItem(id);live();
+}
+function rebuildEduItem(id){
+  const e=S.edu.find(x=>x.id===id);if(!e)return;
+  const s=g(`eds-${id}`);if(s)s.textContent=dR(e.start,e.end,e.present)||'Date not set';
+  const endW=g(`edp-end-${id}`);
+  if(endW){
+    endW.innerHTML=e.present?`<div class="mp-input"><span class="mp-input-text">Present</span></div>`:mpBtn(e.end,'end',id,'edu','End date');
+    endW.style.opacity=e.present?'.4':'1';endW.style.pointerEvents=e.present?'none':'auto';
+  }
+}
+function renderEduList(){
+  const c=g('edu-list');c.innerHTML='';
+  if(!S.edu.length){c.innerHTML='<div class="empty-state"><strong>No education yet</strong>Add your highest qualification</div>';return}
+  S.edu.forEach(e=>{
+    const d=document.createElement('div');d.className='ci';
+    d.innerHTML=`
+    <div class="cih" onclick="toggleCard('edb-${e.id}')">
+      <div class="ci-left">
+        <div class="ci-ico" style="background:var(--gd)">🎓</div>
+        <div class="ci-texts">
+          <div class="cil" id="edl-${e.id}">${e.degree||e.school||'New Education'}</div>
+          <div class="ci-sub" id="eds-${e.id}">${dR(e.start,e.end,e.present)||'Date not set'}</div>
+        </div>
+      </div>
+      <button class="ib del" onclick="event.stopPropagation();remEdu(${e.id})">✕</button>
+    </div>
+    <div class="cib" id="edb-${e.id}">
+      <div class="fg"><label class="fl">Degree / Qualification</label>
+        <input class="inp" type="text" value="${e.degree}" placeholder="B.E. Software Engineering" oninput="eduF(${e.id},'degree',this.value)"/>
+      </div>
+      <div class="fg"><label class="fl">Institution</label>
+        <input class="inp" type="text" value="${e.school}" placeholder="Sir Syed University" oninput="eduF(${e.id},'school',this.value)"/>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Start Date</label>
+          <div class="mp-wrap">${mpBtn(e.start,'start',e.id,'edu','Start date')}</div>
+        </div>
+        <div class="fg"><label class="fl">End Date</label>
+          <div class="mp-wrap" id="edp-end-${e.id}" style="${e.present?'opacity:.4;pointer-events:none':''}">
+            ${e.present?`<div class="mp-input"><span class="mp-input-text">Present</span></div>`:mpBtn(e.end,'end',e.id,'edu','End date')}
+          </div>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:14px">
+        <label class="tog"><input type="checkbox" ${e.present?'checked':''} onchange="eduP(${e.id},this.checked)"><div class="togt"><div class="togk"></div></div>Currently enrolled</label>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Grade / GPA</label>
+          <input class="inp" type="text" value="${e.grade}" placeholder="3.5 / 4.0" oninput="eduF(${e.id},'grade',this.value)"/>
+        </div>
+        <div class="fg"><label class="fl">Field of Study</label>
+          <input class="inp" type="text" value="${e.field}" placeholder="Computer Science" oninput="eduF(${e.id},'field',this.value)"/>
+        </div>
+      </div>
+    </div>`;
+    c.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════
+   CERTIFICATIONS
+══════════════════════════════════════════ */
+function addCert(){
+  const id=uid('cert');
+  S.cert.push({id,name:'',org:'',date:'',cid:''});
+  renderCertList();
+  const b=g(`ctb-${id}`);if(b)b.classList.add('open');
+  live();
+}
+function remCert(id){S.cert=S.cert.filter(x=>x.id!==id);renderCertList();live()}
+function certF(id,k,v){
+  const c=S.cert.find(x=>x.id===id);if(!c)return;
+  c[k]=v;
+  const l=g(`ctl-${id}`);if(l)l.textContent=c.name||'New Certification';
+  live();
+}
+function rebuildCertItem(id){
+  const c=S.cert.find(x=>x.id===id);if(!c)return;
+  const dW=g(`ctp-date-${id}`);
+  if(dW){dW.innerHTML=mpBtn(c.date,'date',id,'cert','Date issued')}
+}
+function renderCertList(){
+  const c=g('cert-list');c.innerHTML='';
+  if(!S.cert.length){c.innerHTML='<div class="empty-state"><strong>No certifications yet</strong>Add certifications to boost ATS keywords</div>';return}
+  S.cert.forEach(e=>{
+    const d=document.createElement('div');d.className='ci';
+    d.innerHTML=`
+    <div class="cih" onclick="toggleCard('ctb-${e.id}')">
+      <div class="ci-left">
+        <div class="ci-ico" style="background:var(--pd)">🏆</div>
+        <div class="ci-texts">
+          <div class="cil" id="ctl-${e.id}">${e.name||'New Certification'}</div>
+          <div class="ci-sub">${e.org||'Organization not set'}</div>
+        </div>
+      </div>
+      <button class="ib del" onclick="event.stopPropagation();remCert(${e.id})">✕</button>
+    </div>
+    <div class="cib" id="ctb-${e.id}">
+      <div class="fg"><label class="fl">Certification Name</label>
+        <input class="inp" type="text" value="${e.name}" placeholder="AWS Solutions Architect Associate" oninput="certF(${e.id},'name',this.value)"/>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Issuing Organization</label>
+          <input class="inp" type="text" value="${e.org}" placeholder="Amazon Web Services" oninput="certF(${e.id},'org',this.value)"/>
+        </div>
+        <div class="fg"><label class="fl">Date Issued</label>
+          <div class="mp-wrap" id="ctp-date-${e.id}">${mpBtn(e.date,'date',e.id,'cert','Date issued')}</div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Credential ID</label>
+        <input class="inp" type="text" value="${e.cid}" placeholder="Optional" oninput="certF(${e.id},'cid',this.value)"/>
+      </div>
+    </div>`;
+    c.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════
+   PROJECTS
+══════════════════════════════════════════ */
+function addProj(){
+  const id=uid('proj');
+  S.proj.push({id,name:'',tech:'',link:'',desc:''});
+  renderProjList();
+  const b=g(`pjb-${id}`);if(b)b.classList.add('open');
+  refreshAllSkillProjLists();live();
+}
+function remProj(id){
+  S.proj=S.proj.filter(x=>x.id!==id);
+  S.skills.forEach(s=>{s.pids=s.pids.filter(p=>p!==id)});
+  renderProjList();refreshAllSkillProjLists();live();
+}
+function projF(id,k,v){
+  const p=S.proj.find(x=>x.id===id);if(!p)return;
+  p[k]=v;
+  const l=g(`pjl-${id}`);if(l)l.textContent=p.name||'New Project';
+  refreshAllSkillProjLists();live();
+}
+function renderProjList(){
+  const c=g('proj-list');c.innerHTML='';
+  if(!S.proj.length){c.innerHTML='<div class="empty-state"><strong>No projects yet</strong>Add projects, then link to skills below</div>';return}
+  S.proj.forEach(p=>{
+    const d=document.createElement('div');d.className='ci';
+    d.innerHTML=`
+    <div class="cih" onclick="toggleCard('pjb-${p.id}')">
+      <div class="ci-left">
+        <div class="ci-ico" style="background:var(--bg_blue)">🚀</div>
+        <div class="ci-texts">
+          <div class="cil" id="pjl-${p.id}">${p.name||'New Project'}</div>
+          <div class="ci-sub">${p.tech||'Tech stack not set'}</div>
+        </div>
+      </div>
+      <button class="ib del" onclick="event.stopPropagation();remProj(${p.id})">✕</button>
+    </div>
+    <div class="cib" id="pjb-${p.id}">
+      <div class="frow">
+        <div class="fg"><label class="fl">Project Name</label>
+          <input class="inp" type="text" value="${p.name}" placeholder="Cloud Automation Bot" oninput="projF(${p.id},'name',this.value)"/>
+        </div>
+        <div class="fg"><label class="fl">Tech Stack</label>
+          <input class="inp" type="text" value="${p.tech}" placeholder="Python, Docker, K8s" oninput="projF(${p.id},'tech',this.value)"/>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">GitHub / URL</label>
+        <input class="inp" type="url" value="${p.link}" placeholder="https://github.com/you/repo" oninput="projF(${p.id},'link',this.value)"/>
+      </div>
+      <div class="fg"><label class="fl">Description</label>
+        <textarea rows="3" placeholder="What it does and the impact — start with an action verb…" oninput="projF(${p.id},'desc',this.value)">${p.desc}</textarea>
+      </div>
+    </div>`;
+    c.appendChild(d);
+  });
+}
+
+/* ══════════════════════════════════════════
+   SKILLS
+══════════════════════════════════════════ */
+function addSkill(){
+  const id=uid('skill');
+  S.skills.push({id,name:'',color:SKILL_COLORS[S.skills.length%SKILL_COLORS.length],level:3,pids:[]});
+  renderSkillList();
+}
+function remSkill(id){S.skills=S.skills.filter(x=>x.id!==id);renderSkillList();live()}
+function skillF(id,k,v){const s=S.skills.find(x=>x.id===id);if(!s)return;s[k]=v;live()}
+
+function setSkillLevel(id,lv){
+  const s=S.skills.find(x=>x.id===id);if(!s)return;
+  s.level=lv;
+  const blk=g(`skb-${id}`);
+  if(blk){
+    blk.querySelectorAll('.level-bar').forEach((b,i)=>{
+      b.classList.toggle('on',i<lv);
+      b.classList.toggle('current',i===lv-1);
+    });
+    const lbl=blk.querySelector('.level-label-val');
+    if(lbl)lbl.textContent=LEVEL_NAMES[lv];
+  }
+  live();
+}
+function setSkillColor(id,col){
+  const s=S.skills.find(x=>x.id===id);if(!s)return;
+  s.color=col;
+  const blk=g(`skb-${id}`);
+  if(blk){
+    const dot=blk.querySelector('.skill-dot');if(dot)dot.style.background=col;
+    blk.querySelectorAll('.cp').forEach(c=>c.classList.toggle('s',c.dataset.c===col));
+    // update active bars color
+    blk.querySelectorAll('.level-bar.on').forEach(b=>{b.style.setProperty('--bar-col',col)});
+  }
+  live();
+}
+function toggleSkillProj(sid,pid,el){
+  const s=S.skills.find(x=>x.id===sid);if(!s)return;
+  const i=s.pids.indexOf(pid);
+  if(i===-1){s.pids.push(pid);el.classList.add('on');el.querySelector('.sp-check').textContent='✓'}
+  else{s.pids.splice(i,1);el.classList.remove('on');el.querySelector('.sp-check').textContent=''}
+  live();
+}
+function refreshSkillProjList(sid){
+  const s=S.skills.find(x=>x.id===sid);
+  const el=g(`spl-${sid}`);if(!el||!s)return;
+  if(!S.proj.length){el.innerHTML='<div class="sp-empty">Add projects in the Projects section first</div>';return}
+  el.innerHTML=S.proj.map(p=>{
+    const on=s.pids.includes(p.id);
+    return`<div class="sp-item${on?' on':''}" onclick="toggleSkillProj(${sid},${p.id},this)">
+      <div class="sp-check">${on?'✓':''}</div>
+      <span style="flex:1">${p.name||'Unnamed'}</span>
+      ${p.tech?`<span style="font-size:10px;color:var(--t3)">${p.tech.split(',').slice(0,2).join(', ')}</span>`:''}
+    </div>`;
+  }).join('');
+}
+function refreshAllSkillProjLists(){S.skills.forEach(s=>refreshSkillProjList(s.id))}
+
+function renderSkillList(){
+  const c=g('skill-list');if(!c)return;c.innerHTML='';
+  if(!S.skills.length){
+    c.innerHTML='<div class="empty-state"><strong>No skills yet</strong>Click "+ Add Skill" to get started</div>';
+    return;
+  }
+  S.skills.forEach(s=>{
+    const d=document.createElement('div');d.className='skill-block';d.id=`skb-${s.id}`;
+    d.innerHTML=`
+    <div class="skill-head">
+      <div class="skill-dot" style="background:${s.color}"></div>
+      <input class="skill-name-inp" type="text" value="${s.name}" placeholder="e.g. Cloud & DevOps, Frontend, Python…"
+        oninput="skillF(${s.id},'name',this.value)" onfocus="this.closest('.skill-block').classList.add('active-edit')" onblur="this.closest('.skill-block').classList.remove('active-edit')"/>
+      <button class="ib del" onclick="remSkill(${s.id})" title="Remove skill">✕</button>
+    </div>
+    <div class="skill-body">
+      <!-- LEVEL BARS — 36px tall each, easy to click -->
+      <div class="level-section">
+        <div class="level-label">
+          Proficiency Level
+          <span class="level-label-val">${LEVEL_NAMES[s.level]}</span>
+        </div>
+        <div class="level-bars">
+          ${[1,2,3,4,5].map(i=>`
+            <div class="level-bar${i<=s.level?' on':''}${i===s.level?' current':''}"
+              onclick="setSkillLevel(${s.id},${i})"
+              title="${LEVEL_NAMES[i]}">
+              <span class="lb-text">${LEVEL_NAMES[i]}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t2);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between">
+        Linked Projects
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--t3)">same project can be in many skills</span>
+      </div>
+      <div class="sp-list" id="spl-${s.id}"></div>
+      <div class="cprow">
+        ${SKILL_COLORS.map(cl=>`<div class="cp${cl===s.color?' s':''}" data-c="${cl}" style="background:${cl}" onclick="setSkillColor(${s.id},'${cl}')"></div>`).join('')}
+      </div>
+    </div>`;
+    c.appendChild(d);
+    refreshSkillProjList(s.id);
+  });
+  live();
+}
+
+/* ══════════════════════════════════════════
+   RENDER CV
+══════════════════════════════════════════ */
+function rCV(){
+  const d=S,ac=d.accent;
+  const doc=g('cv-doc');if(!doc)return;
+  doc.style.fontSize=d.fs+'pt';
+
+  const parts=[];
+  if(d.phone) parts.push(`Phone: ${d.phone}`);
+  if(d.email) parts.push(`Email: <a href="mailto:${d.email}" style="color:${ac}">${d.email}</a>`);
+  if(d.location) parts.push(`Location: ${d.location}`);
+  if(d.linkedin) parts.push(`LinkedIn: <a href="${d.linkedin}" target="_blank" style="color:${ac}">${d.linkedin.replace(/https?:\/\//,'')}</a>`);
+  if(d.github) parts.push(`GitHub: <a href="${d.github}" target="_blank" style="color:${ac}">${d.github.replace(/https?:\/\//,'')}</a>`);
+
+  const expH=d.show.exp&&d.exp.length?`<div class="cv-sec">
+    <div class="cv-sech" style="color:${ac};border-color:${ac}">WORK EXPERIENCE</div>
+    ${d.exp.map(e=>{const b=e.bullets.split('\n').map(x=>x.trim()).filter(Boolean);
+    return`<div class="cv-entry"><div class="cv-etop"><span class="cv-erole">${e.role||'Role'}</span><span class="cv-edate">${dR(e.start,e.end,e.present)}</span></div>
+    <div class="cv-eorg">${e.company||''}${e.loc?' · '+e.loc:''}</div>
+    ${b.length?`<ul class="cv-bul">${b.map(x=>`<li>${x.replace(/^[•\-]\s*/,'')}</li>`).join('')}</ul>`:''}</div>`;
+    }).join('')}</div>`:'';
+
+  const eduH=d.show.edu&&d.edu.length?`<div class="cv-sec">
+    <div class="cv-sech" style="color:${ac};border-color:${ac}">EDUCATION</div>
+    ${d.edu.map(e=>`<div class="cv-entry"><div class="cv-etop"><span class="cv-erole">${e.degree||'Degree'}</span><span class="cv-edate">${dR(e.start,e.end,e.present)}</span></div>
+    <div class="cv-eorg">${e.school||''}${e.grade?' · GPA '+e.grade:''}</div>
+    ${e.field?`<div style="font-size:9pt;color:#556">${e.field}</div>`:''}</div>`).join('')}</div>`:'';
+
+  const skillH=d.show.skills&&d.skills.filter(s=>s.name).length?`<div class="cv-sec">
+    <div class="cv-sech" style="color:${ac};border-color:${ac}">TECHNICAL SKILLS</div>
+    ${d.skills.filter(s=>s.name).map(s=>{
+      const lp=d.proj.filter(p=>s.pids.includes(p.id));
+      const lv=LEVEL_NAMES[s.level||3];
+      const kw=lp.length?lp.map(p=>[p.name,p.tech].filter(Boolean).join(', ')).join('; '):'';
+      return`<div class="cv-skrow"><div class="cv-skcap">${s.name}</div><div class="cv-skval">${kw||'—'} <span style="color:#718096;font-size:8.5pt">(${lv})</span></div></div>`;
+    }).join('')}</div>`:'';
+
+  const projH=d.show.proj&&d.proj.filter(p=>p.name).length?`<div class="cv-sec">
+    <div class="cv-sech" style="color:${ac};border-color:${ac}">PROJECTS</div>
+    ${d.proj.filter(p=>p.name).map(p=>{
+      const ls=d.skills.filter(s=>s.pids.includes(p.id)).map(s=>s.name).filter(Boolean);
+      return`<div class="cv-proj"><div class="cv-ptop">
+        <span class="cv-pname">${p.link?`<a href="${p.link}" target="_blank" style="color:${ac};text-decoration:none">${p.name}</a>`:p.name}</span>
+        <span class="cv-ptech">${p.tech||''}</span></div>
+        ${ls.length?`<div class="cv-pskills">Skills: ${ls.join(' · ')}</div>`:''}
+        ${p.desc?`<div class="cv-pdesc">${p.desc}</div>`:''}</div>`;
+    }).join('')}</div>`:'';
+
+  const certH=d.show.cert&&d.cert.filter(c=>c.name).length?`<div class="cv-sec">
+    <div class="cv-sech" style="color:${ac};border-color:${ac}">CERTIFICATIONS</div>
+    ${d.cert.filter(c=>c.name).map(c=>`<div class="cv-certrow">
+      <span><span class="cv-certn">${c.name}</span>${c.org?` &nbsp;·&nbsp; <span style="color:#4A5568">${c.org}</span>`:''}</span>
+      <span class="cv-certm">${fmtM(c.date)}</span></div>`).join('')}</div>`:'';
+
+  doc.innerHTML=`
+    <div class="cv-name">${d.name||'Your Full Name'}</div>
+    ${d.title?`<div class="cv-jobtitle">${d.title}</div>`:''}
+    <div class="cv-contacts">${parts.join(' &nbsp;|&nbsp; ')}</div>
+    ${d.show.summary&&d.summary?`<div class="cv-sec"><div class="cv-sech" style="color:${ac};border-color:${ac}">PROFESSIONAL SUMMARY</div><div class="cv-sum">${d.summary}</div></div>`:''}
+    ${expH}${eduH}${skillH}${projH}${certH}`;
+}
+
+/* ══════════════════════════════════════════
+   ATS SCORING
+══════════════════════════════════════════ */
+function calcScore(){
+  sync();const d=S;const checks=[];let sc=0;
+  function add(pass,warn,txt,sub,pts){checks.push({pass,warn,txt,sub});if(pass)sc+=pts;else if(warn)sc+=Math.floor(pts/2)}
+  add(d.name.length>1,false,`Name: ${d.name||'Missing'}`,d.name?'Detected':'Add full name',5);
+  add(/^[^@]+@[^@]+\.[^@]+$/.test(d.email),false,`Email: ${d.email||'Missing'}`,d.email?'Valid':'Add professional email',8);
+  add(d.phone.replace(/\D/g,'').length>=7,false,`Phone: ${d.phone||'Missing'}`,d.phone?'Present':'Add phone number',5);
+  add(d.linkedin.includes('linkedin.com'),false,'LinkedIn linked',d.linkedin.includes('linkedin')?'URL present':'Add LinkedIn — 87% of recruiters check',5);
+  add(d.github.includes('github.com'),false,'GitHub linked',d.github.includes('github')?'Present':'Add GitHub (key for tech roles)',4);
+  const sw=d.summary.trim().split(/\s+/).filter(Boolean).length;
+  add(sw>=50,sw>0&&sw<50,`Summary: ${sw} words`,sw>=50?'Good (50+ words)':'Aim for 50–100 words with job title',10);
+  add(d.exp.length>0,false,`Experience: ${d.exp.length} entr${d.exp.length===1?'y':'ies'}`,d.exp.length?'Populated':'Add at least one position',10);
+  if(d.exp.length){const ok=d.exp.every(e=>e.bullets.trim().length>10);add(ok,false,'Bullet points',ok?'All roles have bullets':'Add bullets to all roles',5)}
+  add(d.edu.length>0,false,`Education: ${d.edu.length}`,d.edu.length?'Present':'Add your qualification',8);
+  const sk=d.skills.filter(s=>s.name).length;
+  add(sk>=5,sk>0&&sk<5,`Skills: ${sk}`,sk>=5?'Good count (5+)':'Add more skills (aim 6+)',10);
+  add(d.proj.length>0,false,`Projects: ${d.proj.length}`,d.proj.length?'Present':'Key for fresh graduates',8);
+  const linked=d.skills.filter(s=>s.pids&&s.pids.length).length;
+  if(sk&&d.proj.length)add(linked>0,false,`Skill–project links: ${linked}`,linked?`${linked} linked`:'Link skills to projects',4);
+  add(d.cert.length>0,false,`Certifications: ${d.cert.length}`,d.cert.length?'Present':'Add cloud/industry certs',6);
+  const vbs=['developed','built','deployed','managed','led','increased','reduced','automated','optimized','launched','delivered'];
+  const txt=(d.exp.map(e=>e.bullets).join(' ')+' '+d.proj.map(p=>p.desc).join(' ')).toLowerCase();
+  const vc=vbs.filter(v=>txt.includes(v)).length;
+  add(vc>=3,vc>0&&vc<3,`Action verbs: ${vc}`,vc>=3?'Strong verbs ✓':'Start bullets with action verbs',5);
+  return{score:Math.min(100,Math.max(0,sc)),checks};
+}
+
+function uATS(){
+  const{score:sc,checks}=calcScore();
+  const c=182.2//(2*Math.PI*29)
+  const ring=g('a-ring');
+  if(ring){ring.style.strokeDashoffset=(c-c*sc/100).toFixed(1);ring.style.stroke=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
+  g('a-num').textContent=sc;
+  const gr=sc>=85?{t:'Excellent',s:'ATS-ready — well done!'}:sc>=70?{t:'Good',s:'Minor tweaks needed'}:sc>=50?{t:'Fair',s:'Several gaps to address'}:{t:'Needs Work',s:'Fill in missing sections'};
+  g('a-grade').textContent=gr.t;g('a-gsub').textContent=gr.s;
+  const bf=g('a-bfill');if(bf){bf.style.width=sc+'%';bf.style.background=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
+  const cl=g('a-checks');
+  if(cl)cl.innerHTML=checks.map(c=>`<div class="chk ${c.pass?'pass':c.warn?'warn':'fail'}">
+    <div class="chkico">${c.pass?'✓':c.warn?'⚠':'✕'}</div>
+    <div><div class="chkt">${c.txt}</div><div class="chks">${c.sub}</div></div></div>`).join('');
+  const d=S;const tips=[];
+  if(!d.name)tips.push('• Add your full name');
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(d.email))tips.push('• Add a professional email');
+  if(!d.linkedin.includes('linkedin'))tips.push('• Add LinkedIn URL');
+  const sw=d.summary.trim().split(/\s+/).filter(Boolean).length;
+  if(sw<50)tips.push('• Expand summary to 50–100 words');
+  if(!d.exp.length)tips.push('• Add work experience');
+  if(d.skills.filter(s=>s.name).length<5)tips.push('• Add more skills (aim 6+)');
+  if(d.skills.length&&d.proj.length&&d.skills.filter(s=>s.pids&&s.pids.length).length===0)tips.push('• Link projects to skills in Skills tab');
+  if(!d.cert.length)tips.push('• Add certifications — AWS/GCP certs boost ATS keywords');
+  if(!tips.length)tips.push('✓ CV is ATS-ready! Match exact keyword terms from job descriptions.');
+  tips.push('• Pro tip: Include both abbreviation and full form — "AWS (Amazon Web Services)"');
+  g('a-tips').innerHTML=tips.map(t=>`<div style="padding:3px 0;border-bottom:1px solid var(--b0)">${t}</div>`).join('');
+}
+
+function updateRuler(){
+  const{score:sc,checks}=calcScore();
+  const c=131.9;
+  const r=g('r-ring');
+  if(r){r.style.strokeDashoffset=(c-c*sc/100).toFixed(1);r.style.stroke=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
+  g('r-num').textContent=sc;
+  const gr=sc>=85?'Excellent':sc>=70?'Good':sc>=50?'Fair':'Needs Work';
+  g('r-grade').textContent=gr+' — ATS Score';
+  g('r-sub').textContent=sc>=75?'Passes most ATS systems':sc>=50?'Gaps to address':'Fill in more details';
+  const bf=g('r-bf');if(bf){bf.style.width=sc+'%';bf.style.background=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
+  const rc=g('r-chips');if(!rc)return;
+  const passes=checks.filter(c=>c.pass).slice(0,3);
+  const warns=checks.filter(c=>c.warn).slice(0,2);
+  const fails=checks.filter(c=>!c.pass&&!c.warn).slice(0,3);
+  rc.innerHTML=[...passes.map(c=>`<div class="rchip p">✓ ${c.txt}</div>`),
+    ...warns.map(c=>`<div class="rchip w">⚠ ${c.txt}</div>`),
+    ...fails.map(c=>`<div class="rchip f">✕ ${c.txt}</div>`)].slice(0,7).join('');
+}
+
+/* ══════════════════════════════════════════
+   PDF EXPORT
+══════════════════════════════════════════ */
+function exportPDF(){
+  // Check if html2pdf library loaded correctly
+  if(typeof html2pdf === 'undefined'){
+    notif('PDF library not loaded. Check your internet connection.','r');
+    console.error('html2pdf is not defined — CDN script did not load');
+    return;
+  }
+  notif('Generating PDF…','a');
+  html2pdf().set({
+    margin:[.5,.5,.5,.5],
+    filename:`${S.name||'cv'}_resume.pdf`,
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,useCORS:true,letterRendering:true},
+    jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
+  }).from(g('cv-doc')).save().then(()=>{
+    notif('PDF exported!');
+
+    // FIREBASE REMOVED: window.logPDFDownload() was called here to write
+    // to a Firestore "pdf_downloads" collection and fire an Analytics event.
+    // To restore: re-add firebase-service.js and call:
+    //   window.logPDFDownload(window.CVFORGE_USER_ID || 'anonymous');
+
+    // ── SHOW POST-DOWNLOAD AD SLOT ───────────────────────
+    const adSlot=g('ad-post-download');
+    if(adSlot){
+      adSlot.style.display='flex';
+      setTimeout(()=>{ adSlot.style.display='none'; }, 8000);
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   SAVE / LOAD
+══════════════════════════════════════════ */
+function downloadJSON(){
+  sync();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));
+  a.download=`${S.name||'cv'}_cvforge_backup.json`;a.click();
+  notif('Backup downloaded!');
+}
+function loadJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);Object.assign(S,data);
+      ['exp','edu','proj','cert'].forEach(t=>{ID[t]=(S[t]||[]).reduce((m,i)=>Math.max(m,i.id||0),0)});
+      ID.skill=(S.skills||[]).reduce((m,i)=>Math.max(m,i.id||0),0);
+      ['name','title','phone','email','linkedin','github','location','summary'].forEach(k=>{const inp=g('f-'+k);if(inp)inp.value=S[k]||''});
+      renderExpList();renderEduList();renderProjList();renderCertList();renderSkillList();
+      live();renderAllBulletAnalyzers();
+      _asLastHash=JSON.stringify(S);
+      notif('File loaded — autosave active');
+    }catch{notif('Invalid file','r')}
+  };r.readAsText(f);ev.target.value='';
+}
+
+/* ══════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════ */
+function setAccent(el){
+  document.querySelectorAll('.cp[data-c]').forEach(c=>c.classList.remove('s'));
+  el.classList.add('s');S.accent=el.dataset.c;rCV();
+}
+
+/* ══════════════════════════════════════════
+   BULLET ANALYSIS ENGINE
+   Scores each bullet 0–100, generates rewrite
+══════════════════════════════════════════ */
+const ACTION_VERBS=['built','developed','designed','deployed','automated','optimized','reduced','increased','led','managed','launched','created','implemented','delivered','achieved','migrated','architected','engineered','established','streamlined','accelerated','integrated','resolved','mentored','scaled','monitored','configured','maintained','collaborated','drove','coordinated','produced','generated','improved','transformed','secured','analysed','analyzed'];
+const WEAK_WORDS=['helped','assisted','worked on','was responsible for','participated in','involved in','contributed to','tried to','attempted','tasked with','responsible for','handled','dealt with','did','made','got','used','utilized','various','multiple','several','some','many','good','great','excellent','amazing','passionate','hard-working','team player','dynamic','synergy','leverage','utilize'];
+const NUMBERS_RE=/\d+[%xX]?|\$\d+|\d+[kKmMbB]/;
+
+function scoreBullet(text){
+  const lower=text.toLowerCase().trim();
+  if(!lower)return{score:0,issues:[],rewrite:null};
+  const issues=[];
+  let score=30; // base
+
+  // Action verb at start
+  const firstWord=lower.replace(/^[•\-\*]\s*/,'').split(/\s+/)[0];
+  const hasActionVerb=ACTION_VERBS.some(v=>firstWord===v||firstWord.startsWith(v));
+  if(hasActionVerb){score+=25}
+  else{issues.push({ico:'⚡',msg:`Starts with "${firstWord}" — use a strong action verb instead (Built, Deployed, Reduced…)`})}
+
+  // Quantified impact
+  if(NUMBERS_RE.test(text)){score+=30;score=Math.min(score,95)}
+  else{issues.push({ico:'📊',msg:'No numbers — recruiters need proof. Add a metric: %, time saved, team size, revenue, users…'})}
+
+  // Weak language
+  const foundWeak=WEAK_WORDS.filter(w=>lower.includes(w));
+  if(foundWeak.length){
+    score-=15;
+    issues.push({ico:'🚫',msg:`Weak phrase: "${foundWeak[0]}" — replace with a specific action verb`});
+  }
+
+  // Length check
+  const words=text.trim().split(/\s+/).length;
+  if(words<6){score-=10;issues.push({ico:'✏️',msg:'Too short — add context: what technology, what scale, what outcome'})}
+  if(words>35){score-=8;issues.push({ico:'✂️',msg:'Too long ('+words+' words) — trim to one clear achievement per bullet'})}
+
+  // Past tense check for current role is skipped (we can't know)
+
+  // Passive voice signals
+  const passiveSignals=['was','were','been','being','is','are'];
+  const startsPassive=passiveSignals.some(p=>lower.replace(/^[•\-\*]\s*/,'').startsWith(p+' '));
+  if(startsPassive){score-=10;issues.push({ico:'🔄',msg:'Passive voice detected — flip to active: "Reduced…" instead of "Was responsible for reducing…"'})}
+
+  score=Math.max(0,Math.min(100,score));
+
+  // Generate rewrite suggestion
+  const rewrite=generateRewrite(text,issues,score);
+  return{score,issues,rewrite};
+}
+
+function generateRewrite(original,issues,score){
+  if(score>=80)return null; // already good, no rewrite needed
+  const lower=original.toLowerCase().trim().replace(/^[•\-\*]\s*/,'');
+
+  // Template rewrites based on detected patterns
+  const hasVerb=ACTION_VERBS.some(v=>lower.split(/\s+/)[0]===v);
+  const hasNum=NUMBERS_RE.test(original);
+
+  // Extract the core subject
+  const words=lower.split(/\s+/);
+  const coreWords=words.slice(0,6).join(' ');
+
+  const templates=[
+    // No verb, no number
+    !hasVerb&&!hasNum ? `Built and deployed [system/feature] reducing [metric] by X% across [scope]` : null,
+    // Has verb, no number
+    hasVerb&&!hasNum ? `${words[0].charAt(0).toUpperCase()+words[0].slice(1)} [specific thing] for [N] users/teams, achieving [measurable outcome]` : null,
+    // No verb, has number
+    !hasVerb&&hasNum ? `Engineered ${coreWords}… — reduced [time/cost/errors] by the ${NUMBERS_RE.exec(original)?.[0]||'X'}` : null,
+  ].filter(Boolean);
+
+  if(issues.some(i=>i.msg.includes('Weak phrase'))){
+    const weak=WEAK_WORDS.find(w=>lower.includes(w));
+    if(weak){
+      const after=lower.split(weak).slice(1).join(weak).trim();
+      return `${ACTION_VERBS[Math.floor(Math.random()*5)].charAt(0).toUpperCase()+ACTION_VERBS[Math.floor(Math.random()*5)].slice(1)} ${after||'[specific system/process], achieving [X% improvement / $Y saved / N users served]'}`;
+    }
+  }
+
+  if(issues.some(i=>i.msg.includes('Passive'))){
+    const cleaned=lower.replace(/^(was|were|been|is|are)\s+(responsible for|tasked with|involved in)?\s*/i,'');
+    const verb=ACTION_VERBS[Math.floor(Math.random()*8)];
+    return`${verb.charAt(0).toUpperCase()+verb.slice(1)} ${cleaned}, achieving [quantified result]`;
+  }
+
+  return templates[0]||`${words[0]&&hasVerb?words[0].charAt(0).toUpperCase()+words[0].slice(1):'Built'} [specific thing], ${!hasNum?'reducing [metric] by X% / serving N users / saving $Y':'improving [outcome further]'}`;
+}
+
+function renderBulletAnalyzer(expId){
+  const e=S.exp.find(x=>x.id===expId);
+  if(!e)return;
+  const container=g(`ba-${expId}`);
+  const badge=g(`impact-badge-${expId}`);
+  if(!container)return;
+
+  const lines=e.bullets.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length){
+    container.style.display='none';
+    if(badge){badge.className='impact-score-badge none';badge.textContent=''}
+    return;
+  }
+
+  const analyses=lines.map(l=>({line:l,...scoreBullet(l)}));
+  const avgScore=Math.round(analyses.reduce((s,a)=>s+a.score,0)/analyses.length);
+  const scoreClass=avgScore>=70?'high':avgScore>=45?'mid':'low';
+  const scoreLabel=avgScore>=70?'Strong Impact':avgScore>=45?'Medium Impact':'Weak Impact';
+
+  // Update badge
+  if(badge){
+    badge.className=`impact-score-badge ${scoreClass}`;
+    badge.textContent=`Impact: ${avgScore}`;
+  }
+
+  container.style.display='block';
+  container.innerHTML=`
+    <div class="ba-header">
+      Bullet Analysis
+      <div class="ba-score-pill ${scoreClass}">${avgScore}/100 — ${scoreLabel}</div>
+    </div>
+    <div class="ba-bullets">
+      ${analyses.map((a,i)=>`
+        <div class="ba-bullet-row score-${a.score>=70?'high':a.score>=45?'mid':'low'}">
+          <div class="ba-bullet-top" onclick="toggleBaDetail('ba-detail-${expId}-${i}',this)">
+            <div class="ba-score-badge">${a.score}</div>
+            <div class="ba-bullet-text">${a.line.replace(/^[•\-\*]\s*/,'')}</div>
+            <div class="ba-expand-btn">${a.issues.length||a.rewrite?'+':'✓'}</div>
+          </div>
+          <div class="ba-detail" id="ba-detail-${expId}-${i}">
+            ${a.issues.length?`<div class="ba-issues">${a.issues.map(iss=>`<div class="ba-issue"><span class="ba-issue-ico">${iss.ico}</span><span>${iss.msg}</span></div>`).join('')}</div>`:''}
+            ${a.rewrite?`
+              <div class="ba-rewrite">
+                <div class="ba-rewrite-label">✨ Suggested Rewrite</div>
+                <div class="ba-rewrite-text" id="rw-text-${expId}-${i}">${a.rewrite}</div>
+                <button class="ba-apply-btn" onclick="applyRewrite(${expId},${i},'${escStr(a.rewrite)}')">
+                  ↩ Apply this rewrite
+                </button>
+              </div>`:a.score>=80?`<div style="font-size:11px;color:var(--green);padding:4px 0">✓ This bullet is strong — good work</div>`:''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+
+  // also update ATS ruler
+  updateRuler();
+}
+
+function escStr(s){return s.replace(/'/g,"&#39;").replace(/"/g,'&quot;')}
+
+function toggleBaDetail(id,btn){
+  const d=g(id);if(!d)return;
+  const open=d.classList.toggle('open');
+  const expBtn=btn.querySelector('.ba-expand-btn');
+  if(expBtn)expBtn.textContent=open?'−':'+';
+}
+
+function applyRewrite(expId,bulletIndex,rewriteText){
+  const e=S.exp.find(x=>x.id===expId);if(!e)return;
+  const lines=e.bullets.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(bulletIndex>=lines.length)return;
+  lines[bulletIndex]='• '+rewriteText.replace(/^[•\-\*]\s*/,'');
+  e.bullets=lines.join('\n');
+  // update textarea
+  const ta=g(`bta-${expId}`);if(ta)ta.value=e.bullets;
+  renderBulletAnalyzer(expId);
+  rCV();
+  notif('Bullet rewritten — edit the template to add your specifics');
+}
+
+// Re-render all bullet analyzers after load
+function renderAllBulletAnalyzers(){
+  S.exp.forEach(e=>{
+    if(e.bullets)renderBulletAnalyzer(e.id);
+  });
+}
+
+/* ══════════════════════════════════════════
+   RECRUITER REJECTION WARNINGS
+   Scans entire CV for deal-breaker patterns
+══════════════════════════════════════════ */
+const REJECTION_RULES=[
+  {
+    id:'no_contact',
+    check:()=>!S.email&&!S.phone,
+    ico:'📵',label:'No Contact Information',
+    desc:'Missing both email and phone. Recruiter literally cannot contact you — instant bin.',
+    fix:'Add your email and phone number in the Personal Info section.'
+  },
+  {
+    id:'unprofessional_email',
+    check:()=>S.email&&/(hotboy|sexy|cool|gaming|leet|420|xX|Xx|ninja|killer|dragon|swag)/i.test(S.email),
+    ico:'📧',label:'Unprofessional Email Address',
+    desc:`"${S.email||''}" signals immaturity. 76% of recruiters reject CVs with unprofessional emails.`,
+    fix:'Create a firstname.lastname@gmail.com address and use it exclusively for job applications.'
+  },
+  {
+    id:'no_experience_no_projects',
+    check:()=>S.exp.length===0&&S.proj.length===0,
+    ico:'📭',label:'No Experience & No Projects',
+    desc:'With nothing to show, there is no reason to invite you for an interview.',
+    fix:'Add internships, freelance work, or open-source projects. Any real work counts.'
+  },
+  {
+    id:'empty_bullets',
+    check:()=>S.exp.some(e=>e.role&&!e.bullets.trim()),
+    ico:'🕳️',label:'Roles Listed With No Bullet Points',
+    desc:()=>{
+      const empty=S.exp.filter(e=>e.role&&!e.bullets.trim()).map(e=>e.role);
+      return`"${empty[0]}" has a title but no description. Recruiters skip roles with no details — it looks like you have nothing to show for that time.`;
+    },
+    fix:'Add at least 2–3 bullet points per role. Even a basic description beats silence.'
+  },
+  {
+    id:'too_many_bullets',
+    check:()=>S.exp.some(e=>e.bullets.split('\n').filter(l=>l.trim()).length>8),
+    ico:'📜',label:'Too Many Bullet Points in One Role',
+    desc:'More than 8 bullets per role loses the recruiter. Attention is finite — diluting your strongest points buries them.',
+    fix:'Keep 3–5 bullets per role. Ruthlessly cut anything that is not a clear achievement.'
+  },
+  {
+    id:'no_numbers',
+    check:()=>{
+      const allBullets=S.exp.flatMap(e=>e.bullets.split('\n').filter(l=>l.trim()));
+      return allBullets.length>=3&&allBullets.every(b=>!NUMBERS_RE.test(b));
+    },
+    ico:'📊',label:'Zero Quantified Achievements',
+    desc:'Not a single bullet contains a number, percentage, or measurable outcome. "Improved performance" means nothing without a number.',
+    fix:'Go back to each bullet and add a metric: "by 40%", "for 50k users", "saving $2k/month", "team of 4".'
+  },
+  {
+    id:'all_weak_bullets',
+    check:()=>{
+      const all=S.exp.flatMap(e=>e.bullets.split('\n').filter(l=>l.trim()));
+      if(all.length<2)return false;
+      const weak=all.filter(b=>WEAK_WORDS.some(w=>b.toLowerCase().includes(w)));
+      return weak.length/all.length>0.6;
+    },
+    ico:'⚠️',label:'Majority of Bullets Use Weak Language',
+    desc:'Over 60% of your bullets contain passive or vague phrases ("responsible for", "helped with", "was involved in"). These signal low ownership and get auto-filtered.',
+    fix:'Rewrite each bullet to start with a strong past-tense verb: Built, Deployed, Led, Reduced, Automated.'
+  },
+  {
+    id:'short_cv',
+    check:()=>S.exp.length>0&&S.skills.length===0&&S.proj.length===0&&S.cert.length===0,
+    ico:'📉',label:'CV Has Experience But No Skills/Projects/Certs',
+    desc:'A CV with only experience listed looks thin and unstructured. Recruiters expect to see supporting evidence.',
+    fix:'Add a Skills section (minimum 6 skills), and at least 1 project or certification.'
+  },
+  {
+    id:'generic_title',
+    check:()=>{
+      const t=(S.title||'').toLowerCase();
+      return t&&['developer','engineer','manager','analyst','designer','student'].includes(t.trim());
+    },
+    ico:'🎯',label:'Job Title Is Too Generic',
+    desc:`"${S.title}" matches hundreds of candidates. ATS ranks you lower when your title is a single generic word.`,
+    fix:'Be specific: "Cloud Engineer (AWS / Kubernetes)" or "Full Stack Developer (React, Node.js)".'
+  },
+  {
+    id:'gaps_no_explanation',
+    check:()=>{
+      // detect gaps > 12 months between sorted exp entries
+      const sorted=S.exp.filter(e=>e.start&&e.end&&!e.present).sort((a,b)=>a.end>b.end?-1:1);
+      if(sorted.length<2)return false;
+      for(let i=0;i<sorted.length-1;i++){
+        const endMs=new Date(sorted[i].end+'-01').getTime();
+        const nextStartMs=new Date(sorted[i+1].start+'-01').getTime();
+        if(endMs-nextStartMs>365*24*3600*1000)return true;
+      }
+      return false;
+    },
+    ico:'🗓️',label:'Employment Gap Over 12 Months Detected',
+    desc:'A gap of more than a year will be noticed. Without explanation, many recruiters assume the worst.',
+    fix:'Add a brief note in the bullet points covering what you did: freelance, courses, personal projects, health, caregiving.'
+  },
+  {
+    id:'no_summary',
+    check:()=>S.exp.length>=2&&!S.summary.trim(),
+    ico:'📝',label:'No Summary Despite Having Experience',
+    desc:'With 2+ roles, skipping the summary makes you look lazy. Recruiters spend 7 seconds on the first glance — your summary is the hook.',
+    fix:'Write 2–3 sentences: your role, years of experience, key technologies, and what you are looking for.'
+  },
+  {
+    id:'spelling_flags',
+    check:()=>{
+      // simple common misspellings in CV content
+      const allText=[S.summary,...S.exp.map(e=>e.bullets),...S.proj.map(p=>p.desc)].join(' ').toLowerCase();
+      const typos=['recieve','seperate','occured','managment','developement','implentation','enviroment','acheive','carreer','responsibilties'];
+      return typos.some(t=>allText.includes(t));
+    },
+    ico:'🔤',label:'Likely Spelling Error Detected',
+    desc:'Spelling mistakes are the #1 reason for immediate rejection. Even one typo signals carelessness.',
+    fix:'Paste your entire CV text into a spell checker or Grammarly before submitting.'
+  },
+];
+
+function updateRejectionWarnings(){
+  const warnings=REJECTION_RULES.filter(r=>{
+    try{return r.check()}catch{return false}
+  });
+
+  const panel=g('rejection-panel');
+  const body=g('rej-body');
+  const count=g('rej-count');
+  if(!panel||!body||!count)return;
+
+  if(!warnings.length){
+    panel.classList.add('hidden');
+    return;
+  }
+
+  panel.classList.remove('hidden');
+  count.textContent=`${warnings.length} issue${warnings.length>1?'s':''}`;
+  body.innerHTML=warnings.map(w=>`
+    <div class="rej-item">
+      <div class="rej-ico">${w.ico}</div>
+      <div class="rej-content">
+        <div class="rej-label">${w.label}</div>
+        <div class="rej-desc">${typeof w.desc==='function'?w.desc():w.desc}</div>
+        <div class="rej-fix">→ Fix: ${w.fix}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   BOOT — STARTUP SEQUENCE
+   ───────────────────────────────────────────
+   FIREBASE REMOVED: Steps 3 and 4 previously
+   loaded data from Firestore and started a
+   real-time onSnapshot() listener. Both have
+   been removed. The app now starts from
+   localStorage only.
+
+   Startup priority:
+     1. Render empty UI immediately (fast paint)
+     2. Restore from localStorage (instant, offline)
+══════════════════════════════════════════ */
+(async function boot(){
+
+  // Step 1: Render empty shell immediately (fast paint)
+  renderExpList();renderEduList();renderProjList();renderCertList();renderSkillList();
+  rCV();updateRuler();updateRejectionWarnings();
+
+  // Step 2: Validate JWT with server + populate topbar user name.
+  // If token expired/revoked → redirect to auth.html.
+  await initAuth();
+
+  // Step 3: Restore from localStorage (instant, works offline)
+  const localRestored = loadAutosave();
+  if(localRestored){
+    renderExpList();renderEduList();renderProjList();renderCertList();renderSkillList();
+    rCV();updateRuler();updateRejectionWarnings();renderAllBulletAnalyzers();
+    updateKeywordDisplay();
+    const pt=g('public-toggle');if(pt)pt.checked=!!S.isPublic;
+    const pb=g('pub-badge');if(pb){pb.textContent=S.isPublic?'Public':'Private';pb.className='public-badge '+(S.isPublic?'pub':'priv')}
+  } else {
+    setCloudStatus('offline','No saved data');
+  }
+
+  // Step 4: Load latest CV from database.
+  // Cloud data overrides localStorage so the user always sees the
+  // most up-to-date version (e.g. after using another device).
+  try {
+    const token=localStorage.getItem('cvforge_token');
+    if(token){
+      setCloudStatus('syncing','Loading from cloud…');
+      const res=await fetch(`${API}/cv`,{headers:getAuthHeaders()});
+      if(res.ok){
+        const data=await res.json();
+        if(data.success && data.data){
+          applyLoadedData(data.data);
+          // Overwrite localStorage with fresh cloud data
+          const snap=JSON.stringify(S);
+          localStorage.setItem(LS_KEY,snap);
+          localStorage.setItem(LS_KEY+'_ts',Date.now().toString());
+          _asLastHash=snap;
+          setCloudStatus('synced','Loaded from cloud');
+        } else {
+          setCloudStatus('synced','All saved');
+        }
+      } else {
+        // Non-fatal: API reachable but returned an error (e.g. no CV yet)
+        if(!localRestored) setCloudStatus('offline','Autosave on');
+        else setCloudStatus('synced','All saved');
+      }
+    } else if(!localRestored){
+      setTimeout(()=>setCloudStatus('offline','Autosave on'),2000);
+    }
+  } catch(_e){
+    // API offline — localStorage already loaded in Step 3
+    if(!localRestored) setCloudStatus('offline','Autosave on');
+    else setCloudStatus('synced','All saved');
+  }
+
+})();
+
+/* ══════════════════════════════════════════
+   APPLY LOADED DATA
+   Maps raw stored data back into the S state
+   object and re-renders all UI components.
+   FIREBASE REMOVED: previously used by both
+   localStorage restore AND Firestore restore.
+   Now only called by loadAutosave() and loadJSON().
+══════════════════════════════════════════ */
+function applyLoadedData(data){
+  // Core text fields
+  const textFields=['name','title','phone','email','linkedin','github','location','summary'];
+  textFields.forEach(k=>{
+    if(data[k]!==undefined) S[k]=data[k];
+    const inp=g('f-'+k);if(inp&&data[k]!==undefined)inp.value=data[k]||'';
+  });
+
+  // Arrays
+  if(data.exp)    S.exp    = data.exp;
+  if(data.edu)    S.edu    = data.edu;
+  if(data.proj)   S.proj   = data.proj;
+  if(data.cert)   S.cert   = data.cert;
+  if(data.skills) S.skills = data.skills;
+
+  // Preference fields (no longer synced to Firestore — stored in localStorage)
+  if(data.isPublic!==undefined)   S.isPublic      = data.isPublic;
+  if(data.jobPreferences)         S.jobPreferences = data.jobPreferences;
+  if(data.accentColor)            S.accent         = data.accentColor;
+  if(data.accent)                 S.accent         = data.accent;
+
+  // Restore entry ID counters so new entries don't get duplicate IDs
+  ['exp','edu','proj','cert'].forEach(t=>{
+    const arr=S[t]||[];
+    ID[t]=arr.reduce((m,i)=>Math.max(m,i.id||0),0);
+  });
+  ID.skill=(S.skills||[]).reduce((m,i)=>Math.max(m,i.id||0),0);
+
+  // Restore job preferences UI
+  const jpType=g('jp-type');   if(jpType&&data.jobPreferences?.jobType)        jpType.value=data.jobPreferences.jobType;
+  const jpRole=g('jp-role');   if(jpRole&&data.jobPreferences?.preferredRole)   jpRole.value=data.jobPreferences.preferredRole;
+  const jpSal =g('jp-salary'); if(jpSal &&data.jobPreferences?.minSalary)       jpSal.value=data.jobPreferences.minSalary;
+  const jpAvail=g('jp-avail'); if(jpAvail&&data.jobPreferences?.availableFrom)  jpAvail.value=data.jobPreferences.availableFrom;
+
+  // Restore public toggle UI
+  const pt=g('public-toggle');if(pt) pt.checked=!!S.isPublic;
+  const pb=g('pub-badge');
+  if(pb){pb.textContent=S.isPublic?'Public':'Private';pb.className='public-badge '+(S.isPublic?'pub':'priv')}
+
+  // Re-render all components
+  renderExpList();renderEduList();renderProjList();renderCertList();renderSkillList();
+  rCV();updateRuler();updateRejectionWarnings();renderAllBulletAnalyzers();
+  updateKeywordDisplay();
+}
+
+function showEcosystemHome(){
+  const overlay = g('ecosystem-home');
+  if (overlay) overlay.classList.remove('hidden');
+}
+
+function hideEcosystemHome(){
+  const overlay = g('ecosystem-home');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+async function logoutUser(){
+  // Revoke JWT on server so it cannot be reused
+  const token=localStorage.getItem('cvforge_token');
+  if(token){
+    try{
+      await fetch(`${API}/auth/logout`,{
+        method:'POST',
+        headers:getAuthHeaders()
+      });
+    }catch(_e){ /* API offline — still clear local state */ }
+  }
+  localStorage.removeItem('cvforge_token');
+  localStorage.removeItem('cvforge_user');
+  window.location.href='auth.html';
+}
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</body>
+</html>

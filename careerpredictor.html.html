@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just An Intern - Career Predictor</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg:#090B0F;
+            --s0:#0D1018;
+            --s1:#131720;
+            --s2:#181D28;
+            --s3:#1E2433;
+            --b1:rgba(255,255,255,.07);
+            --b2:rgba(255,255,255,.11);
+            --t0:#F0F2F8;
+            --t1:#B8BECC;
+            --t2:#7A8299;
+            --blue:#4F7AFF;
+            --blue2:#6B93FF;
+            --blue3:#3A62E8;
+            --bd:rgba(79,122,255,.15);
+            --bg_blue:rgba(79,122,255,.08);
+            --font:'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg) !important;
+            color: var(--t0) !important;
+        }
+        /* Remove click-blink animation on every render */
+        .fade-in { animation: none !important; }
+        @keyframes fadeIn { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
+
+        /* Bring Tailwind utility palette closer to index.html dark style */
+        .bg-slate-50, .bg-white, .bg-slate-100 { background-color: var(--s1) !important; }
+        .bg-slate-900 { background: linear-gradient(135deg, #2D52C9, #4F7AFF) !important; }
+        .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-slate-400 {
+            color: var(--t1) !important;
+        }
+        .text-white { color: #fff !important; }
+        .border-slate-100, .border-slate-200, .border-slate-700 {
+            border-color: var(--b1) !important;
+        }
+        .shadow-xl, .shadow-lg, .shadow-sm {
+            box-shadow: 0 16px 40px rgba(0,0,0,.45) !important;
+        }
+        .bg-emerald-600, .bg-emerald-700, .bg-blue-600, .bg-indigo-600, .bg-purple-600, .bg-orange-600, .bg-pink-600 {
+            background: linear-gradient(135deg, var(--blue3), var(--blue)) !important;
+        }
+        .text-emerald-700, .text-blue-700, .text-indigo-700, .text-purple-700, .text-orange-700, .text-pink-700 {
+            color: var(--blue2) !important;
+        }
+        .bg-emerald-50, .bg-blue-50, .bg-indigo-50, .bg-purple-50, .bg-orange-50, .bg-pink-50 {
+            background: var(--bg_blue) !important;
+        }
+        .border-emerald-100, .border-blue-100, .border-indigo-100, .border-purple-100, .border-orange-100, .border-pink-100, .border-emerald-200, .border-blue-200, .border-indigo-200, .border-purple-200, .border-orange-200, .border-pink-200 {
+            border-color: var(--bd) !important;
+        }
+        .ring-emerald-500, .ring-blue-500 { --tw-ring-color: rgba(79,122,255,.35) !important; }
+        .hover\:bg-emerald-700:hover, .hover\:bg-blue-700:hover, .hover\:bg-slate-800:hover {
+            background: linear-gradient(135deg, #4069F0, #5C86FF) !important;
+        }
+        input, button { font-family: var(--font) !important; }
+
+        /* Custom scrollbar for chat */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ── ANIMATED BACKGROUND ── */
+        body { position: relative; overflow-x: hidden; }
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none; z-index: 0;
+        }
+        .bg-orb {
+            position: fixed; border-radius: 50%;
+            filter: blur(100px); pointer-events: none; z-index: 0;
+        }
+        .bg-orb-1 {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(79,122,255,.16) 0%, transparent 65%);
+            top: -200px; left: -150px;
+            animation: orb-cp1 24s ease-in-out infinite;
+        }
+        .bg-orb-2 {
+            width: 480px; height: 480px;
+            background: radial-gradient(circle, rgba(34,197,94,.09) 0%, transparent 65%);
+            bottom: -150px; right: -120px;
+            animation: orb-cp2 30s ease-in-out infinite;
+        }
+        @keyframes orb-cp1 { 0%,100%{transform:translate(0,0)} 40%{transform:translate(60px,70px)} 75%{transform:translate(-40px,40px)} }
+        @keyframes orb-cp2 { 0%,100%{transform:translate(0,0)} 40%{transform:translate(-55px,-65px)} 75%{transform:translate(35px,-30px)} }
+
+        /* Ensure app container is above orbs */
+        #app { position: relative; z-index: 1; }
+
+        /* ── PAGE ENTRANCE ANIMATION ── */
+        #app > * {
+            animation: cp-fade-up 0.5s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        @keyframes cp-fade-up {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── TOPBAR / NAV POLISH ── */
+        .sticky {
+            background: rgba(9,11,15,.88) !important;
+            backdrop-filter: blur(20px) !important;
+            border-bottom: 1px solid rgba(255,255,255,.06) !important;
+        }
+
+        /* ── BUTTON IMPROVEMENTS ── */
+        button, .btn {
+            transition: all 0.2s cubic-bezier(.16,1,.3,1) !important;
+        }
+        button:hover:not(:disabled) { transform: translateY(-1px); }
+        button:active { transform: translateY(0) !important; }
+
+        /* ── CARD HOVER POLISH ── */
+        .rounded-xl, .rounded-2xl {
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        /* ── INPUT FOCUS GLOW ── */
+        input:focus, select:focus, textarea:focus {
+            box-shadow: 0 0 0 3px rgba(79,122,255,.15) !important;
+            border-color: rgba(79,122,255,.5) !important;
+            outline: none !important;
+        }
+
+        /* ── PROGRESS BAR ANIMATION ── */
+        .transition-all { transition: all 0.4s cubic-bezier(.16,1,.3,1) !important; }
+
+        /* ── GRADIENT TEXT ── */
+        .grad-text {
+            background: linear-gradient(135deg, #6B93FF, #A78BFA);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        /* ── OPTION CARD HOVER ── */
+        label[class*="cursor-pointer"] {
+            transition: all 0.18s cubic-bezier(.16,1,.3,1) !important;
+        }
+        label[class*="cursor-pointer"]:hover {
+            transform: translateY(-2px);
+            border-color: rgba(79,122,255,.4) !important;
+            background: rgba(79,122,255,.05) !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <!-- Animated background orbs -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+
+    <!-- App Container -->
+    <div id="app" class="max-w-4xl mx-auto min-h-screen flex flex-col">
+        <!-- Content injected here by JS -->
+    </div>
+
+    <!-- Firebase SDKs (Module) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // Configuration - checking global variable first, then localStorage
+        let firebaseConfig = {};
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            } else {
+                firebaseConfig = JSON.parse(localStorage.getItem('__firebase_config') || '{}');
+            }
+        } catch (e) { console.error("Config parse error", e); }
+        
+        // Initialize (Safe check for empty config in preview)
+        if (Object.keys(firebaseConfig).length > 0) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+                
+                // Expose to global scope for the main logic to use
+                window.firebaseAuth = auth;
+                window.firebaseDb = db;
+                window.firebaseFuncs = { signInAnonymously, collection, addDoc, serverTimestamp };
+                
+                // Auto sign-in
+                signInAnonymously(auth).then(userCred => {
+                    console.log("Auth:", userCred.user.uid);
+                }).catch(e => console.error("Auth Error", e));
+            } catch (e) {
+                console.warn("Firebase Init Error (likely missing config):", e);
+            }
+        }
+    </script>
+
+    <!-- Main Application Logic -->
+    <script>
+        // --- CONFIGURATION ---
+        const API_BASE = localStorage.getItem('cvforge_api_base') || 'http://localhost:3000';
+        const API = `${API_BASE}/api`;
+
+        // --- DATA CONSTANTS ---
+        const TRAITS = ['analytical', 'creativity', 'socialInfluence', 'conscientiousness', 'riskTolerance', 'stressTolerance', 'leadership', 'patience'];
+        
+        const CAREER_DATABASE = [
+            { id: 'med_mbbs', title: 'MBBS Doctor', stream: ['pre-medical'], demand: 85, traits: { empathy: 90, stressTolerance: 90, patience: 95, conscientiousness: 90 }, risk: 'Medium', salary: 'High (Late)' },
+            { id: 'med_bds', title: 'Dentist (BDS)', stream: ['pre-medical'], demand: 80, traits: { creativity: 60, patience: 80, conscientiousness: 85 }, risk: 'Low', salary: 'High' },
+            { id: 'med_pharm', title: 'Pharmacist', stream: ['pre-medical'], demand: 75, traits: { conscientiousness: 90, analytical: 70, patience: 70 }, risk: 'Low', salary: 'Medium' },
+            { id: 'med_physio', title: 'Physiotherapist', stream: ['pre-medical'], demand: 70, traits: { empathy: 85, socialInfluence: 60, patience: 80 }, risk: 'Low', salary: 'Medium' },
+            { id: 'med_psych', title: 'Clinical Psychologist', stream: ['pre-medical', 'arts'], demand: 65, traits: { empathy: 95, analytical: 60, patience: 90 }, risk: 'Medium', salary: 'Medium' },
+            { id: 'eng_soft', title: 'Software Engineer', stream: ['pre-engineering', 'ics'], demand: 98, traits: { analytical: 90, creativity: 60, conscientiousness: 60, patience: 70 }, risk: 'Low', salary: 'High' },
+            { id: 'eng_data', title: 'Data Scientist', stream: ['pre-engineering', 'ics'], demand: 95, traits: { analytical: 95, patience: 80, creativity: 50 }, risk: 'Low', salary: 'High' },
+            { id: 'eng_civil', title: 'Civil Engineer', stream: ['pre-engineering'], demand: 75, traits: { stressTolerance: 80, leadership: 70, conscientiousness: 80 }, risk: 'Medium', salary: 'Medium' },
+            { id: 'eng_mech', title: 'Mechanical Engineer', stream: ['pre-engineering'], demand: 70, traits: { analytical: 85, conscientiousness: 75, stressTolerance: 70 }, risk: 'Medium', salary: 'Medium' },
+            { id: 'eng_cyber', title: 'Cyber Security Analyst', stream: ['pre-engineering', 'ics'], demand: 92, traits: { analytical: 90, riskTolerance: 40, conscientiousness: 85 }, risk: 'Low', salary: 'High' },
+            { id: 'com_ca', title: 'Chartered Accountant (CA)', stream: ['commerce', 'pre-engineering', 'pre-medical'], demand: 90, traits: { conscientiousness: 98, analytical: 85, patience: 90, stressTolerance: 85 }, risk: 'High', salary: 'Elite' },
+            { id: 'com_acca', title: 'ACCA Professional', stream: ['commerce', 'ics', 'pre-engineering'], demand: 85, traits: { conscientiousness: 90, analytical: 80, socialInfluence: 50 }, risk: 'Medium', salary: 'High' },
+            { id: 'com_fin', title: 'Financial Analyst / CFA', stream: ['commerce', 'pre-engineering'], demand: 80, traits: { analytical: 90, riskTolerance: 60, stressTolerance: 70 }, risk: 'Medium', salary: 'High' },
+            { id: 'com_mkt', title: 'Marketing Manager', stream: ['commerce', 'arts', 'ics'], demand: 85, traits: { creativity: 85, socialInfluence: 95, leadership: 70 }, risk: 'Medium', salary: 'Medium' },
+            { id: 'com_hr', title: 'HR Manager', stream: ['commerce', 'arts'], demand: 75, traits: { socialInfluence: 90, empathy: 80, leadership: 70 }, risk: 'Low', salary: 'Medium' },
+            { id: 'art_css', title: 'CSS Officer (Civil Service)', stream: ['any'], demand: 100, traits: { leadership: 90, stressTolerance: 85, socialInfluence: 80, analytical: 70 }, risk: 'High', salary: 'Stable' },
+            { id: 'art_law', title: 'Lawyer / Advocate', stream: ['arts', 'commerce', 'pre-engineering'], demand: 75, traits: { analytical: 85, socialInfluence: 90, stressTolerance: 80 }, risk: 'Medium', salary: 'Volatile' },
+            { id: 'art_journ', title: 'Journalist / Media', stream: ['arts', 'ics'], demand: 60, traits: { socialInfluence: 85, riskTolerance: 70, creativity: 70 }, risk: 'High', salary: 'Low Start' },
+            { id: 'art_design', title: 'Graphic/UI UX Designer', stream: ['ics', 'arts', 'pre-engineering'], demand: 88, traits: { creativity: 95, patience: 70, analytical: 50 }, risk: 'Low', salary: 'High' },
+            { id: 'voc_amazon', title: 'E-commerce Specialist (Amazon)', stream: ['any'], demand: 90, traits: { riskTolerance: 80, analytical: 70, conscientiousness: 75 }, risk: 'Medium', salary: 'Volatile' },
+            { id: 'voc_freelance', title: 'Digital Freelancer', stream: ['any'], demand: 85, traits: { conscientiousness: 85, riskTolerance: 70, creativity: 60 }, risk: 'Medium', salary: 'Volatile' }
+        ];
+
+        const QUESTION_BANK = [
+            { id: 1, text: "A project deadline is changed to tomorrow morning. You have a lot left to do. You:", options: [{ text: "Make a strict hourly plan and execute it without sleep.", scores: { conscientiousness: 10, stressTolerance: 8 } }, { text: "Call teammates to divide the work immediately.", scores: { leadership: 10, socialInfluence: 8 } }, { text: "Panic slightly, then try to finish the critical parts only.", scores: { stressTolerance: 3, analytical: 5 } }, { text: "Look for a shortcut or extension request.", scores: { riskTolerance: 8, conscientiousness: 2 } }] },
+            { id: 2, text: "You are learning a new difficult skill (e.g., coding or a new language). It's frustrating.", options: [{ text: "I push through for hours until I solve it.", scores: { patience: 10, conscientiousness: 8 } }, { text: "I look for a creative workaround or different method.", scores: { creativity: 10, analytical: 5 } }, { text: "I ask a mentor or friend to explain it to me.", scores: { socialInfluence: 8, patience: 4 } }, { text: "I switch to something else and come back later.", scores: { patience: 2, riskTolerance: 5 } }] },
+            { id: 3, text: "Career Choice Risk: You are offered two jobs.", options: [{ text: "Job A: Stable government job, average salary, zero risk.", scores: { riskTolerance: 0, patience: 8 } }, { text: "Job B: Commission-based sales, potential for 5x salary but no guarantee.", scores: { riskTolerance: 10, socialInfluence: 8 } }, { text: "Job C: Startup role, high chaos, high learning.", scores: { riskTolerance: 7, stressTolerance: 8 } }, { text: "Job D: Research role, solitary, intellectual challenge.", scores: { analytical: 10, socialInfluence: 0 } }] },
+            { id: 4, text: "In a group discussion, people are arguing.", options: [{ text: "I take the lead and mediate the conflict.", scores: { leadership: 10, socialInfluence: 8 } }, { text: "I stay quiet and analyze who is logically right.", scores: { analytical: 10, socialInfluence: 2 } }, { text: "I make a joke to lighten the mood.", scores: { socialInfluence: 7, creativity: 8 } }, { text: "I leave the room; I hate conflict.", scores: { stressTolerance: 0, leadership: 0 } }] },
+            { id: 5, text: "You have free time. You prefer to:", options: [{ text: "Solve puzzles, play strategy games, or read non-fiction.", scores: { analytical: 10, patience: 6 } }, { text: "Paint, design, write, or create content.", scores: { creativity: 10, analytical: 2 } }, { text: "Go out with a large group of friends.", scores: { socialInfluence: 10, conscientiousness: 3 } }, { text: "Organize my room or plan my week.", scores: { conscientiousness: 10, creativity: 0 } }] },
+            { id: 6, text: "How do you handle your daily routine?", options: [{ text: "I plan every hour in my calendar.", scores: { conscientiousness: 10, riskTolerance: 2 } }, { text: "I have a rough to-do list but go with the flow.", scores: { conscientiousness: 6, riskTolerance: 5 } }, { text: "I hate routines, I do what I feel like.", scores: { conscientiousness: 1, creativity: 8 } }, { text: "I usually forget what I need to do until the last minute.", scores: { conscientiousness: 0, stressTolerance: 6 } }] },
+            { id: 7, text: "A complex problem appears with no clear instructions.", options: [{ text: "I break it down into data points and logic flows.", scores: { analytical: 10, creativity: 3 } }, { text: "I brainstorm wild, out-of-the-box solutions.", scores: { creativity: 10, analytical: 4 } }, { text: "I ask the team for their input before deciding.", scores: { leadership: 7, socialInfluence: 8 } }, { text: "I wait for someone to give me better instructions.", scores: { leadership: 0, riskTolerance: 2 } }] },
+            { id: 8, text: "Public Speaking: You have to give a presentation to 50 people.", options: [{ text: "I love it! I can charm the crowd.", scores: { socialInfluence: 10, stressTolerance: 8 } }, { text: "I will do it if I have prepared thoroughly.", scores: { conscientiousness: 8, stressTolerance: 5 } }, { text: "I dread it. I prefer working behind the scenes.", scores: { socialInfluence: 1, analytical: 6 } }, { text: "I'll wing it and hope for the best.", scores: { riskTolerance: 9, conscientiousness: 1 } }] },
+            { id: 9, text: "Financial Patience: You start a business.", options: [{ text: "I need profit in month 1, or I quit.", scores: { patience: 0, riskTolerance: 4 } }, { text: "I can work for 2 years without profit if the vision is big.", scores: { patience: 10, riskTolerance: 8 } }, { text: "I prefer a guaranteed salary, no business for me.", scores: { riskTolerance: 0, patience: 6 } }, { text: "I'll sell whatever is trending right now.", scores: { creativity: 5, patience: 2 } }] },
+            { id: 10, text: "Would you move to a new city for a job without knowing anyone?", options: [{ text: "Yes, I love the adventure and uncertainty.", scores: { riskTolerance: 10, socialInfluence: 6 } }, { text: "Only if the pay is double my current one.", scores: { riskTolerance: 6, analytical: 6 } }, { text: "Maybe, if I can plan everything in advance.", scores: { riskTolerance: 4, conscientiousness: 8 } }, { text: "No, I need my stability and family nearby.", scores: { riskTolerance: 0, patience: 5 } }] },
+            { id: 11, text: "When you make a mistake, you:", options: [{ text: "Analyze exactly why it happened to prevent recurrence.", scores: { analytical: 10, conscientiousness: 8 } }, { text: "Admit it instantly and take responsibility.", scores: { leadership: 10, socialInfluence: 5 } }, { text: "Feel terrible and stress about it for days.", scores: { stressTolerance: 0, empathy: 8 } }, { text: "Try to fix it quietly before anyone notices.", scores: { riskTolerance: 6, leadership: 2 } }] },
+            { id: 12, text: "Your friend is sad about a failure. You:", options: [{ text: "Listen to them cry and support them emotionally.", scores: { empathy: 10, socialInfluence: 6 } }, { text: "Give them a logical plan to fix the problem.", scores: { analytical: 10, empathy: 2 } }, { text: "Take them out to distract them.", scores: { socialInfluence: 8, creativity: 5 } }, { text: "Tell them to toughen up.", scores: { empathy: 0, leadership: 3 } }] },
+            { id: 13, text: "Consistency Check: Do you enjoy networking events?", options: [{ text: "Yes, I talk to everyone.", scores: { socialInfluence: 10 } }, { text: "I prefer 1-on-1 conversations.", scores: { socialInfluence: 5 } }, { text: "No, I hide in the corner.", scores: { socialInfluence: 0 } }, { text: "I only go if mandatory.", scores: { socialInfluence: 2 } }], isExtended: true },
+            { id: 14, text: "Consistency Check: A task takes 3 months of boring repetitive work.", options: [{ text: "I can do it if the goal is clear.", scores: { patience: 10 } }, { text: "I automate it or delegate it.", scores: { creativity: 8, patience: 4 } }, { text: "I quit after 1 week.", scores: { patience: 0 } }, { text: "I complain but do it.", scores: { patience: 5 } }], isExtended: true },
+            { id: 15, text: "Consistency Check: You are forced to lead a team.", options: [{ text: "I naturally take charge.", scores: { leadership: 10 } }, { text: "I do it, but I find it stressful.", scores: { leadership: 5, stressTolerance: 4 } }, { text: "I refuse and pass it to someone else.", scores: { leadership: 0 } }, { text: "I try to make decisions by voting.", scores: { leadership: 4, socialInfluence: 6 } }], isExtended: true }
+        ];
+
+        // --- GLOBAL STATE ---
+        let STATE = {
+            step: 0,
+            profile: { age: '', city: 'Karachi', stream: 'pre-engineering', financialPressure: 'no' },
+            interests: [],
+            mcqAnswers: {},
+            results: null,
+            isExtendedPhase: false,
+            geminiResponse: null,
+            loadingGemini: false,
+            // New Features State
+            resultTab: 'overview', // 'overview', 'dayInLife', 'roadmap', 'email', 'mentor', 'resume'
+            dayInLife: null,
+            dayInLifeLoading: false,
+            roadmap: null,
+            roadmapLoading: false,
+            emailDraft: null,
+            emailLoading: false,
+            resume: null,
+            resumeLoading: false,
+            audioUrl: null,
+            audioLoading: false,
+            chatHistory: [],
+            chatInput: "",
+            chatLoading: false
+        };
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            // Load state from persistence
+            const savedState = localStorage.getItem('pakCareerState');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    STATE = { ...STATE, ...parsed };
+                    // Ensure new fields exist if loading old state
+                    if (!STATE.resultTab) STATE.resultTab = 'overview';
+                    if (!STATE.chatHistory) STATE.chatHistory = [];
+                    if (!STATE.resume) STATE.resume = null; // Ensure resume state init
+                } catch(e) { console.error("Persistence Error", e); }
+            }
+            render();
+        };
+
+        function saveState() {
+            localStorage.setItem('pakCareerState', JSON.stringify(STATE));
+        }
+
+        // --- LOGIC FUNCTIONS ---
+
+        function setProfile(field, value) {
+            STATE.profile[field] = value;
+            saveState();
+            render();
+        }
+
+        function setStep(newStep) {
+            STATE.step = newStep;
+            saveState();
+            render();
+        }
+
+        function toggleInterest(interest) {
+            if (STATE.interests.includes(interest)) {
+                STATE.interests = STATE.interests.filter(i => i !== interest);
+            } else if (STATE.interests.length < 3) {
+                STATE.interests.push(interest);
+            }
+            saveState();
+            render();
+        }
+
+        function answerMcq(qId, optionIndex) {
+            STATE.mcqAnswers[qId] = optionIndex;
+            saveState();
+            render();
+        }
+
+        function setResultTab(tab) {
+            STATE.resultTab = tab;
+            saveState();
+            render();
+            
+            // Trigger auto-fetch if data missing
+            if (tab === 'dayInLife' && !STATE.dayInLife) generateDayInLife();
+            if (tab === 'roadmap' && !STATE.roadmap) fetchRoadmap();
+            if (tab === 'email' && !STATE.emailDraft) fetchEmailDraft();
+            if (tab === 'resume' && !STATE.resume) fetchResume();
+        }
+
+        function updateChatInput(val) {
+            STATE.chatInput = val;
+            // No saveState on every keystroke to avoid lag/thrashing, just update memory
+        }
+
+        function handleRestart() {
+            if (confirm("Retake assessment? This will clear current progress.")) {
+                localStorage.removeItem('pakCareerState');
+                STATE = {
+                    step: 0,
+                    profile: { age: '', city: 'Karachi', stream: 'pre-engineering', financialPressure: 'no' },
+                    interests: [],
+                    mcqAnswers: {},
+                    results: null,
+                    isExtendedPhase: false,
+                    geminiResponse: null,
+                    loadingGemini: false,
+                    resultTab: 'overview',
+                    dayInLife: null,
+                    dayInLifeLoading: false,
+                    roadmap: null,
+                    roadmapLoading: false,
+                    emailDraft: null,
+                    emailLoading: false,
+                    resume: null,
+                    resumeLoading: false,
+                    audioUrl: null,
+                    audioLoading: false,
+                    chatHistory: [],
+                    chatInput: "",
+                    chatLoading: false
+                };
+                render();
+            }
+        }
+
+        function handleAssessmentComplete() {
+            const currentQCount = Object.keys(STATE.mcqAnswers).length;
+            
+            // Extended Logic Check
+            if (currentQCount >= 12 && !STATE.isExtendedPhase) {
+                const q1 = STATE.mcqAnswers[1];
+                const q6 = STATE.mcqAnswers[6];
+                const inconsistency = (q1 === 0 && q6 === 2) || (q1 === 2 && q6 === 0);
+                if (inconsistency) {
+                    STATE.isExtendedPhase = true;
+                    saveState();
+                    render();
+                    return;
+                }
+            }
+
+            setStep(4);
+            setTimeout(() => {
+                STATE.results = calculateResults(STATE.profile, STATE.interests, STATE.mcqAnswers);
+                saveState();
+                setStep(5);
+                callGeminiAnalysis(STATE.results);
+            }, 1500);
+        }
+
+        function calculateResults(profile, interests, mcqAnswers) {
+            let rawScores = {}; 
+            let maxScores = {};
+            TRAITS.forEach(t => { rawScores[t] = 0; maxScores[t] = 0; });
+
+            Object.keys(mcqAnswers).forEach(qId => {
+                const q = QUESTION_BANK.find(que => que.id === parseInt(qId));
+                if (!q) return;
+                const ansIdx = mcqAnswers[qId];
+                const selectedOpt = q.options[ansIdx];
+                Object.entries(selectedOpt.scores).forEach(([trait, val]) => rawScores[trait] += val);
+                Object.keys(selectedOpt.scores).forEach(trait => maxScores[trait] += 10);
+            });
+
+            const userTraits = {};
+            TRAITS.forEach(t => {
+                userTraits[t] = maxScores[t] > 0 ? Math.round((rawScores[t] / maxScores[t]) * 100) : 50;
+            });
+
+            let consistencyErrors = 0;
+            let extremeResponses = 0;
+            if (mcqAnswers[1] === 0 && mcqAnswers[6] === 2) consistencyErrors++;
+            if (mcqAnswers[1] === 2 && mcqAnswers[6] === 0) consistencyErrors++;
+            if (mcqAnswers[3] === 0 && mcqAnswers[10] === 2) consistencyErrors++;
+
+            Object.values(mcqAnswers).forEach(idx => { if (idx === 0) extremeResponses++; });
+
+            let confidenceScore = 100;
+            let confidenceReason = "High consistency detected.";
+            if (consistencyErrors > 0) { confidenceScore -= (consistencyErrors * 20); confidenceReason = "Contradictory answers detected."; }
+            if (extremeResponses > 8) { confidenceScore -= 15; confidenceReason = "Pattern of extreme answers detected."; }
+
+            const scoredCareers = CAREER_DATABASE.map(career => {
+                let score = 0;
+                let reasons = [];
+                let elimination = null;
+                const wP = confidenceScore < 70 ? 0.20 : 0.40;
+                const wI = confidenceScore < 70 ? 0.30 : 0.25;
+                const wC = confidenceScore < 70 ? 0.35 : 0.20;
+                const wD = 0.15;
+
+                let traitScore = 0;
+                let relevantTraits = 0;
+                Object.entries(career.traits).forEach(([t, reqVal]) => {
+                    const userVal = userTraits[t] || 50;
+                    traitScore += (100 - Math.abs(userVal - reqVal));
+                    relevantTraits++;
+                });
+                score += (relevantTraits > 0 ? traitScore / relevantTraits : 50) * wP;
+
+                const hasInterest = interests.some(i => career.title.toLowerCase().includes(i.toLowerCase()) || 
+                    (career.id.includes('med') && i === 'Health') ||
+                    (career.id.includes('eng') && i === 'Tech') ||
+                    (career.id.includes('com') && (i === 'Business' || i === 'Finance')));
+                score += (hasInterest ? 100 : 40) * wI;
+
+                let constraintVal = 100;
+                if (!career.stream.includes('any') && !career.stream.includes(profile.stream)) {
+                    if (profile.stream === 'pre-medical' && career.id.includes('eng')) { constraintVal = 0; elimination = "Requires Pre-Engineering background."; }
+                    else if (profile.stream === 'arts' && career.id.includes('med')) { constraintVal = 0; elimination = "Requires Pre-Medical background."; }
+                    else { constraintVal = 40; reasons.push("Requires stream conversion/extra study."); }
+                }
+                if (profile.financialPressure === 'yes') {
+                    if (career.salary === 'Low Start' || career.salary === 'Volatile') { constraintVal -= 30; reasons.push("Risky due to immediate financial needs."); }
+                    else if (career.risk === 'High') { constraintVal -= 20; }
+                }
+                score += constraintVal * wC;
+                score += career.demand * wD;
+
+                return { ...career, finalScore: Math.round(score), reasons, elimination };
+            }).sort((a, b) => b.finalScore - a.finalScore);
+
+            return { careers: scoredCareers, userTraits, confidenceScore, confidenceReason };
+        }
+
+        // --- AI API FUNCTIONS (Cohere via backend proxy) ---
+        async function callAIJSON(prompt, temperature = 0.4) {
+            const response = await fetch(`${API}/ai/cohere/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, expectJson: true, temperature })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'AI request failed');
+            }
+            return data.json;
+        }
+
+        async function callAIText(prompt, temperature = 0.6) {
+            const response = await fetch(`${API}/ai/cohere/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt, expectJson: false, temperature })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'AI request failed');
+            }
+            return data.text;
+        }
+
+        async function callGeminiAnalysis(res) {
+            STATE.loadingGemini = true;
+            render();
+            
+            const topCareer = res.careers[0];
+            const userTraits = res.userTraits;
+            const prompt = `
+              Role: Blunt, analytical career counselor for Pakistan.
+              User: ${STATE.profile.age}yo, ${STATE.profile.stream}, City: ${STATE.profile.city}.
+              Financial Pressure: ${STATE.profile.financialPressure}.
+              Traits: Analytical ${userTraits.analytical}, Creativity ${userTraits.creativity}, Conscientiousness ${userTraits.conscientiousness}, Risk ${userTraits.riskTolerance}.
+              Top Match: ${topCareer.title} (Score: ${topCareer.finalScore}).
+              Task:
+              1. Why You Fit: 3 bullet points.
+              2. Harsh Reality: 1 sentence on difficulties in Pakistan.
+              3. 30-Day Plan: 3 actionable steps.
+              Output JSON: { "why_fit": [], "harsh_reality": "", "starter_plan": [] }
+            `;
+
+            try {
+                const content = await callAIJSON(prompt, 0.3);
+                STATE.geminiResponse = content;
+            } catch (e) {
+                console.error(e);
+                STATE.geminiResponse = {
+                    why_fit: ["Your profile traits were processed successfully."],
+                    harsh_reality: `AI service error: ${e.message || 'Analysis unavailable right now.'}`,
+                    starter_plan: ["Check backend COHERE_API_KEY and restart API.", "Try again in a moment."]
+                };
+            } finally {
+                STATE.loadingGemini = false;
+                render();
+            }
+        }
+
+        async function generateAudio() {
+            alert('Audio narration is currently unavailable in Cohere mode.');
+        }
+
+        async function fetchResume() {
+            STATE.resumeLoading = true;
+            render();
+            const career = STATE.results.careers[0].title;
+            const prompt = `
+                Generate resume content for a fresh candidate in Pakistan targeting ${career}.
+                Data: ${STATE.profile.stream} background, High ${Object.keys(STATE.results.userTraits).reduce((a, b) => STATE.results.userTraits[a] > STATE.results.userTraits[b] ? a : b)} trait.
+                Output JSON: {
+                    "summary": "Professional summary...",
+                    "hard_skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],
+                    "experience_bullets": ["Action verb bullet 1...", "Action verb bullet 2...", "Action verb bullet 3..."]
+                }
+            `;
+            try {
+                STATE.resume = await callAIJSON(prompt, 0.4);
+            } catch (e) {
+                console.error(e);
+                STATE.resume = {
+                    summary: `Resume generation unavailable: ${e.message || 'AI error.'}`,
+                    hard_skills: ["Communication", "Problem Solving", "Adaptability"],
+                    experience_bullets: ["Built academic and personal projects relevant to target role."]
+                };
+            }
+            finally { STATE.resumeLoading = false; render(); }
+        }
+
+        async function generateDayInLife() {
+            STATE.dayInLifeLoading = true;
+            render();
+            const career = STATE.results.careers[0].title;
+            const prompt = `Generate a gritty, realistic 'Day in the Life' schedule for a ${career} in Pakistan. Include local context (traffic, load shedding, office culture). Output JSON array: [{"time": "8:00 AM", "activity": "..."}]`;
+            try {
+                STATE.dayInLife = await callAIJSON(prompt, 0.5);
+            } catch (e) {
+                console.error(e);
+                STATE.dayInLife = [
+                    { time: "9:00 AM", activity: `Could not generate schedule right now (${e.message || 'AI error'}).` }
+                ];
+            }
+            finally { STATE.dayInLifeLoading = false; render(); }
+        }
+
+        async function fetchRoadmap() {
+            STATE.roadmapLoading = true;
+            render();
+            const career = STATE.results.careers[0].title;
+            const prompt = `List top 3 universities in ${STATE.profile.city || 'Pakistan'} for ${career}. Output JSON array: [{"name": "...", "degree": "...", "tip": "Admission tip"}]`;
+            try {
+                STATE.roadmap = await callAIJSON(prompt, 0.4);
+            } catch (e) {
+                console.error(e);
+                STATE.roadmap = [
+                    { name: "AI generation unavailable", degree: "Please retry", tip: e.message || "Check backend configuration." }
+                ];
+            }
+            finally { STATE.roadmapLoading = false; render(); }
+        }
+
+        async function fetchEmailDraft() {
+            STATE.emailLoading = true;
+            render();
+            const career = STATE.results.careers[0].title;
+            const prompt = `Draft a polite LinkedIn cold message from a student to a senior ${career} in Pakistan asking for mentorship. Output JSON: {"subject": "...", "body": "..."}`;
+            try {
+                STATE.emailDraft = await callAIJSON(prompt, 0.4);
+            } catch (e) {
+                console.error(e);
+                STATE.emailDraft = {
+                    subject: "Mentorship Request",
+                    body: `Could not generate AI draft right now (${e.message || 'AI error'}). Please retry after backend is configured.`
+                };
+            }
+            finally { STATE.emailLoading = false; render(); }
+        }
+
+        async function handleChatSend() {
+            if (!STATE.chatInput.trim()) return;
+            const userMsg = STATE.chatInput;
+            STATE.chatHistory.push({ role: 'user', text: userMsg });
+            STATE.chatInput = "";
+            STATE.chatLoading = true;
+            render();
+            
+            // Scroll to bottom helper
+            setTimeout(() => {
+                const container = document.getElementById('chat-container');
+                if(container) container.scrollTop = container.scrollHeight;
+            }, 50);
+
+            const career = STATE.results.careers[0].title;
+            const context = `You are a senior ${career} in Pakistan. Mentoring a student. Be blunt, helpful, Pakistani context. Keep it under 50 words.`;
+            const prompt = `${context}\nHistory: ${STATE.chatHistory.map(m => m.role + ': ' + m.text).join('\n')}\nUser: ${userMsg}\nModel:`;
+
+            try {
+                const text = await callAIText(prompt, 0.7);
+                STATE.chatHistory.push({ role: 'model', text: text });
+            } catch (e) { 
+                STATE.chatHistory.push({ role: 'model', text: "Connection error." });
+            } finally { 
+                STATE.chatLoading = false; 
+                render();
+                setTimeout(() => {
+                    const container = document.getElementById('chat-container');
+                    if(container) container.scrollTop = container.scrollHeight;
+                }, 50);
+            }
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderHeader() {
+            return `
+                <div class="flex justify-between items-center p-4 bg-white border-b border-slate-100 sticky top-0 z-50">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-emerald-600 p-1.5 rounded-lg">
+                            <i data-lucide="brain" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="font-bold text-slate-800">Just An Intern Career Predictor</span>
+                    </div>
+                    ${STATE.step > 0 ? `<button onclick="handleRestart()" class="text-xs font-medium text-slate-500 hover:text-emerald-600 flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restart</button>` : ''}
+                </div>
+            `;
+        }
+
+        function renderStep0() {
+            return `
+                <div class="flex items-center justify-center min-h-[80vh] p-6 fade-in">
+                    <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl border border-slate-100 text-center">
+                        <div class="bg-slate-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-slate-200">
+                            <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h1 class="text-4xl font-black text-slate-900 mb-4 tracking-tight">Just An Intern Career Predictor</h1>
+                        <p class="text-slate-500 mb-10 font-medium leading-relaxed">
+                            A scientific, data-driven career engine calibrated for the Pakistani job market. 
+                            No fluff. Just vectors.
+                        </p>
+                        <button onclick="setStep(1)" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
+                            Start Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStep1() {
+            const streams = ['pre-engineering', 'pre-medical', 'ics', 'commerce', 'arts'];
+            const streamBtns = streams.map(s => 
+                `<button onclick="setProfile('stream', '${s}')" class="p-3 rounded-lg text-sm font-medium border capitalize ${STATE.profile.stream === s ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200'}">${s.replace('-', ' ')}</button>`
+            ).join('');
+
+            return `
+                <div class="max-w-lg mx-auto p-6 space-y-6 fade-in">
+                    <h2 class="text-2xl font-black text-slate-800">Who are you?</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">Stream</label>
+                            <div class="grid grid-cols-2 gap-2 mt-1">${streamBtns}</div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">Financial Urgency</label>
+                            <div class="grid grid-cols-2 gap-2 mt-1">
+                                <button onclick="setProfile('financialPressure', 'yes')" class="p-3 rounded-lg text-sm border text-left ${STATE.profile.financialPressure === 'yes' ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500' : 'bg-white border-slate-200 text-slate-500'}">
+                                    <div class="font-bold">High</div><div class="text-xs opacity-75">Need income ASAP</div>
+                                </button>
+                                <button onclick="setProfile('financialPressure', 'no')" class="p-3 rounded-lg text-sm border text-left ${STATE.profile.financialPressure === 'no' ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500' : 'bg-white border-slate-200 text-slate-500'}">
+                                    <div class="font-bold">Low</div><div class="text-xs opacity-75">Can invest time</div>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">Age</label>
+                            <input type="number" value="${STATE.profile.age}" oninput="setProfile('age', this.value)" class="w-full p-3 border border-slate-200 rounded-lg mt-1 outline-none focus:border-emerald-500" placeholder="e.g. 18" />
+                        </div>
+                    </div>
+
+                    <button onclick="setStep(2)" ${!STATE.profile.age ? 'disabled' : ''} class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold disabled:opacity-50 hover:bg-slate-800 transition-all">Next Step</button>
+                </div>
+            `;
+        }
+
+        function renderStep2() {
+            const list = ['Tech', 'Health', 'Business', 'Finance', 'Arts', 'Public Service', 'Writing', 'Research'];
+            const btns = list.map(i => 
+                `<button onclick="toggleInterest('${i}')" class="p-4 rounded-xl border font-bold text-sm transition-all ${STATE.interests.includes(i) ? 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-200'}">${i}</button>`
+            ).join('');
+
+            return `
+                <div class="max-w-lg mx-auto p-6 space-y-6 fade-in">
+                    <h2 class="text-2xl font-black text-slate-800">Interests</h2>
+                    <p class="text-slate-500 text-sm">Select up to 3 areas.</p>
+                    <div class="grid grid-cols-2 gap-3">${btns}</div>
+                    <button onclick="setStep(3)" ${STATE.interests.length === 0 ? 'disabled' : ''} class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold disabled:opacity-50 hover:bg-slate-800 transition-all">Start Assessment</button>
+                </div>
+            `;
+        }
+
+        function renderStep3() {
+            const visibleQs = QUESTION_BANK.filter(q => STATE.isExtendedPhase ? true : !q.isExtended);
+            const progress = (Object.keys(STATE.mcqAnswers).length / visibleQs.length) * 100;
+            
+            const qList = visibleQs.map((q, idx) => `
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex gap-3 mb-4">
+                        <span class="bg-slate-100 text-slate-500 font-bold px-2 py-1 rounded text-xs h-fit">Q${idx + 1}</span>
+                        <p class="font-bold text-slate-800 text-lg leading-snug">${q.text}</p>
+                    </div>
+                    <div class="space-y-2">
+                        ${q.options.map((opt, optIdx) => `
+                            <button onclick="answerMcq(${q.id}, ${optIdx})" class="w-full text-left p-4 rounded-xl border text-sm transition-all ${STATE.mcqAnswers[q.id] === optIdx ? 'bg-emerald-50 border-emerald-500 text-emerald-900 font-medium' : 'bg-white border-slate-100 text-slate-600 hover:bg-slate-50'}">
+                                ${opt.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="max-w-xl mx-auto p-6 space-y-8 fade-in">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-400 uppercase">
+                            <span>Progress</span>
+                            <span>${Object.keys(STATE.mcqAnswers).length} / ${visibleQs.length}</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${progress}%"></div>
+                        </div>
+                        ${STATE.isExtendedPhase ? `<div class="bg-amber-50 text-amber-700 text-xs px-3 py-2 rounded-lg flex items-center gap-2"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Extending assessment for accuracy...</div>` : ''}
+                    </div>
+                    <div class="space-y-8">${qList}</div>
+                    <button onclick="handleAssessmentComplete()" ${Object.keys(STATE.mcqAnswers).length < visibleQs.length ? 'disabled' : ''} class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-emerald-200 disabled:opacity-50 disabled:shadow-none hover:bg-emerald-700 transition-all">
+                        ${STATE.isExtendedPhase ? "Finalize Analysis" : (visibleQs.length === 12 ? "Analyze Profile" : "Continue")}
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderStep4() {
+            return `
+                <div class="flex flex-col items-center justify-center min-h-[80vh] text-center p-6 fade-in">
+                    <i data-lucide="loader-2" class="w-12 h-12 text-emerald-600 animate-spin mb-6"></i>
+                    <h2 class="text-2xl font-black text-slate-900 mb-2">Processing Vectors...</h2>
+                    <p class="text-slate-500">Cross-referencing ${Object.keys(STATE.mcqAnswers).length} data points against ${CAREER_DATABASE.length} careers.</p>
+                </div>
+            `;
+        }
+
+        function renderStep5() {
+            if (!STATE.results) return '';
+            const { careers, userTraits, confidenceScore, confidenceReason } = STATE.results;
+            const topCareers = careers.filter(c => !c.elimination).slice(0, 5);
+            const avoided = careers.filter(c => c.elimination).slice(0, 3);
+            const gemini = STATE.geminiResponse;
+
+            // Header
+            let html = `
+                <div class="max-w-4xl mx-auto p-4 md:p-8 space-y-6 fade-in">
+                    <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div><h1 class="text-3xl font-black">Career Report</h1><p class="text-slate-400 mt-1">Based on vectors & ML logic</p></div>
+                        <div class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                            <div class="text-right"><div class="text-xs font-bold text-slate-400 uppercase">Confidence</div><div class="text-2xl font-black ${confidenceScore > 75 ? 'text-emerald-400' : 'text-amber-400'}">${confidenceScore > 75 ? 'High' : 'Low'}</div></div>
+                            <div class="w-2 h-12 rounded-full ${confidenceScore > 75 ? 'bg-emerald-500' : 'bg-amber-500'}"></div>
+                        </div>
+                    </div>
+                    ${confidenceScore <= 75 ? `<div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex gap-3 text-amber-800 text-sm"><i data-lucide="shield-alert" class="w-5 h-5 shrink-0"></i> <div><strong>Reliability Check:</strong> ${confidenceReason}</div></div>` : ''}
+                    
+                    <!-- Feature Tabs -->
+                    <div class="flex gap-2 overflow-x-auto pb-2 bg-white p-2 rounded-xl border border-slate-200">
+                        <button onclick="setResultTab('overview')" class="flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'overview' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'text-slate-500 hover:bg-slate-50'}">
+                            <i data-lucide="activity" class="w-4 h-4"></i> Overview
+                        </button>
+                        <button onclick="setResultTab('dayInLife')" class="flex-1 min-w-[110px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'dayInLife' ? 'bg-purple-50 text-purple-700 ring-1 ring-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
+                            <i data-lucide="calendar" class="w-4 h-4"></i> Day In Life <i data-lucide="sparkles" class="w-3 h-3 text-purple-400"></i>
+                        </button>
+                        <button onclick="setResultTab('roadmap')" class="flex-1 min-w-[110px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'roadmap' ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-slate-500 hover:bg-slate-50'}">
+                            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Roadmap <i data-lucide="sparkles" class="w-3 h-3 text-indigo-400"></i>
+                        </button>
+                        <button onclick="setResultTab('email')" class="flex-1 min-w-[110px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'email' ? 'bg-orange-50 text-orange-700 ring-1 ring-orange-200' : 'text-slate-500 hover:bg-slate-50'}">
+                            <i data-lucide="mail" class="w-4 h-4"></i> Outreach <i data-lucide="sparkles" class="w-3 h-3 text-orange-400"></i>
+                        </button>
+                        <button onclick="setResultTab('resume')" class="flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'resume' ? 'bg-pink-50 text-pink-700 ring-1 ring-pink-200' : 'text-slate-500 hover:bg-slate-50'}">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> Resume <i data-lucide="sparkles" class="w-3 h-3 text-pink-400"></i>
+                        </button>
+                         <button onclick="setResultTab('mentor')" class="flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'mentor' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-slate-500 hover:bg-slate-50'}">
+                            <i data-lucide="message-square" class="w-4 h-4"></i> Mentor
+                        </button>
+                    </div>
+
+            `;
+
+            if (STATE.resultTab === 'overview') {
+                html += `<div class="grid md:grid-cols-3 gap-6 fade-in"><div class="md:col-span-2 space-y-6">`;
+                
+                // Top Match
+                if (topCareers[0]) {
+                    const c = topCareers[0];
+                    html += `
+                        <div class="bg-white rounded-3xl shadow-sm border border-emerald-500 overflow-hidden relative group">
+                            <div class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 absolute top-0 left-0 rounded-br-xl z-10">#1 Recommended</div>
+                            <div class="p-8 pt-10">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div><h2 class="text-2xl font-black text-slate-900">${c.title}</h2><div class="flex gap-2 mt-2"><span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-md font-medium">${c.stream.join('/')}</span></div></div>
+                                    <div class="text-4xl font-black text-emerald-600">${c.finalScore}%</div>
+                                </div>
+                                <div class="space-y-4">
+                                    ${STATE.loadingGemini ? `<div class="flex items-center gap-2 text-slate-400 text-sm py-4"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Generating AI insights...</div>` : 
+                                      gemini ? `
+                                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                            <div class="flex justify-between items-center mb-3">
+                                                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Why You Fit</h3>
+                                                <button onclick="generateAudio()" ${STATE.audioLoading ? 'disabled' : ''} class="text-xs flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-full text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors">
+                                                    ${STATE.audioLoading ? '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Loading...' : '<i data-lucide="volume-2" class="w-3 h-3"></i> Listen ✨'}
+                                                </button>
+                                            </div>
+                                            <ul class="space-y-2 text-sm text-slate-600">${gemini.why_fit.map(pt => `<li class="flex gap-2"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1.5 shrink-0"></span>${pt}</li>`).join('')}</ul>
+                                        </div>
+                                        <div class="grid sm:grid-cols-2 gap-4">
+                                            <div class="bg-red-50 p-4 rounded-2xl border border-red-100"><h3 class="font-bold text-red-800 text-sm mb-2 flex items-center gap-2"><i data-lucide="ban" class="w-4 h-4"></i> Harsh Reality</h3><p class="text-xs text-red-700 leading-relaxed">${gemini.harsh_reality}</p></div>
+                                            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100"><h3 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i> Starter Plan</h3><ul class="text-xs text-blue-700 space-y-1">${gemini.starter_plan.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
+                                        </div>
+                                      ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Other Paths
+                html += `<div class="space-y-3"><h3 class="font-bold text-slate-700 ml-2">Other Viable Paths</h3>`;
+                topCareers.slice(1).forEach((c, i) => {
+                    html += `
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-300 transition-all flex justify-between items-center">
+                            <div><div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-400">#${i + 2}</span><h4 class="font-bold text-slate-800">${c.title}</h4></div><div class="text-xs text-slate-400 mt-1">Demand: ${c.demand}/100</div></div>
+                            <div class="text-xl font-bold text-slate-600">${c.finalScore}%</div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+
+                // Sidebar
+                html += `</div><div class="space-y-6"><div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200"><h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-emerald-600"></i> Trait Analysis</h3><div class="space-y-4">${TRAITS.map(t => `<div><div class="flex justify-between text-xs font-bold uppercase text-slate-400 mb-1"><span>${t.replace(/([A-Z])/g, ' $1').trim()}</span><span>${userTraits[t]}</span></div><div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-slate-800 rounded-full" style="width: ${userTraits[t]}%"></div></div></div>`).join('')}</div></div></div></div>`;
+            
+            } else if (STATE.resultTab === 'dayInLife') {
+                html += `
+                    <div class="bg-white rounded-3xl shadow-sm border border-purple-200 overflow-hidden fade-in">
+                        <div class="bg-purple-600 p-6 text-white"><h2 class="text-2xl font-black">Day In The Life</h2><p class="text-purple-200 text-sm">24h simulation for ${topCareers[0].title}</p></div>
+                        <div class="p-6">
+                            ${STATE.dayInLifeLoading ? `<div class="py-20 text-center text-purple-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Simulating daily grind...</div>` :
+                            STATE.dayInLife ? `<div class="relative border-l-2 border-purple-200 ml-4 space-y-8 my-4">
+                                ${STATE.dayInLife.map(item => `
+                                    <div class="relative pl-8">
+                                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-100 border-2 border-purple-500"></div>
+                                        <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">${item.time}</span>
+                                        <h4 class="font-bold text-slate-800 text-lg mt-1">${item.activity.split(':')[0]}</h4>
+                                        <p class="text-slate-600 text-sm mt-1">${item.activity.split(':')[1] || item.activity}</p>
+                                    </div>
+                                `).join('')}
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (STATE.resultTab === 'roadmap') {
+                html += `
+                    <div class="bg-white rounded-3xl shadow-sm border border-indigo-200 overflow-hidden fade-in">
+                        <div class="bg-indigo-600 p-6 text-white"><h2 class="text-2xl font-black">University Roadmap</h2><p class="text-indigo-200 text-sm">Top institutes in ${STATE.profile.city || 'Pakistan'}</p></div>
+                        <div class="p-6">
+                            ${STATE.roadmapLoading ? `<div class="py-20 text-center text-indigo-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Scouting universities...</div>` :
+                            STATE.roadmap ? `<div class="grid md:grid-cols-1 gap-4">
+                                ${STATE.roadmap.map((uni, idx) => `
+                                    <div class="bg-indigo-50 border border-indigo-100 p-5 rounded-2xl flex items-start gap-4">
+                                        <div class="bg-white p-3 rounded-full shadow-sm text-indigo-600 font-bold text-lg h-12 w-12 flex items-center justify-center">${idx + 1}</div>
+                                        <div>
+                                            <h4 class="font-bold text-slate-900 text-lg">${uni.name}</h4>
+                                            <p class="text-indigo-700 font-medium text-sm">${uni.degree}</p>
+                                            <div class="mt-3 bg-white p-3 rounded-xl border border-indigo-100 text-xs text-slate-600"><span class="font-bold text-indigo-600">💡 Tip:</span> ${uni.tip}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (STATE.resultTab === 'email') {
+                html += `
+                    <div class="bg-white rounded-3xl shadow-sm border border-orange-200 overflow-hidden fade-in">
+                        <div class="bg-orange-600 p-6 text-white"><h2 class="text-2xl font-black">Smart Outreach</h2><p class="text-orange-200 text-sm">Cold email draft for mentors.</p></div>
+                        <div class="p-6">
+                            ${STATE.emailLoading ? `<div class="py-20 text-center text-orange-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Drafting email...</div>` :
+                            STATE.emailDraft ? `
+                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 relative">
+                                    <div class="mb-4"><span class="text-xs font-bold text-slate-400 uppercase">Subject</span><p class="font-bold text-slate-800">${STATE.emailDraft.subject}</p></div>
+                                    <div><span class="text-xs font-bold text-slate-400 uppercase">Body</span><p class="text-slate-700 whitespace-pre-wrap text-sm leading-relaxed mt-1">${STATE.emailDraft.body}</p></div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (STATE.resultTab === 'resume') {
+                html += `
+                    <div class="bg-white rounded-3xl shadow-sm border border-pink-200 overflow-hidden fade-in">
+                        <div class="bg-pink-600 p-6 text-white"><h2 class="text-2xl font-black">AI Resume Builder</h2><p class="text-pink-200 text-sm">Tailored content for your CV.</p></div>
+                        <div class="p-6">
+                            ${STATE.resumeLoading ? `<div class="py-20 text-center text-pink-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Generating professional content...</div>` :
+                            STATE.resume ? `
+                                <div class="space-y-6">
+                                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Professional Summary</span>
+                                        <p class="text-slate-700 text-sm leading-relaxed">${STATE.resume.summary}</p>
+                                    </div>
+                                    
+                                    <div class="grid md:grid-cols-2 gap-6">
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Recommended Hard Skills</span>
+                                            <div class="flex flex-wrap gap-2">
+                                                ${STATE.resume.hard_skills.map(skill => `<span class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-700 font-medium shadow-sm">${skill}</span>`).join('')}
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Experience Bullet Points (Fresher)</span>
+                                            <ul class="space-y-3">
+                                                ${STATE.resume.experience_bullets.map(bullet => `
+                                                    <li class="flex gap-3 text-sm text-slate-600">
+                                                        <span class="text-pink-500 font-bold mt-0.5">•</span>
+                                                        <span>${bullet}</span>
+                                                    </li>
+                                                `).join('')}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <button onclick="navigator.clipboard.writeText(JSON.stringify(STATE.resume, null, 2)); alert('Content copied!');" class="w-full mt-4 border border-pink-200 text-pink-700 hover:bg-pink-50 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                                        <i data-lucide="copy" class="w-4 h-4"></i> Copy All Data
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            } else if (STATE.resultTab === 'mentor') {
+                 html += `
+                    <div class="bg-white rounded-3xl shadow-sm border border-blue-200 overflow-hidden flex flex-col h-[600px] fade-in">
+                        <div class="bg-blue-600 p-4 text-white flex items-center gap-3">
+                            <div class="bg-white/20 p-2 rounded-full"><i data-lucide="user" class="w-5 h-5 text-white"></i></div>
+                            <div><h2 class="font-bold text-lg">Senior ${topCareers[0].title}</h2><p class="text-blue-100 text-xs">AI Mentor • Online</p></div>
+                        </div>
+                        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                            ${STATE.chatHistory.length === 0 ? `<div class="text-center py-10 text-slate-400 text-sm"><p>Ask me anything.</p><p class="mt-2 text-xs bg-white inline-block px-3 py-1 rounded-full border">"Is the salary good?"</p></div>` : ''}
+                            ${STATE.chatHistory.map(msg => `
+                                <div class="flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}">
+                                    <div class="max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'}">${msg.text}</div>
+                                </div>
+                            `).join('')}
+                            ${STATE.chatLoading ? `<div class="flex justify-start"><div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none shadow-sm"><i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-600"></i></div></div>` : ''}
+                        </div>
+                        <div class="p-4 bg-white border-t border-slate-100 flex gap-2">
+                            <input type="text" id="chatInput" value="${STATE.chatInput}" oninput="updateChatInput(this.value)" onkeydown="if(event.key==='Enter') handleChatSend()" placeholder="Ask a question..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                            <button onclick="handleChatSend()" ${!STATE.chatInput.trim() || STATE.chatLoading ? 'disabled' : ''} class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"><i data-lucide="send" class="w-5 h-5"></i></button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`; // End Container
+            return html;
+        }
+
+        // --- MAIN RENDER LOOP ---
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = renderHeader();
+            
+            if (STATE.step === 0) app.innerHTML += renderStep0();
+            else if (STATE.step === 1) app.innerHTML += renderStep1();
+            else if (STATE.step === 2) app.innerHTML += renderStep2();
+            else if (STATE.step === 3) app.innerHTML += renderStep3();
+            else if (STATE.step === 4) app.innerHTML += renderStep4();
+            else if (STATE.step === 5) app.innerHTML += renderStep5();
+
+            lucide.createIcons();
+            
+            // Re-focus chat input if it exists and was focused
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput && STATE.resultTab === 'mentor' && !STATE.chatLoading) {
+               chatInput.focus();
+            }
+
+            // Expose logic to window for onclick handlers
+            window.setStep = setStep;
+            window.setProfile = setProfile;
+            window.toggleInterest = toggleInterest;
+            window.answerMcq = answerMcq;
+            window.handleAssessmentComplete = handleAssessmentComplete;
+            window.handleRestart = handleRestart;
+            window.setResultTab = setResultTab;
+            window.updateChatInput = updateChatInput;
+            window.handleChatSend = handleChatSend;
+            window.fetchResume = fetchResume;
+            window.generateAudio = generateAudio;
+        }
+    </script>
+</body>
+</html>

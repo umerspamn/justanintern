@@ -1,0 +1,65 @@
+/*
+ * Plus Jakarta Sans — Self-hosted for EC2 deployment
+ * ─────────────────────────────────────────────────────
+ * Generated from Google Fonts. Font files live in:
+ *   assets/fonts/PlusJakartaSans-*.woff2
+ *
+ * setup.sh downloads these files automatically.
+ * If you need to download manually:
+ *   https://fonts.google.com/specimen/Plus+Jakarta+Sans
+ * ─────────────────────────────────────────────────────
+ */
+
+/* 300 Light */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans-Light.woff2') format('woff2');
+}
+
+/* 400 Regular */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans-Regular.woff2') format('woff2');
+}
+
+/* 500 Medium */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans-Medium.woff2') format('woff2');
+}
+
+/* 600 SemiBold */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans-SemiBold.woff2') format('woff2');
+}
+
+/* 700 Bold */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans-Bold.woff2') format('woff2');
+}
+
+/* 800 ExtraBold */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/PlusJakartaSans-ExtraBold.woff2') format('woff2');
+}
