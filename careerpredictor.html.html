@@ -1,218 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Just An Intern - Career Predictor</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Predictor — Just An Intern</title>
+<meta name="description" content="Discover careers that fit your strengths. A data-driven career predictor calibrated for the Pakistani job market, from Just An Intern."/>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
 
-    <style>
-        :root{
-            --bg:#090B0F;
-            --s0:#0D1018;
-            --s1:#131720;
-            --s2:#181D28;
-            --s3:#1E2433;
-            --b1:rgba(255,255,255,.07);
-            --b2:rgba(255,255,255,.11);
-            --t0:#F0F2F8;
-            --t1:#B8BECC;
-            --t2:#7A8299;
-            --blue:#4F7AFF;
-            --blue2:#6B93FF;
-            --blue3:#3A62E8;
-            --bd:rgba(79,122,255,.15);
-            --bg_blue:rgba(79,122,255,.08);
-            --font:'Plus Jakarta Sans', system-ui, sans-serif;
-        }
-        body {
-            font-family: var(--font);
-            background: var(--bg) !important;
-            color: var(--t0) !important;
-        }
-        /* Remove click-blink animation on every render */
-        .fade-in { animation: none !important; }
-        @keyframes fadeIn { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
+<!-- Plus Jakarta Sans — matches the Just An Intern design system -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* Bring Tailwind utility palette closer to index.html dark style */
-        .bg-slate-50, .bg-white, .bg-slate-100 { background-color: var(--s1) !important; }
-        .bg-slate-900 { background: linear-gradient(135deg, #2D52C9, #4F7AFF) !important; }
-        .text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-slate-400 {
-            color: var(--t1) !important;
-        }
-        .text-white { color: #fff !important; }
-        .border-slate-100, .border-slate-200, .border-slate-700 {
-            border-color: var(--b1) !important;
-        }
-        .shadow-xl, .shadow-lg, .shadow-sm {
-            box-shadow: 0 16px 40px rgba(0,0,0,.45) !important;
-        }
-        .bg-emerald-600, .bg-emerald-700, .bg-blue-600, .bg-indigo-600, .bg-purple-600, .bg-orange-600, .bg-pink-600 {
-            background: linear-gradient(135deg, var(--blue3), var(--blue)) !important;
-        }
-        .text-emerald-700, .text-blue-700, .text-indigo-700, .text-purple-700, .text-orange-700, .text-pink-700 {
-            color: var(--blue2) !important;
-        }
-        .bg-emerald-50, .bg-blue-50, .bg-indigo-50, .bg-purple-50, .bg-orange-50, .bg-pink-50 {
-            background: var(--bg_blue) !important;
-        }
-        .border-emerald-100, .border-blue-100, .border-indigo-100, .border-purple-100, .border-orange-100, .border-pink-100, .border-emerald-200, .border-blue-200, .border-indigo-200, .border-purple-200, .border-orange-200, .border-pink-200 {
-            border-color: var(--bd) !important;
-        }
-        .ring-emerald-500, .ring-blue-500 { --tw-ring-color: rgba(79,122,255,.35) !important; }
-        .hover\:bg-emerald-700:hover, .hover\:bg-blue-700:hover, .hover\:bg-slate-800:hover {
-            background: linear-gradient(135deg, #4069F0, #5C86FF) !important;
-        }
-        input, button { font-family: var(--font) !important; }
+<style>
+/* ===== Design tokens (Just An Intern system) ===== */
+:root{
+  --bg:#090B0F;
+  --s0:#0D1018;--s1:#131720;--s2:#181D28;--s3:#1E2433;--s4:#242A3A;--s5:#2A3044;
+  --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.17);
+  --t0:#F0F2F8;--t1:#B8BECC;--t2:#7A8299;--t3:#4A5166;
+  --blue:#4F7AFF;--blue2:#6B93FF;--blue3:#3A62E8;--bd:rgba(79,122,255,.15);--bg_blue:rgba(79,122,255,.08);
+  --green:#22C55E;--gd:rgba(34,197,94,.12);--gt:rgba(34,197,94,.7);
+  --amber:#F59E0B;--ad:rgba(245,158,11,.12);
+  --red:#EF4444;--rd:rgba(239,68,68,.12);
+  --purple:#A78BFA;--pd:rgba(167,139,250,.12);
+  --cyan:#06B6D4;
+  --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --th:54px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.2);
+  --shadow:0 4px 12px rgba(0,0,0,.4),0 2px 4px rgba(0,0,0,.3);
+  --shadow-lg:0 16px 40px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.4);
+  --shadow-xl:0 32px 80px rgba(0,0,0,.6),0 8px 24px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);background:var(--bg);color:var(--t0);
+  min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased;
+  position:relative;overflow-x:hidden;
+}
+::selection{background:rgba(79,122,255,.3)}
 
-        /* Custom scrollbar for chat */
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+/* ambient background */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+.bg-orb-1{width:600px;height:600px;background:radial-gradient(circle,rgba(79,122,255,.16) 0%,transparent 65%);top:-200px;left:-150px;animation:orb1 24s ease-in-out infinite}
+.bg-orb-2{width:480px;height:480px;background:radial-gradient(circle,rgba(167,139,250,.10) 0%,transparent 65%);bottom:-150px;right:-120px;animation:orb2 30s ease-in-out infinite}
+@keyframes orb1{0%,100%{transform:translate(0,0)}40%{transform:translate(60px,70px)}75%{transform:translate(-40px,40px)}}
+@keyframes orb2{0%,100%{transform:translate(0,0)}40%{transform:translate(-55px,-65px)}75%{transform:translate(35px,-30px)}}
 
-        /* ── ANIMATED BACKGROUND ── */
-        body { position: relative; overflow-x: hidden; }
-        body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background-image: radial-gradient(circle, rgba(255,255,255,.025) 1px, transparent 1px);
-            background-size: 28px 28px;
-            pointer-events: none; z-index: 0;
-        }
-        .bg-orb {
-            position: fixed; border-radius: 50%;
-            filter: blur(100px); pointer-events: none; z-index: 0;
-        }
-        .bg-orb-1 {
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(79,122,255,.16) 0%, transparent 65%);
-            top: -200px; left: -150px;
-            animation: orb-cp1 24s ease-in-out infinite;
-        }
-        .bg-orb-2 {
-            width: 480px; height: 480px;
-            background: radial-gradient(circle, rgba(34,197,94,.09) 0%, transparent 65%);
-            bottom: -150px; right: -120px;
-            animation: orb-cp2 30s ease-in-out infinite;
-        }
-        @keyframes orb-cp1 { 0%,100%{transform:translate(0,0)} 40%{transform:translate(60px,70px)} 75%{transform:translate(-40px,40px)} }
-        @keyframes orb-cp2 { 0%,100%{transform:translate(0,0)} 40%{transform:translate(-55px,-65px)} 75%{transform:translate(35px,-30px)} }
+/* app shell + containers */
+.cp-app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.cp-narrow{width:100%;max-width:460px;margin:0 auto;padding:30px 20px}
+.cp-mid{width:100%;max-width:580px;margin:0 auto;padding:30px 20px}
+.cp-wide{width:100%;max-width:1040px;margin:0 auto;padding:24px 20px 72px;display:flex;flex-direction:column;gap:18px}
+.cp-center{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;min-height:78vh}
+.cp-stack{display:flex;flex-direction:column}
+.cp-gap-16{gap:16px}.cp-gap-20{gap:20px}.cp-gap-24{gap:24px}
 
-        /* Ensure app container is above orbs */
-        #app { position: relative; z-index: 1; }
+/* topbar */
+.cp-top{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  height:var(--th);padding:0 18px;background:rgba(9,11,15,.85);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);
+}
+.cp-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;letter-spacing:-.2px;color:var(--t0)}
+.cp-brand-ico{width:30px;height:30px;border-radius:var(--r8);display:grid;place-items:center;background:linear-gradient(135deg,var(--blue3),var(--blue));box-shadow:0 2px 10px rgba(79,122,255,.35)}
+.cp-brand-ico svg{width:16px;height:16px;color:#fff}
+.cp-brand small{display:block;font-size:10.5px;font-weight:600;color:var(--t2);letter-spacing:.02em;margin-top:1px}
+.cp-restart{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--t2);background:transparent;border:1px solid var(--b1);padding:6px 11px;border-radius:var(--r8);cursor:pointer;transition:all .15s var(--ease)}
+.cp-restart:hover{color:var(--t0);border-color:var(--b3);background:var(--s2)}
+.cp-restart svg{width:13px;height:13px}
 
-        /* ── PAGE ENTRANCE ANIMATION ── */
-        #app > * {
-            animation: cp-fade-up 0.5s cubic-bezier(.16,1,.3,1) forwards;
-        }
-        @keyframes cp-fade-up {
-            from { opacity: 0; transform: translateY(16px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+/* typography */
+.cp-h1{font-size:clamp(26px,4.5vw,40px);font-weight:800;line-height:1.08;letter-spacing:-.6px;color:var(--t0);margin:0 0 12px}
+.cp-h2{font-size:22px;font-weight:800;letter-spacing:-.3px;color:var(--t0);margin:0}
+.cp-h3{font-size:15px;font-weight:700;color:var(--t0);margin:0}
+.cp-h4{font-size:15.5px;font-weight:700;color:var(--t0);margin:0}
+.cp-sub{color:var(--t1);font-size:14px;line-height:1.7;margin:0}
+.cp-mut{color:var(--t2);font-size:12px}
+.cp-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2)}
+.grad{background:linear-gradient(135deg,#6B93FF 0%,#A78BFA 60%,#60C9FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-        /* ── TOPBAR / NAV POLISH ── */
-        .sticky {
-            background: rgba(9,11,15,.88) !important;
-            backdrop-filter: blur(20px) !important;
-            border-bottom: 1px solid rgba(255,255,255,.06) !important;
-        }
+/* buttons — identical to index.html system */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 14px;border-radius:var(--r8);font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;border:1px solid transparent;transition:all .15s var(--ease);white-space:nowrap;letter-spacing:.1px}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,#3A62E8,#5B87FF);color:#fff;border-color:rgba(79,122,255,.4);box-shadow:0 2px 10px rgba(79,122,255,.35)}
+.btn-primary:hover:not(:disabled){background:linear-gradient(135deg,#4B73F9,#6B97FF);box-shadow:0 4px 20px rgba(79,122,255,.5);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-ghost{background:transparent;color:var(--t1);border-color:var(--b2)}
+.btn-ghost:hover:not(:disabled){background:var(--s2);border-color:var(--b3);color:var(--t0);transform:translateY(-1px)}
+.btn-lg{padding:13px 18px;font-size:13.5px;border-radius:var(--r12)}
+.btn-block{width:100%}
 
-        /* ── BUTTON IMPROVEMENTS ── */
-        button, .btn {
-            transition: all 0.2s cubic-bezier(.16,1,.3,1) !important;
-        }
-        button:hover:not(:disabled) { transform: translateY(-1px); }
-        button:active { transform: translateY(0) !important; }
+/* inputs — identical to index.html .inp */
+.inp{width:100%;padding:11px 13px;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r8);color:var(--t0);font-family:var(--font);font-size:13.5px;outline:none;transition:border-color .18s,background .18s,box-shadow .18s;-webkit-appearance:none;line-height:1.5}
+.inp:hover{border-color:var(--b2);background:var(--s3)}
+.inp:focus{border-color:var(--blue);background:var(--s3);box-shadow:0 0 0 3px rgba(79,122,255,.12)}
+.inp::placeholder{color:var(--t3)}
 
-        /* ── CARD HOVER POLISH ── */
-        .rounded-xl, .rounded-2xl {
-            transition: box-shadow 0.2s, transform 0.2s;
-        }
+/* cards */
+.cp-card{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r20);box-shadow:var(--shadow-lg)}
+.cp-card-pad{padding:26px}
+.cp-card.is-rec{border-color:rgba(79,122,255,.45);box-shadow:var(--shadow-lg),0 0 0 1px rgba(79,122,255,.12)}
+.cp-soft{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r12);padding:16px}
+.cp-clip{overflow:hidden}
 
-        /* ── INPUT FOCUS GLOW ── */
-        input:focus, select:focus, textarea:focus {
-            box-shadow: 0 0 0 3px rgba(79,122,255,.15) !important;
-            border-color: rgba(79,122,255,.5) !important;
-            outline: none !important;
-        }
+/* fields */
+.cp-field{margin-bottom:18px}
+.cp-label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
 
-        /* ── PROGRESS BAR ANIMATION ── */
-        .transition-all { transition: all 0.4s cubic-bezier(.16,1,.3,1) !important; }
+/* option buttons / choice cards */
+.cp-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.cp-opt{display:block;width:100%;text-align:left;padding:12px 14px;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r10);color:var(--t1);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .16s var(--ease)}
+.cp-opt:hover{border-color:rgba(79,122,255,.4);background:var(--s3);color:var(--t0);transform:translateY(-1px)}
+.cp-opt.is-on{border-color:var(--blue);background:var(--bg_blue);color:var(--t0);box-shadow:0 0 0 3px rgba(79,122,255,.1)}
+.cp-opt-title{font-weight:700;color:var(--t0)}
+.cp-opt-note{font-size:11.5px;color:var(--t2);margin-top:2px;font-weight:500}
+.cp-opt.is-on .cp-opt-note{color:var(--t1)}
+.cp-opt-c{text-align:center}
 
-        /* ── GRADIENT TEXT ── */
-        .grad-text {
-            background: linear-gradient(135deg, #6B93FF, #A78BFA);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
+/* tabs */
+.cp-tabs{display:flex;gap:6px;overflow-x:auto;padding:6px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r12);scrollbar-width:none}
+.cp-tabs::-webkit-scrollbar{display:none}
+.cp-tab{flex:1;min-width:104px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 12px;border-radius:var(--r8);font-size:12.5px;font-weight:700;color:var(--t2);background:transparent;border:1px solid transparent;cursor:pointer;transition:all .15s var(--ease);white-space:nowrap}
+.cp-tab:hover{color:var(--t0);background:var(--s2)}
+.cp-tab.is-on{color:var(--blue2);background:var(--bg_blue);border-color:var(--bd)}
+.cp-tab svg{width:15px;height:15px}
 
-        /* ── OPTION CARD HOVER ── */
-        label[class*="cursor-pointer"] {
-            transition: all 0.18s cubic-bezier(.16,1,.3,1) !important;
-        }
-        label[class*="cursor-pointer"]:hover {
-            transform: translateY(-2px);
-            border-color: rgba(79,122,255,.4) !important;
-            background: rgba(79,122,255,.05) !important;
-        }
-    </style>
+/* progress + bars */
+.cp-prog{height:7px;background:var(--s2);border-radius:99px;overflow:hidden}
+.cp-prog-fill{height:100%;background:linear-gradient(90deg,var(--blue3),var(--blue));border-radius:99px;transition:width .5s var(--ease)}
+.cp-prog-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t2);margin-bottom:8px}
+.cp-bar{height:6px;background:var(--s2);border-radius:99px;overflow:hidden}
+.cp-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:99px;transition:width .6s var(--ease)}
+.cp-bar-row{display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--t2);margin-bottom:6px}
+.cp-bar-row span:last-child{color:var(--t0)}
+
+/* alerts */
+.cp-alert{display:flex;gap:10px;padding:13px 15px;border-radius:var(--r12);font-size:13px;line-height:1.55}
+.cp-alert svg{width:17px;height:17px;flex-shrink:0;margin-top:1px}
+.cp-alert.info{background:var(--bg_blue);border:1px solid var(--bd);color:var(--blue2)}
+.cp-alert.warn{background:var(--ad);border:1px solid rgba(245,158,11,.25);color:var(--amber)}
+.cp-alert.danger{background:var(--rd);border:1px solid rgba(239,68,68,.25);color:#FCA5A5}
+.cp-alert strong{color:var(--t0);font-weight:700}
+
+/* pills + chips */
+.cp-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;background:var(--s3);color:var(--t1);border:1px solid var(--b1)}
+.cp-qnum{display:inline-grid;place-items:center;min-width:30px;height:24px;padding:0 7px;border-radius:var(--r6);font-size:11px;font-weight:700;background:var(--bg_blue);color:var(--blue2);border:1px solid var(--bd)}
+
+/* score + report header */
+.cp-score{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1;color:var(--blue2)}
+.cp-report-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:18px;padding:26px;border-radius:var(--r20);background:linear-gradient(135deg,#11162A,#0E1119);border:1px solid var(--b1);box-shadow:var(--shadow-lg)}
+.cp-conf{display:flex;align-items:center;gap:14px;background:var(--s2);border:1px solid var(--b1);padding:14px 16px;border-radius:var(--r16)}
+.cp-conf-bar{width:6px;height:42px;border-radius:99px}
+.cp-conf .v{font-size:20px;font-weight:800;line-height:1}
+
+/* feature header band */
+.cp-fh{padding:22px 24px;background:linear-gradient(135deg,var(--blue3),var(--blue));color:#fff}
+.cp-fh h2{margin:0;font-size:20px;font-weight:800;letter-spacing:-.3px;color:#fff}
+.cp-fh p{margin:5px 0 0;font-size:12.5px;color:rgba(255,255,255,.82)}
+
+/* timeline (day in life) */
+.cp-tl{position:relative;border-left:1.5px solid var(--b2);margin:4px 0 4px 6px;padding:6px 0;display:flex;flex-direction:column;gap:26px}
+.cp-tl-item{position:relative;padding-left:26px}
+.cp-tl-dot{position:absolute;left:-8px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--s1);border:2px solid var(--blue)}
+.cp-tl-time{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue2)}
+.cp-tl-h{font-size:15px;font-weight:700;color:var(--t0);margin:4px 0 2px}
+.cp-tl-p{font-size:13px;color:var(--t1);margin:0;line-height:1.55}
+
+/* roadmap */
+.cp-uni{display:flex;gap:14px;align-items:flex-start;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r16);padding:16px}
+.cp-uni-n{flex-shrink:0;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:16px;color:var(--blue2);background:var(--bg_blue);border:1px solid var(--bd)}
+.cp-uni-deg{color:var(--blue2);font-weight:600;font-size:13px;margin:2px 0 0}
+.cp-uni-tip{margin-top:10px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r10);padding:10px 12px;font-size:12px;color:var(--t1);line-height:1.5}
+.cp-uni-tip b{color:var(--blue2)}
+
+/* email / resume content */
+.cp-doc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r16);padding:20px}
+.cp-doc .lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);display:block;margin-bottom:6px}
+.cp-doc .val{color:var(--t0);font-weight:700;margin:0 0 16px}
+.cp-doc .body{color:var(--t1);font-size:13.5px;line-height:1.7;white-space:pre-wrap;margin:0}
+.cp-skills{display:flex;flex-wrap:wrap;gap:7px}
+.cp-skill{display:inline-flex;padding:6px 11px;border-radius:var(--r8);font-size:12.5px;font-weight:600;background:var(--s2);border:1px solid var(--b1);color:var(--t0)}
+
+/* chat */
+.cp-chat{display:flex;flex-direction:column;height:600px;background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r20);overflow:hidden}
+.cp-chat-head{display:flex;align-items:center;gap:11px;padding:14px 16px;background:linear-gradient(135deg,var(--blue3),var(--blue));color:#fff}
+.cp-chat-av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.18)}
+.cp-chat-av svg{width:18px;height:18px;color:#fff}
+.cp-chat-head h2{margin:0;font-size:15px;font-weight:700;color:#fff}
+.cp-chat-head p{margin:1px 0 0;font-size:11.5px;color:rgba(255,255,255,.8)}
+.cp-chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--s0)}
+.cp-chat-body::-webkit-scrollbar{width:8px}.cp-chat-body::-webkit-scrollbar-thumb{background:var(--s3);border-radius:99px}
+.cp-msg{max-width:80%;padding:11px 14px;font-size:13px;line-height:1.5;border-radius:var(--r16)}
+.cp-msg.bot{align-self:flex-start;background:var(--s2);border:1px solid var(--b1);color:var(--t0);border-top-left-radius:6px}
+.cp-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--blue3),var(--blue));color:#fff;border-top-right-radius:6px}
+.cp-chat-foot{display:flex;gap:9px;padding:13px;border-top:1px solid var(--b1);background:var(--s1)}
+.cp-chat-empty{text-align:center;color:var(--t2);font-size:13px;padding:40px 16px}
+.cp-chat-empty .hint{display:inline-block;margin-top:10px;font-size:11.5px;background:var(--s2);border:1px solid var(--b1);padding:5px 11px;border-radius:99px;color:var(--t1)}
+
+/* lists */
+.cp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.cp-list li{display:flex;gap:9px;font-size:13px;color:var(--t1);line-height:1.55}
+.cp-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);margin-top:7px;flex-shrink:0}
+
+/* "other paths" row */
+.cp-row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r16);padding:16px 18px;transition:border-color .18s,transform .18s}
+.cp-row:hover{border-color:var(--b3);transform:translateY(-1px)}
+.cp-row .pct{font-size:18px;font-weight:800;color:var(--t1)}
+
+/* results layout */
+.cp-result-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start}
+.cp-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* spinner + loading */
+.cp-spin{animation:cpspin 1s linear infinite}
+@keyframes cpspin{to{transform:rotate(360deg)}}
+.cp-loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:64px 16px;color:var(--t1);font-size:14px;text-align:center}
+.cp-loading svg{width:30px;height:30px;color:var(--blue)}
+
+/* rec badge */
+.cp-rec-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--blue2);background:var(--bg_blue);border:1px solid var(--bd);padding:5px 11px;border-radius:99px}
+
+/* responsive */
+@media(max-width:860px){.cp-result-grid{grid-template-columns:1fr}}
+@media(max-width:560px){
+  .cp-grid-2{grid-template-columns:1fr}
+  .cp-2col{grid-template-columns:1fr}
+  .cp-card-pad{padding:20px}
+  .cp-report-head{padding:20px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
+<body>
 
-    <!-- Animated background orbs -->
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
+<!-- ambient orbs -->
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
 
-    <!-- App Container -->
-    <div id="app" class="max-w-4xl mx-auto min-h-screen flex flex-col">
-        <!-- Content injected here by JS -->
-    </div>
+<!-- app -->
+<div id="app" class="cp-app"></div>
 
-    <!-- Firebase SDKs (Module) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-
-        // Configuration - checking global variable first, then localStorage
-        let firebaseConfig = {};
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                firebaseConfig = JSON.parse(__firebase_config);
-            } else {
-                firebaseConfig = JSON.parse(localStorage.getItem('__firebase_config') || '{}');
-            }
-        } catch (e) { console.error("Config parse error", e); }
-        
-        // Initialize (Safe check for empty config in preview)
-        if (Object.keys(firebaseConfig).length > 0) {
-            try {
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-                
-                // Expose to global scope for the main logic to use
-                window.firebaseAuth = auth;
-                window.firebaseDb = db;
-                window.firebaseFuncs = { signInAnonymously, collection, addDoc, serverTimestamp };
-                
-                // Auto sign-in
-                signInAnonymously(auth).then(userCred => {
-                    console.log("Auth:", userCred.user.uid);
-                }).catch(e => console.error("Auth Error", e));
-            } catch (e) {
-                console.warn("Firebase Init Error (likely missing config):", e);
-            }
-        }
-    </script>
-
-    <!-- Main Application Logic -->
+<!-- Main Application Logic -->
     <script>
         // --- CONFIGURATION ---
         const API_BASE = localStorage.getItem('cvforge_api_base') || 'http://localhost:3000';
@@ -587,7 +630,10 @@
             const career = STATE.results.careers[0].title;
             const prompt = `Generate a gritty, realistic 'Day in the Life' schedule for a ${career} in Pakistan. Include local context (traffic, load shedding, office culture). Output JSON array: [{"time": "8:00 AM", "activity": "..."}]`;
             try {
-                STATE.dayInLife = await callAIJSON(prompt, 0.5);
+                const data = await callAIJSON(prompt, 0.5);
+                STATE.dayInLife = Array.isArray(data)
+                    ? data
+                    : (data && Array.isArray(Object.values(data)[0]) ? Object.values(data)[0] : []);
             } catch (e) {
                 console.error(e);
                 STATE.dayInLife = [
@@ -603,7 +649,10 @@
             const career = STATE.results.careers[0].title;
             const prompt = `List top 3 universities in ${STATE.profile.city || 'Pakistan'} for ${career}. Output JSON array: [{"name": "...", "degree": "...", "tip": "Admission tip"}]`;
             try {
-                STATE.roadmap = await callAIJSON(prompt, 0.4);
+                const data = await callAIJSON(prompt, 0.4);
+                STATE.roadmap = Array.isArray(data)
+                    ? data
+                    : (data && Array.isArray(Object.values(data)[0]) ? Object.values(data)[0] : []);
             } catch (e) {
                 console.error(e);
                 STATE.roadmap = [
@@ -667,33 +716,24 @@
 
         function renderHeader() {
             return `
-                <div class="flex justify-between items-center p-4 bg-white border-b border-slate-100 sticky top-0 z-50">
-                    <div class="flex items-center gap-2">
-                        <div class="bg-emerald-600 p-1.5 rounded-lg">
-                            <i data-lucide="brain" class="w-5 h-5 text-white"></i>
-                        </div>
-                        <span class="font-bold text-slate-800">Just An Intern Career Predictor</span>
+                <div class="cp-top">
+                    <div class="cp-brand">
+                        <div class="cp-brand-ico"><i data-lucide="compass"></i></div>
+                        <div>Career Predictor<small>Just An Intern</small></div>
                     </div>
-                    ${STATE.step > 0 ? `<button onclick="handleRestart()" class="text-xs font-medium text-slate-500 hover:text-emerald-600 flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restart</button>` : ''}
+                    ${STATE.step > 0 ? `<button onclick="handleRestart()" class="cp-restart"><i data-lucide="rotate-ccw"></i> Restart</button>` : ''}
                 </div>
             `;
         }
 
         function renderStep0() {
             return `
-                <div class="flex items-center justify-center min-h-[80vh] p-6 fade-in">
-                    <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-xl border border-slate-100 text-center">
-                        <div class="bg-slate-900 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-slate-200">
-                            <i data-lucide="sparkles" class="w-8 h-8 text-white"></i>
-                        </div>
-                        <h1 class="text-4xl font-black text-slate-900 mb-4 tracking-tight">Just An Intern Career Predictor</h1>
-                        <p class="text-slate-500 mb-10 font-medium leading-relaxed">
-                            A scientific, data-driven career engine calibrated for the Pakistani job market. 
-                            No fluff. Just vectors.
-                        </p>
-                        <button onclick="setStep(1)" class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2">
-                            Start Analysis <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                        </button>
+                <div class="cp-center">
+                    <div class="cp-card cp-card-pad" style="max-width:460px;width:100%;text-align:center">
+                        <div class="cp-brand-ico" style="width:56px;height:56px;border-radius:var(--r16);margin:0 auto 22px"><i data-lucide="compass" style="width:28px;height:28px"></i></div>
+                        <h1 class="cp-h1">Find the career that <span class="grad">fits you.</span></h1>
+                        <p class="cp-sub" style="margin-bottom:28px">A data-driven career engine calibrated for the Pakistani job market. Answer honestly, and we'll map your strengths to real paths, no fluff.</p>
+                        <button onclick="setStep(1)" class="btn btn-primary btn-lg btn-block">Start analysis <i data-lucide="arrow-right"></i></button>
                     </div>
                 </div>
             `;
@@ -702,36 +742,39 @@
         function renderStep1() {
             const streams = ['pre-engineering', 'pre-medical', 'ics', 'commerce', 'arts'];
             const streamBtns = streams.map(s => 
-                `<button onclick="setProfile('stream', '${s}')" class="p-3 rounded-lg text-sm font-medium border capitalize ${STATE.profile.stream === s ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200'}">${s.replace('-', ' ')}</button>`
+                `<button onclick="setProfile('stream', '${s}')" class="cp-opt cp-opt-c ${STATE.profile.stream === s ? 'is-on' : ''}" style="text-transform:capitalize">${s.replace('-', ' ')}</button>`
             ).join('');
 
             return `
-                <div class="max-w-lg mx-auto p-6 space-y-6 fade-in">
-                    <h2 class="text-2xl font-black text-slate-800">Who are you?</h2>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase">Stream</label>
-                            <div class="grid grid-cols-2 gap-2 mt-1">${streamBtns}</div>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase">Financial Urgency</label>
-                            <div class="grid grid-cols-2 gap-2 mt-1">
-                                <button onclick="setProfile('financialPressure', 'yes')" class="p-3 rounded-lg text-sm border text-left ${STATE.profile.financialPressure === 'yes' ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500' : 'bg-white border-slate-200 text-slate-500'}">
-                                    <div class="font-bold">High</div><div class="text-xs opacity-75">Need income ASAP</div>
-                                </button>
-                                <button onclick="setProfile('financialPressure', 'no')" class="p-3 rounded-lg text-sm border text-left ${STATE.profile.financialPressure === 'no' ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-1 ring-emerald-500' : 'bg-white border-slate-200 text-slate-500'}">
-                                    <div class="font-bold">Low</div><div class="text-xs opacity-75">Can invest time</div>
-                                </button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase">Age</label>
-                            <input type="number" value="${STATE.profile.age}" oninput="setProfile('age', this.value)" class="w-full p-3 border border-slate-200 rounded-lg mt-1 outline-none focus:border-emerald-500" placeholder="e.g. 18" />
+                <div class="cp-mid cp-stack cp-gap-24">
+                    <div>
+                        <span class="cp-eyebrow">Step 1 of 3</span>
+                        <h2 class="cp-h2" style="margin-top:6px">Tell us about you</h2>
+                    </div>
+
+                    <div class="cp-field">
+                        <label class="cp-label">Academic stream</label>
+                        <div class="cp-grid-2">${streamBtns}</div>
+                    </div>
+
+                    <div class="cp-field">
+                        <label class="cp-label">Financial urgency</label>
+                        <div class="cp-grid-2">
+                            <button onclick="setProfile('financialPressure', 'yes')" class="cp-opt ${STATE.profile.financialPressure === 'yes' ? 'is-on' : ''}">
+                                <div class="cp-opt-title">High</div><div class="cp-opt-note">Need income ASAP</div>
+                            </button>
+                            <button onclick="setProfile('financialPressure', 'no')" class="cp-opt ${STATE.profile.financialPressure === 'no' ? 'is-on' : ''}">
+                                <div class="cp-opt-title">Low</div><div class="cp-opt-note">Can invest time</div>
+                            </button>
                         </div>
                     </div>
 
-                    <button onclick="setStep(2)" ${!STATE.profile.age ? 'disabled' : ''} class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold disabled:opacity-50 hover:bg-slate-800 transition-all">Next Step</button>
+                    <div class="cp-field">
+                        <label class="cp-label">Age</label>
+                        <input type="number" value="${STATE.profile.age}" oninput="setProfile('age', this.value)" class="inp" placeholder="e.g. 18" />
+                    </div>
+
+                    <button onclick="setStep(2)" ${!STATE.profile.age ? 'disabled' : ''} class="btn btn-primary btn-lg btn-block">Continue <i data-lucide="arrow-right"></i></button>
                 </div>
             `;
         }
@@ -739,15 +782,18 @@
         function renderStep2() {
             const list = ['Tech', 'Health', 'Business', 'Finance', 'Arts', 'Public Service', 'Writing', 'Research'];
             const btns = list.map(i => 
-                `<button onclick="toggleInterest('${i}')" class="p-4 rounded-xl border font-bold text-sm transition-all ${STATE.interests.includes(i) ? 'bg-emerald-600 text-white border-emerald-600 shadow-md transform scale-[1.02]' : 'bg-white text-slate-600 border-slate-200'}">${i}</button>`
+                `<button onclick="toggleInterest('${i}')" class="cp-opt cp-opt-c ${STATE.interests.includes(i) ? 'is-on' : ''}">${i}</button>`
             ).join('');
 
             return `
-                <div class="max-w-lg mx-auto p-6 space-y-6 fade-in">
-                    <h2 class="text-2xl font-black text-slate-800">Interests</h2>
-                    <p class="text-slate-500 text-sm">Select up to 3 areas.</p>
-                    <div class="grid grid-cols-2 gap-3">${btns}</div>
-                    <button onclick="setStep(3)" ${STATE.interests.length === 0 ? 'disabled' : ''} class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold disabled:opacity-50 hover:bg-slate-800 transition-all">Start Assessment</button>
+                <div class="cp-mid cp-stack cp-gap-24">
+                    <div>
+                        <span class="cp-eyebrow">Step 2 of 3</span>
+                        <h2 class="cp-h2" style="margin-top:6px">What pulls your interest?</h2>
+                        <p class="cp-sub" style="margin-top:6px">Pick up to 3 areas. ${STATE.interests.length}/3 selected.</p>
+                    </div>
+                    <div class="cp-grid-2">${btns}</div>
+                    <button onclick="setStep(3)" ${STATE.interests.length === 0 ? 'disabled' : ''} class="btn btn-primary btn-lg btn-block">Start assessment <i data-lucide="arrow-right"></i></button>
                 </div>
             `;
         }
@@ -757,14 +803,14 @@
             const progress = (Object.keys(STATE.mcqAnswers).length / visibleQs.length) * 100;
             
             const qList = visibleQs.map((q, idx) => `
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <div class="flex gap-3 mb-4">
-                        <span class="bg-slate-100 text-slate-500 font-bold px-2 py-1 rounded text-xs h-fit">Q${idx + 1}</span>
-                        <p class="font-bold text-slate-800 text-lg leading-snug">${q.text}</p>
+                <div class="cp-card cp-card-pad">
+                    <div style="display:flex;gap:11px;margin-bottom:16px">
+                        <span class="cp-qnum">Q${idx + 1}</span>
+                        <p class="cp-h4" style="line-height:1.4">${q.text}</p>
                     </div>
-                    <div class="space-y-2">
+                    <div class="cp-stack" style="gap:8px">
                         ${q.options.map((opt, optIdx) => `
-                            <button onclick="answerMcq(${q.id}, ${optIdx})" class="w-full text-left p-4 rounded-xl border text-sm transition-all ${STATE.mcqAnswers[q.id] === optIdx ? 'bg-emerald-50 border-emerald-500 text-emerald-900 font-medium' : 'bg-white border-slate-100 text-slate-600 hover:bg-slate-50'}">
+                            <button onclick="answerMcq(${q.id}, ${optIdx})" class="cp-opt ${STATE.mcqAnswers[q.id] === optIdx ? 'is-on' : ''}">
                                 ${opt.text}
                             </button>
                         `).join('')}
@@ -773,20 +819,18 @@
             `).join('');
 
             return `
-                <div class="max-w-xl mx-auto p-6 space-y-8 fade-in">
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs font-bold text-slate-400 uppercase">
+                <div class="cp-mid cp-stack" style="gap:24px">
+                    <div>
+                        <div class="cp-prog-row">
                             <span>Progress</span>
                             <span>${Object.keys(STATE.mcqAnswers).length} / ${visibleQs.length}</span>
                         </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${progress}%"></div>
-                        </div>
-                        ${STATE.isExtendedPhase ? `<div class="bg-amber-50 text-amber-700 text-xs px-3 py-2 rounded-lg flex items-center gap-2"><i data-lucide="alert-triangle" class="w-3 h-3"></i> Extending assessment for accuracy...</div>` : ''}
+                        <div class="cp-prog"><div class="cp-prog-fill" style="width:${progress}%"></div></div>
+                        ${STATE.isExtendedPhase ? `<div class="cp-alert warn" style="margin-top:12px"><i data-lucide="alert-triangle"></i> <div>Extending the assessment for a more accurate read.</div></div>` : ''}
                     </div>
-                    <div class="space-y-8">${qList}</div>
-                    <button onclick="handleAssessmentComplete()" ${Object.keys(STATE.mcqAnswers).length < visibleQs.length ? 'disabled' : ''} class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-emerald-200 disabled:opacity-50 disabled:shadow-none hover:bg-emerald-700 transition-all">
-                        ${STATE.isExtendedPhase ? "Finalize Analysis" : (visibleQs.length === 12 ? "Analyze Profile" : "Continue")}
+                    <div class="cp-stack" style="gap:14px">${qList}</div>
+                    <button onclick="handleAssessmentComplete()" ${Object.keys(STATE.mcqAnswers).length < visibleQs.length ? 'disabled' : ''} class="btn btn-primary btn-lg btn-block">
+                        ${STATE.isExtendedPhase ? "Finalize analysis" : (visibleQs.length === 12 ? "Analyze my profile" : "Continue")}
                     </button>
                 </div>
             `;
@@ -794,10 +838,14 @@
 
         function renderStep4() {
             return `
-                <div class="flex flex-col items-center justify-center min-h-[80vh] text-center p-6 fade-in">
-                    <i data-lucide="loader-2" class="w-12 h-12 text-emerald-600 animate-spin mb-6"></i>
-                    <h2 class="text-2xl font-black text-slate-900 mb-2">Processing Vectors...</h2>
-                    <p class="text-slate-500">Cross-referencing ${Object.keys(STATE.mcqAnswers).length} data points against ${CAREER_DATABASE.length} careers.</p>
+                <div class="cp-center">
+                    <div class="cp-loading">
+                        <i data-lucide="loader-2" class="cp-spin"></i>
+                        <div>
+                            <h2 class="cp-h2" style="margin-bottom:6px">Analyzing your profile</h2>
+                            <p class="cp-sub">Cross-referencing ${Object.keys(STATE.mcqAnswers).length} data points against ${CAREER_DATABASE.length} careers.</p>
+                        </div>
+                    </div>
                 </div>
             `;
         }
@@ -811,207 +859,194 @@
 
             // Header
             let html = `
-                <div class="max-w-4xl mx-auto p-4 md:p-8 space-y-6 fade-in">
-                    <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div><h1 class="text-3xl font-black">Career Report</h1><p class="text-slate-400 mt-1">Based on vectors & ML logic</p></div>
-                        <div class="flex items-center gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
-                            <div class="text-right"><div class="text-xs font-bold text-slate-400 uppercase">Confidence</div><div class="text-2xl font-black ${confidenceScore > 75 ? 'text-emerald-400' : 'text-amber-400'}">${confidenceScore > 75 ? 'High' : 'Low'}</div></div>
-                            <div class="w-2 h-12 rounded-full ${confidenceScore > 75 ? 'bg-emerald-500' : 'bg-amber-500'}"></div>
+                <div class="cp-wide">
+                    <div class="cp-report-head">
+                        <div>
+                            <span class="cp-eyebrow">Your results</span>
+                            <h1 class="cp-h2" style="font-size:28px;margin-top:6px">Career Report</h1>
+                            <p class="cp-sub" style="margin-top:4px">Matched from your traits, interests, and constraints.</p>
+                        </div>
+                        <div class="cp-conf">
+                            <div style="text-align:right">
+                                <div class="cp-eyebrow">Confidence</div>
+                                <div class="v" style="margin-top:4px;color:${confidenceScore > 75 ? 'var(--green)' : 'var(--amber)'}">${confidenceScore > 75 ? 'High' : 'Low'}</div>
+                            </div>
+                            <div class="cp-conf-bar" style="background:${confidenceScore > 75 ? 'var(--green)' : 'var(--amber)'}"></div>
                         </div>
                     </div>
-                    ${confidenceScore <= 75 ? `<div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex gap-3 text-amber-800 text-sm"><i data-lucide="shield-alert" class="w-5 h-5 shrink-0"></i> <div><strong>Reliability Check:</strong> ${confidenceReason}</div></div>` : ''}
-                    
-                    <!-- Feature Tabs -->
-                    <div class="flex gap-2 overflow-x-auto pb-2 bg-white p-2 rounded-xl border border-slate-200">
-                        <button onclick="setResultTab('overview')" class="flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'overview' ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'text-slate-500 hover:bg-slate-50'}">
-                            <i data-lucide="activity" class="w-4 h-4"></i> Overview
-                        </button>
-                        <button onclick="setResultTab('dayInLife')" class="flex-1 min-w-[110px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'dayInLife' ? 'bg-purple-50 text-purple-700 ring-1 ring-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
-                            <i data-lucide="calendar" class="w-4 h-4"></i> Day In Life <i data-lucide="sparkles" class="w-3 h-3 text-purple-400"></i>
-                        </button>
-                        <button onclick="setResultTab('roadmap')" class="flex-1 min-w-[110px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'roadmap' ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200' : 'text-slate-500 hover:bg-slate-50'}">
-                            <i data-lucide="graduation-cap" class="w-4 h-4"></i> Roadmap <i data-lucide="sparkles" class="w-3 h-3 text-indigo-400"></i>
-                        </button>
-                        <button onclick="setResultTab('email')" class="flex-1 min-w-[110px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'email' ? 'bg-orange-50 text-orange-700 ring-1 ring-orange-200' : 'text-slate-500 hover:bg-slate-50'}">
-                            <i data-lucide="mail" class="w-4 h-4"></i> Outreach <i data-lucide="sparkles" class="w-3 h-3 text-orange-400"></i>
-                        </button>
-                        <button onclick="setResultTab('resume')" class="flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'resume' ? 'bg-pink-50 text-pink-700 ring-1 ring-pink-200' : 'text-slate-500 hover:bg-slate-50'}">
-                            <i data-lucide="file-text" class="w-4 h-4"></i> Resume <i data-lucide="sparkles" class="w-3 h-3 text-pink-400"></i>
-                        </button>
-                         <button onclick="setResultTab('mentor')" class="flex-1 min-w-[100px] py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all ${STATE.resultTab === 'mentor' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-200' : 'text-slate-500 hover:bg-slate-50'}">
-                            <i data-lucide="message-square" class="w-4 h-4"></i> Mentor
-                        </button>
+                    ${confidenceScore <= 75 ? `<div class="cp-alert warn"><i data-lucide="shield-alert"></i> <div><strong>Reliability check:</strong> ${confidenceReason} Treat the ranking as directional, not definitive.</div></div>` : ''}
+
+                    <div class="cp-tabs">
+                        <button onclick="setResultTab('overview')" class="cp-tab ${STATE.resultTab === 'overview' ? 'is-on' : ''}"><i data-lucide="layout-dashboard"></i> Overview</button>
+                        <button onclick="setResultTab('dayInLife')" class="cp-tab ${STATE.resultTab === 'dayInLife' ? 'is-on' : ''}"><i data-lucide="calendar"></i> Day in life</button>
+                        <button onclick="setResultTab('roadmap')" class="cp-tab ${STATE.resultTab === 'roadmap' ? 'is-on' : ''}"><i data-lucide="graduation-cap"></i> Roadmap</button>
+                        <button onclick="setResultTab('email')" class="cp-tab ${STATE.resultTab === 'email' ? 'is-on' : ''}"><i data-lucide="mail"></i> Outreach</button>
+                        <button onclick="setResultTab('resume')" class="cp-tab ${STATE.resultTab === 'resume' ? 'is-on' : ''}"><i data-lucide="file-text"></i> Resume</button>
+                        <button onclick="setResultTab('mentor')" class="cp-tab ${STATE.resultTab === 'mentor' ? 'is-on' : ''}"><i data-lucide="message-square"></i> Mentor</button>
                     </div>
 
             `;
 
             if (STATE.resultTab === 'overview') {
-                html += `<div class="grid md:grid-cols-3 gap-6 fade-in"><div class="md:col-span-2 space-y-6">`;
-                
+                html += `<div class="cp-result-grid"><div class="cp-stack" style="gap:16px">`;
+
                 // Top Match
                 if (topCareers[0]) {
                     const c = topCareers[0];
                     html += `
-                        <div class="bg-white rounded-3xl shadow-sm border border-emerald-500 overflow-hidden relative group">
-                            <div class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 absolute top-0 left-0 rounded-br-xl z-10">#1 Recommended</div>
-                            <div class="p-8 pt-10">
-                                <div class="flex justify-between items-start mb-6">
-                                    <div><h2 class="text-2xl font-black text-slate-900">${c.title}</h2><div class="flex gap-2 mt-2"><span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-md font-medium">${c.stream.join('/')}</span></div></div>
-                                    <div class="text-4xl font-black text-emerald-600">${c.finalScore}%</div>
+                        <div class="cp-card is-rec cp-card-pad">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px">
+                                <div>
+                                    <span class="cp-rec-badge"><i data-lucide="star" style="width:12px;height:12px"></i> Top match</span>
+                                    <h2 class="cp-h2" style="margin:12px 0 8px">${c.title}</h2>
+                                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                                        <span class="cp-pill">${c.stream.join(' / ')}</span>
+                                        <span class="cp-pill">Demand ${c.demand}/100</span>
+                                        <span class="cp-pill">${c.salary}</span>
+                                    </div>
                                 </div>
-                                <div class="space-y-4">
-                                    ${STATE.loadingGemini ? `<div class="flex items-center gap-2 text-slate-400 text-sm py-4"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Generating AI insights...</div>` : 
-                                      gemini ? `
-                                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                                            <div class="flex justify-between items-center mb-3">
-                                                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Why You Fit</h3>
-                                                <button onclick="generateAudio()" ${STATE.audioLoading ? 'disabled' : ''} class="text-xs flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-full text-slate-600 hover:text-emerald-600 hover:border-emerald-200 transition-colors">
-                                                    ${STATE.audioLoading ? '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Loading...' : '<i data-lucide="volume-2" class="w-3 h-3"></i> Listen ✨'}
-                                                </button>
-                                            </div>
-                                            <ul class="space-y-2 text-sm text-slate-600">${gemini.why_fit.map(pt => `<li class="flex gap-2"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1.5 shrink-0"></span>${pt}</li>`).join('')}</ul>
-                                        </div>
-                                        <div class="grid sm:grid-cols-2 gap-4">
-                                            <div class="bg-red-50 p-4 rounded-2xl border border-red-100"><h3 class="font-bold text-red-800 text-sm mb-2 flex items-center gap-2"><i data-lucide="ban" class="w-4 h-4"></i> Harsh Reality</h3><p class="text-xs text-red-700 leading-relaxed">${gemini.harsh_reality}</p></div>
-                                            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100"><h3 class="font-bold text-blue-800 text-sm mb-2 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i> Starter Plan</h3><ul class="text-xs text-blue-700 space-y-1">${gemini.starter_plan.map(s => `<li>• ${s}</li>`).join('')}</ul></div>
-                                        </div>
-                                      ` : ''}
-                                </div>
+                                <div class="cp-score">${c.finalScore}%</div>
                             </div>
+                            ${STATE.loadingGemini ? `<div class="cp-loading" style="padding:28px 0"><i data-lucide="loader-2" class="cp-spin"></i> Generating insights…</div>` :
+                              gemini ? `
+                                <div class="cp-soft" style="margin-bottom:16px">
+                                    <h3 class="cp-h3" style="display:flex;align-items:center;gap:7px;margin-bottom:12px"><i data-lucide="check-circle-2" style="width:16px;height:16px;color:var(--green)"></i> Why you fit</h3>
+                                    <ul class="cp-list">${gemini.why_fit.map(pt => `<li><span class="cp-dot"></span>${pt}</li>`).join('')}</ul>
+                                </div>
+                                <div class="cp-2col">
+                                    <div class="cp-alert danger" style="flex-direction:column;gap:8px">
+                                        <div style="display:flex;align-items:center;gap:7px;color:#FCA5A5;font-weight:700;font-size:13px"><i data-lucide="alert-octagon" style="width:16px;height:16px"></i> Harsh reality</div>
+                                        <p style="margin:0;font-size:12.5px;line-height:1.55;color:var(--t1)">${gemini.harsh_reality}</p>
+                                    </div>
+                                    <div class="cp-alert info" style="flex-direction:column;gap:8px">
+                                        <div style="display:flex;align-items:center;gap:7px;color:var(--blue2);font-weight:700;font-size:13px"><i data-lucide="trending-up" style="width:16px;height:16px"></i> Starter plan</div>
+                                        <ul class="cp-list" style="gap:6px">${gemini.starter_plan.map(s => `<li style="color:var(--t1)"><span class="cp-dot"></span>${s}</li>`).join('')}</ul>
+                                    </div>
+                                </div>
+                              ` : ''}
                         </div>
                     `;
                 }
 
                 // Other Paths
-                html += `<div class="space-y-3"><h3 class="font-bold text-slate-700 ml-2">Other Viable Paths</h3>`;
+                html += `<div class="cp-stack" style="gap:10px"><h3 class="cp-h3" style="margin:6px 2px">Other viable paths</h3>`;
                 topCareers.slice(1).forEach((c, i) => {
                     html += `
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-300 transition-all flex justify-between items-center">
-                            <div><div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-400">#${i + 2}</span><h4 class="font-bold text-slate-800">${c.title}</h4></div><div class="text-xs text-slate-400 mt-1">Demand: ${c.demand}/100</div></div>
-                            <div class="text-xl font-bold text-slate-600">${c.finalScore}%</div>
+                        <div class="cp-row">
+                            <div>
+                                <div style="display:flex;align-items:center;gap:9px"><span class="cp-mut" style="font-weight:700">#${i + 2}</span><h4 class="cp-h4" style="font-size:14.5px">${c.title}</h4></div>
+                                <div class="cp-mut" style="margin-top:3px">Demand ${c.demand}/100 · ${c.salary}</div>
+                            </div>
+                            <div class="pct">${c.finalScore}%</div>
                         </div>
                     `;
                 });
                 html += `</div>`;
 
-                // Sidebar
-                html += `</div><div class="space-y-6"><div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200"><h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="activity" class="w-5 h-5 text-emerald-600"></i> Trait Analysis</h3><div class="space-y-4">${TRAITS.map(t => `<div><div class="flex justify-between text-xs font-bold uppercase text-slate-400 mb-1"><span>${t.replace(/([A-Z])/g, ' $1').trim()}</span><span>${userTraits[t]}</span></div><div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-slate-800 rounded-full" style="width: ${userTraits[t]}%"></div></div></div>`).join('')}</div></div></div></div>`;
-            
+                // Sidebar — trait analysis
+                html += `</div><div class="cp-card cp-card-pad"><h3 class="cp-h3" style="display:flex;align-items:center;gap:8px;margin-bottom:20px"><i data-lucide="activity" style="width:17px;height:17px;color:var(--blue)"></i> Trait analysis</h3><div class="cp-stack" style="gap:15px">${TRAITS.map(t => `<div><div class="cp-bar-row"><span>${t.replace(/([A-Z])/g, ' $1').trim()}</span><span>${userTraits[t]}</span></div><div class="cp-bar"><div class="cp-bar-fill" style="width:${userTraits[t]}%"></div></div></div>`).join('')}</div></div></div>`;
+
             } else if (STATE.resultTab === 'dayInLife') {
                 html += `
-                    <div class="bg-white rounded-3xl shadow-sm border border-purple-200 overflow-hidden fade-in">
-                        <div class="bg-purple-600 p-6 text-white"><h2 class="text-2xl font-black">Day In The Life</h2><p class="text-purple-200 text-sm">24h simulation for ${topCareers[0].title}</p></div>
-                        <div class="p-6">
-                            ${STATE.dayInLifeLoading ? `<div class="py-20 text-center text-purple-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Simulating daily grind...</div>` :
-                            STATE.dayInLife ? `<div class="relative border-l-2 border-purple-200 ml-4 space-y-8 my-4">
+                    <div class="cp-card cp-clip">
+                        <div class="cp-fh"><h2>Day in the life</h2><p>A realistic look at ${topCareers[0].title} in Pakistan</p></div>
+                        <div class="cp-card-pad">
+                            ${STATE.dayInLifeLoading ? `<div class="cp-loading"><i data-lucide="loader-2" class="cp-spin"></i> Mapping a typical day…</div>` :
+                            STATE.dayInLife && STATE.dayInLife.length ? `<div class="cp-tl">
                                 ${STATE.dayInLife.map(item => `
-                                    <div class="relative pl-8">
-                                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-100 border-2 border-purple-500"></div>
-                                        <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">${item.time}</span>
-                                        <h4 class="font-bold text-slate-800 text-lg mt-1">${item.activity.split(':')[0]}</h4>
-                                        <p class="text-slate-600 text-sm mt-1">${item.activity.split(':')[1] || item.activity}</p>
+                                    <div class="cp-tl-item">
+                                        <div class="cp-tl-dot"></div>
+                                        <div class="cp-tl-time">${item.time}</div>
+                                        <div class="cp-tl-h">${item.activity.split(':')[0]}</div>
+                                        ${item.activity.split(':')[1] ? `<p class="cp-tl-p">${item.activity.split(':').slice(1).join(':').trim()}</p>` : ''}
                                     </div>
                                 `).join('')}
-                            </div>` : ''}
+                            </div>` : `<div class="cp-loading">No schedule available. Try reopening this tab.</div>`}
                         </div>
                     </div>
                 `;
             } else if (STATE.resultTab === 'roadmap') {
                 html += `
-                    <div class="bg-white rounded-3xl shadow-sm border border-indigo-200 overflow-hidden fade-in">
-                        <div class="bg-indigo-600 p-6 text-white"><h2 class="text-2xl font-black">University Roadmap</h2><p class="text-indigo-200 text-sm">Top institutes in ${STATE.profile.city || 'Pakistan'}</p></div>
-                        <div class="p-6">
-                            ${STATE.roadmapLoading ? `<div class="py-20 text-center text-indigo-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Scouting universities...</div>` :
-                            STATE.roadmap ? `<div class="grid md:grid-cols-1 gap-4">
+                    <div class="cp-card cp-clip">
+                        <div class="cp-fh"><h2>University roadmap</h2><p>Top institutes in ${STATE.profile.city || 'Pakistan'}</p></div>
+                        <div class="cp-card-pad">
+                            ${STATE.roadmapLoading ? `<div class="cp-loading"><i data-lucide="loader-2" class="cp-spin"></i> Finding universities…</div>` :
+                            STATE.roadmap && STATE.roadmap.length ? `<div class="cp-stack" style="gap:12px">
                                 ${STATE.roadmap.map((uni, idx) => `
-                                    <div class="bg-indigo-50 border border-indigo-100 p-5 rounded-2xl flex items-start gap-4">
-                                        <div class="bg-white p-3 rounded-full shadow-sm text-indigo-600 font-bold text-lg h-12 w-12 flex items-center justify-center">${idx + 1}</div>
-                                        <div>
-                                            <h4 class="font-bold text-slate-900 text-lg">${uni.name}</h4>
-                                            <p class="text-indigo-700 font-medium text-sm">${uni.degree}</p>
-                                            <div class="mt-3 bg-white p-3 rounded-xl border border-indigo-100 text-xs text-slate-600"><span class="font-bold text-indigo-600">💡 Tip:</span> ${uni.tip}</div>
+                                    <div class="cp-uni">
+                                        <div class="cp-uni-n">${idx + 1}</div>
+                                        <div style="flex:1">
+                                            <h4 class="cp-h4">${uni.name}</h4>
+                                            <p class="cp-uni-deg">${uni.degree}</p>
+                                            <div class="cp-uni-tip"><b>Tip:</b> ${uni.tip}</div>
                                         </div>
                                     </div>
                                 `).join('')}
-                            </div>` : ''}
+                            </div>` : `<div class="cp-loading">No results available. Try reopening this tab.</div>`}
                         </div>
                     </div>
                 `;
             } else if (STATE.resultTab === 'email') {
                 html += `
-                    <div class="bg-white rounded-3xl shadow-sm border border-orange-200 overflow-hidden fade-in">
-                        <div class="bg-orange-600 p-6 text-white"><h2 class="text-2xl font-black">Smart Outreach</h2><p class="text-orange-200 text-sm">Cold email draft for mentors.</p></div>
-                        <div class="p-6">
-                            ${STATE.emailLoading ? `<div class="py-20 text-center text-orange-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Drafting email...</div>` :
+                    <div class="cp-card cp-clip">
+                        <div class="cp-fh"><h2>Smart outreach</h2><p>A cold message to send a potential mentor</p></div>
+                        <div class="cp-card-pad">
+                            ${STATE.emailLoading ? `<div class="cp-loading"><i data-lucide="loader-2" class="cp-spin"></i> Drafting your message…</div>` :
                             STATE.emailDraft ? `
-                                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 relative">
-                                    <div class="mb-4"><span class="text-xs font-bold text-slate-400 uppercase">Subject</span><p class="font-bold text-slate-800">${STATE.emailDraft.subject}</p></div>
-                                    <div><span class="text-xs font-bold text-slate-400 uppercase">Body</span><p class="text-slate-700 whitespace-pre-wrap text-sm leading-relaxed mt-1">${STATE.emailDraft.body}</p></div>
+                                <div class="cp-doc">
+                                    <span class="lbl">Subject</span>
+                                    <p class="val">${STATE.emailDraft.subject}</p>
+                                    <span class="lbl">Message</span>
+                                    <p class="body">${STATE.emailDraft.body}</p>
                                 </div>
-                            ` : ''}
+                                <button onclick="navigator.clipboard.writeText('Subject: ' + STATE.emailDraft.subject + '\\n\\n' + STATE.emailDraft.body); this.innerHTML='<i data-lucide=&quot;check&quot;></i> Copied'; lucide.createIcons();" class="btn btn-ghost btn-block" style="margin-top:14px"><i data-lucide="copy"></i> Copy message</button>
+                            ` : `<div class="cp-loading">No draft available. Try reopening this tab.</div>`}
                         </div>
                     </div>
                 `;
             } else if (STATE.resultTab === 'resume') {
                 html += `
-                    <div class="bg-white rounded-3xl shadow-sm border border-pink-200 overflow-hidden fade-in">
-                        <div class="bg-pink-600 p-6 text-white"><h2 class="text-2xl font-black">AI Resume Builder</h2><p class="text-pink-200 text-sm">Tailored content for your CV.</p></div>
-                        <div class="p-6">
-                            ${STATE.resumeLoading ? `<div class="py-20 text-center text-pink-600"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-4"></i> Generating professional content...</div>` :
+                    <div class="cp-card cp-clip">
+                        <div class="cp-fh"><h2>Resume content</h2><p>Tailored building blocks for your CV</p></div>
+                        <div class="cp-card-pad">
+                            ${STATE.resumeLoading ? `<div class="cp-loading"><i data-lucide="loader-2" class="cp-spin"></i> Writing your content…</div>` :
                             STATE.resume ? `
-                                <div class="space-y-6">
-                                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
-                                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Professional Summary</span>
-                                        <p class="text-slate-700 text-sm leading-relaxed">${STATE.resume.summary}</p>
+                                <div class="cp-stack" style="gap:18px">
+                                    <div class="cp-doc">
+                                        <span class="lbl">Professional summary</span>
+                                        <p class="body" style="white-space:normal">${STATE.resume.summary}</p>
                                     </div>
-                                    
-                                    <div class="grid md:grid-cols-2 gap-6">
+                                    <div class="cp-2col">
                                         <div>
-                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Recommended Hard Skills</span>
-                                            <div class="flex flex-wrap gap-2">
-                                                ${STATE.resume.hard_skills.map(skill => `<span class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm text-slate-700 font-medium shadow-sm">${skill}</span>`).join('')}
-                                            </div>
+                                            <span class="cp-label">Recommended hard skills</span>
+                                            <div class="cp-skills">${STATE.resume.hard_skills.map(skill => `<span class="cp-skill">${skill}</span>`).join('')}</div>
                                         </div>
-                                        
                                         <div>
-                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Experience Bullet Points (Fresher)</span>
-                                            <ul class="space-y-3">
-                                                ${STATE.resume.experience_bullets.map(bullet => `
-                                                    <li class="flex gap-3 text-sm text-slate-600">
-                                                        <span class="text-pink-500 font-bold mt-0.5">•</span>
-                                                        <span>${bullet}</span>
-                                                    </li>
-                                                `).join('')}
-                                            </ul>
+                                            <span class="cp-label">Experience bullets (fresher)</span>
+                                            <ul class="cp-list">${STATE.resume.experience_bullets.map(b => `<li><span class="cp-dot"></span>${b}</li>`).join('')}</ul>
                                         </div>
                                     </div>
-                                    <button onclick="navigator.clipboard.writeText(JSON.stringify(STATE.resume, null, 2)); alert('Content copied!');" class="w-full mt-4 border border-pink-200 text-pink-700 hover:bg-pink-50 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
-                                        <i data-lucide="copy" class="w-4 h-4"></i> Copy All Data
-                                    </button>
+                                    <button onclick="navigator.clipboard.writeText(JSON.stringify(STATE.resume, null, 2)); this.innerHTML='<i data-lucide=&quot;check&quot;></i> Copied'; lucide.createIcons();" class="btn btn-ghost btn-block"><i data-lucide="copy"></i> Copy all content</button>
                                 </div>
-                            ` : ''}
+                            ` : `<div class="cp-loading">No content available. Try reopening this tab.</div>`}
                         </div>
                     </div>
                 `;
             } else if (STATE.resultTab === 'mentor') {
                  html += `
-                    <div class="bg-white rounded-3xl shadow-sm border border-blue-200 overflow-hidden flex flex-col h-[600px] fade-in">
-                        <div class="bg-blue-600 p-4 text-white flex items-center gap-3">
-                            <div class="bg-white/20 p-2 rounded-full"><i data-lucide="user" class="w-5 h-5 text-white"></i></div>
-                            <div><h2 class="font-bold text-lg">Senior ${topCareers[0].title}</h2><p class="text-blue-100 text-xs">AI Mentor • Online</p></div>
+                    <div class="cp-chat">
+                        <div class="cp-chat-head">
+                            <div class="cp-chat-av"><i data-lucide="user-round"></i></div>
+                            <div><h2>Senior ${topCareers[0].title}</h2><p>Mentor · online</p></div>
                         </div>
-                        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-                            ${STATE.chatHistory.length === 0 ? `<div class="text-center py-10 text-slate-400 text-sm"><p>Ask me anything.</p><p class="mt-2 text-xs bg-white inline-block px-3 py-1 rounded-full border">"Is the salary good?"</p></div>` : ''}
-                            ${STATE.chatHistory.map(msg => `
-                                <div class="flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}">
-                                    <div class="max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white border border-slate-200 text-slate-700 rounded-tl-none shadow-sm'}">${msg.text}</div>
-                                </div>
-                            `).join('')}
-                            ${STATE.chatLoading ? `<div class="flex justify-start"><div class="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-none shadow-sm"><i data-lucide="loader-2" class="w-4 h-4 animate-spin text-blue-600"></i></div></div>` : ''}
+                        <div id="chat-container" class="cp-chat-body">
+                            ${STATE.chatHistory.length === 0 ? `<div class="cp-chat-empty"><p style="margin:0">Ask anything about the role.</p><span class="hint">e.g. "Is the pay actually good?"</span></div>` : ''}
+                            ${STATE.chatHistory.map(msg => `<div class="cp-msg ${msg.role === 'user' ? 'user' : 'bot'}">${msg.text}</div>`).join('')}
+                            ${STATE.chatLoading ? `<div class="cp-msg bot"><i data-lucide="loader-2" class="cp-spin" style="width:16px;height:16px;color:var(--blue)"></i></div>` : ''}
                         </div>
-                        <div class="p-4 bg-white border-t border-slate-100 flex gap-2">
-                            <input type="text" id="chatInput" value="${STATE.chatInput}" oninput="updateChatInput(this.value)" onkeydown="if(event.key==='Enter') handleChatSend()" placeholder="Ask a question..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                            <button onclick="handleChatSend()" ${!STATE.chatInput.trim() || STATE.chatLoading ? 'disabled' : ''} class="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"><i data-lucide="send" class="w-5 h-5"></i></button>
+                        <div class="cp-chat-foot">
+                            <input type="text" id="chatInput" value="${STATE.chatInput}" oninput="updateChatInput(this.value)" onkeydown="if(event.key==='Enter') handleChatSend()" placeholder="Ask a question…" class="inp" />
+                            <button onclick="handleChatSend()" ${!STATE.chatInput.trim() || STATE.chatLoading ? 'disabled' : ''} class="btn btn-primary" style="padding:0 14px"><i data-lucide="send" style="width:16px;height:16px"></i></button>
                         </div>
                     </div>
                 `;

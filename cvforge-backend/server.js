@@ -126,7 +126,7 @@ app.listen(PORT, () => {
   console.log('║  GET  /api/recruiter/search           ║');
   console.log('║  GET  /api/recruiter/stats            ║');
   console.log('║  GET  /api/recruiter/profile/:id      ║');
-  console.log('║  POST /api/ai/cohere/generate         ║');
+  console.log('║  POST /api/ai/groq/generate           ║');
   console.log('╚═══════════════════════════════════════╝');
   console.log('');
 });

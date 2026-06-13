@@ -28,8 +28,8 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       JWT_SECRET: change-this-in-production
-      COHERE_API_KEY: ${COHERE_API_KEY:-}
-      COHERE_MODEL: command-a-03-2025
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: llama-3.3-70b-versatile
       CORS_ORIGINS: http://localhost:8080
     depends_on:
       db:

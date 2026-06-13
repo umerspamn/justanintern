@@ -1,6 +1,6 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const { cohereGenerate } = require('../controllers/aiController');
+const { groqGenerate } = require('../controllers/aiController');
 
 const router = express.Router();
 
@@ -12,6 +12,9 @@ const aiLimiter = rateLimit({
   message: { success: false, error: 'Too many AI requests. Please slow down.' }
 });
 
-router.post('/cohere/generate', aiLimiter, cohereGenerate);
+// New canonical path
+router.post('/groq/generate', aiLimiter, groqGenerate);
+// Backwards-compatible alias so the existing frontend keeps working
+router.post('/cohere/generate', aiLimiter, groqGenerate);
 
 module.exports = router;
