@@ -3028,7 +3028,12 @@ async function logoutUser(){
   localStorage.removeItem('cvforge_user');
   window.location.href='auth.html';
 }
-
+// Add this inside your index.html <script> block
+window.addEventListener('load', () => {
+    if (window.location.hash === '#cvmaker') {
+        hideEcosystemHome();
+    }
+});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>

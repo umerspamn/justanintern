@@ -62,6 +62,8 @@ app.use(globalLimiter);
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
+const jobsRouter = require('./routes/jobs');
+app.use('/api/jobs', jobsRouter);
 
 // ── REQUEST LOGGER (development only) ────────────────────────────
 if (process.env.NODE_ENV !== 'production') {
