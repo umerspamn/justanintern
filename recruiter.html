@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Job Listings — Just An Intern</title>
-<meta name="description" content="Live job listings matched to your career prediction."/>
 <script src="https://unpkg.com/lucide@latest"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,12 +28,10 @@
 html,body{min-height:100vh}
 body{font-family:var(--font);background:var(--bg);color:var(--t0);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 ::selection{background:rgba(79,122,255,.3)}
-
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.025) 1px,transparent 1px);background-size:28px 28px}
 .bg-orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
 .bg-orb-1{width:600px;height:600px;background:radial-gradient(circle,rgba(79,122,255,.14) 0%,transparent 65%);top:-200px;left:-150px}
 .bg-orb-2{width:480px;height:480px;background:radial-gradient(circle,rgba(167,139,250,.08) 0%,transparent 65%);bottom:-150px;right:-120px}
-
 .app{position:relative;z-index:1;min-height:100vh}
 
 /* navbar */
@@ -54,7 +51,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .container{max-width:900px;margin:0 auto;padding:36px 20px 80px}
 
 /* page header */
-.page-head{margin-bottom:32px}
+.page-head{margin-bottom:28px}
 .back-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--t2);text-decoration:none;margin-bottom:14px;transition:color .15s}
 .back-link:hover{color:var(--t0)}
 .back-link svg{width:13px;height:13px}
@@ -62,22 +59,49 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .page-sub{color:var(--t2);font-size:14px}
 .grad{background:linear-gradient(135deg,#6B93FF 0%,#A78BFA 60%,#60C9FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
+/* search box */
+.search-box{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r20);padding:20px;margin-bottom:24px}
+.search-box-title{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.search-box-title svg{width:14px;height:14px}
+.search-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+.search-field label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t2);margin-bottom:7px}
+.inp{width:100%;padding:11px 13px;background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r8);color:var(--t0);font-family:var(--font);font-size:13.5px;outline:none;transition:border-color .18s,background .18s,box-shadow .18s}
+.inp:hover{border-color:var(--b2);background:var(--s3)}
+.inp:focus{border-color:var(--blue);background:var(--s3);box-shadow:0 0 0 3px rgba(79,122,255,.12)}
+.inp::placeholder{color:var(--t3)}
+.predicted-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;background:var(--bg_blue);border:1px solid var(--bd);color:var(--blue2);margin-bottom:8px}
+.predicted-tag svg{width:11px;height:11px}
+.btn-search{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:var(--r8);background:linear-gradient(135deg,var(--blue3),#5B87FF);color:#fff;font-size:13px;font-weight:700;border:1px solid rgba(79,122,255,.4);cursor:pointer;font-family:var(--font);transition:all .15s var(--ease);white-space:nowrap;height:46px}
+.btn-search:hover{background:linear-gradient(135deg,#4B73F9,#6B97FF);transform:translateY(-1px);box-shadow:0 4px 20px rgba(79,122,255,.4)}
+.btn-search:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-search svg{width:15px;height:15px}
+
+/* salary box */
+.salary-box{background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--bd);border-radius:var(--r16);padding:20px;margin-bottom:24px}
+.salary-box-title{font-size:13px;font-weight:700;color:var(--blue2);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.salary-box-title svg{width:15px;height:15px}
+.salary-range{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.salary-range-item{text-align:center}
+.salary-range-val{font-size:22px;font-weight:800;color:var(--t0)}
+.salary-range-lbl{font-size:11px;color:var(--t2);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.salary-divider{font-size:22px;color:var(--t3)}
+
+/* stats */
+.stats-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.stat-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r12);padding:14px 18px;flex:1;min-width:100px}
+.stat-val{font-size:22px;font-weight:800;color:var(--blue2);line-height:1}
+.stat-lbl{font-size:11px;font-weight:600;color:var(--t2);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+
 /* filters */
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
 .filter-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600;background:var(--s2);border:1px solid var(--b1);color:var(--t2);cursor:pointer;transition:all .15s;font-family:var(--font)}
 .filter-btn:hover{border-color:var(--b3);color:var(--t0)}
 .filter-btn.active{background:var(--bg_blue);border-color:var(--bd);color:var(--blue2)}
 .filter-btn svg{width:12px;height:12px}
 
-/* stats row */
-.stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px}
-.stat-card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r12);padding:14px 18px;flex:1;min-width:120px}
-.stat-val{font-size:22px;font-weight:800;color:var(--blue2);line-height:1}
-.stat-lbl{font-size:11px;font-weight:600;color:var(--t2);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
-
 /* job cards */
 .jobs-list{display:flex;flex-direction:column;gap:12px}
-.job-card{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r20);padding:20px;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s,transform .2s,box-shadow .2s;cursor:default}
+.job-card{background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r20);padding:20px;display:flex;gap:16px;align-items:flex-start;transition:border-color .2s,transform .2s,box-shadow .2s}
 .job-card:hover{border-color:rgba(79,122,255,.4);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
 .job-logo{width:46px;height:46px;border-radius:var(--r10);background:var(--s3);border:1px solid var(--b1);display:grid;place-items:center;flex-shrink:0;overflow:hidden}
 .job-logo img{width:100%;height:100%;object-fit:contain;border-radius:var(--r10)}
@@ -86,14 +110,13 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .job-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .job-title{font-size:15px;font-weight:700;color:var(--t0);margin-bottom:3px}
 .job-company{font-size:13px;color:var(--t1)}
-.job-salary{font-size:15px;font-weight:800;color:var(--blue2);white-space:nowrap}
+.job-salary-val{font-size:15px;font-weight:800;color:var(--blue2);white-space:nowrap}
 .job-posted{font-size:11px;color:var(--t3);margin-top:2px;text-align:right}
 .job-pills{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
 .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600}
 .pill-default{background:var(--s3);border:1px solid var(--b1);color:var(--t1)}
 .pill-blue{background:var(--bg_blue);border:1px solid var(--bd);color:var(--blue2)}
 .pill-green{background:var(--gd);border:1px solid rgba(34,197,94,.2);color:#4ade80}
-.pill-amber{background:var(--ad);border:1px solid rgba(245,158,11,.2);color:#fbbf24}
 .pill svg{width:10px;height:10px}
 .job-desc{font-size:12.5px;color:var(--t2);line-height:1.65;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .job-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -102,32 +125,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .btn-apply:hover{background:linear-gradient(135deg,#4B73F9,#6B97FF);transform:translateY(-1px);box-shadow:0 4px 20px rgba(79,122,255,.4)}
 .btn-apply svg{width:13px;height:13px}
 
-/* salary insight box */
-.salary-box{background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--bd);border-radius:var(--r16);padding:20px;margin-bottom:24px}
-.salary-box-title{font-size:13px;font-weight:700;color:var(--blue2);margin-bottom:12px;display:flex;align-items:center;gap:7px}
-.salary-box-title svg{width:15px;height:15px}
-.salary-range{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.salary-range-item{text-align:center}
-.salary-range-val{font-size:20px;font-weight:800;color:var(--t0)}
-.salary-range-lbl{font-size:11px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:.06em}
-.salary-divider{font-size:20px;color:var(--t3)}
-
-/* loading */
+/* loading / empty / error */
 .loading{display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 0;color:var(--t2);text-align:center}
 .loading svg{color:var(--blue)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{animation:spin 1s linear infinite}
-
-/* empty / error */
 .alert{display:flex;gap:10px;padding:16px;border-radius:var(--r12);font-size:13px;line-height:1.55}
 .alert svg{width:17px;height:17px;flex-shrink:0;margin-top:1px}
 .alert-danger{background:var(--rd);border:1px solid rgba(239,68,68,.25);color:#FCA5A5}
 .alert-info{background:var(--bg_blue);border:1px solid var(--bd);color:var(--blue2)}
+.empty{text-align:center;padding:60px 0;color:var(--t2)}
+.empty svg{width:36px;height:36px;margin-bottom:12px;color:var(--t3)}
 
-@media(max-width:600px){
+@media(max-width:640px){
+  .search-row{grid-template-columns:1fr;gap:12px}
   .job-top{flex-direction:column;gap:8px}
-  .job-salary{text-align:left}
   .stats-row{gap:8px}
+  .nav-links{display:none}
 }
 </style>
 </head>
@@ -136,7 +150,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div class="bg-orb bg-orb-2"></div>
 
 <div class="app">
-  <!-- Navbar -->
   <nav class="nav">
     <a href="index.html" class="nav-brand">
       <div class="nav-ico"><i data-lucide="briefcase"></i></div>
@@ -146,7 +159,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <a href="index.html" class="nav-link"><i data-lucide="home"></i> Home</a>
       <a href="index.html#cvmaker" class="nav-link"><i data-lucide="file-text"></i> CV Maker</a>
       <a href="careerpredictor.html" class="nav-link"><i data-lucide="compass"></i> Predictor</a>
-      <a href="recruiter.html" class="nav-link active"><i data-lucide="briefcase"></i> Jobs</a>
+      <a href="jobs.html" class="nav-link active"><i data-lucide="briefcase"></i> Jobs</a>
     </div>
   </nav>
 
@@ -154,45 +167,84 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 </div>
 
 <script>
-const API    = 'http://localhost:3000/api';
-const params = new URLSearchParams(window.location.search);
-const CAREER  = params.get('career')   || 'Software Engineer';
-const LOCATION= params.get('location') || 'Pakistan';
-const SALARY  = params.get('salary')   || '';
+const API = localStorage.getItem('cvforge_api_base')
+  ? localStorage.getItem('cvforge_api_base') + '/api'
+  : 'http://localhost:3000/api';
+
+// ── Read career from URL param OR from career predictor saved state ──
+const urlParams  = new URLSearchParams(window.location.search);
+
+function getCareerFromPredictor() {
+  try {
+    const saved = localStorage.getItem('pakCareerState');
+    if (!saved) return null;
+    const state = JSON.parse(saved);
+    if (state.results && state.results.careers && state.results.careers.length > 0) {
+      const top = state.results.careers.find(c => !c.elimination);
+      return top ? top.title : null;
+    }
+  } catch(e) { return null; }
+  return null;
+}
+
+const predictedCareer = getCareerFromPredictor();
+const fromPredictor   = !!predictedCareer && !urlParams.get('career');
 
 const SALARY_ESTIMATES = {
-  'Software Engineer':          { min: 80000, max: 200000, currency: 'PKR/month' },
-  'Data Scientist':             { min: 100000, max: 250000, currency: 'PKR/month' },
-  'Cyber Security Analyst':     { min: 90000, max: 220000, currency: 'PKR/month' },
-  'Graphic/UI UX Designer':     { min: 60000, max: 150000, currency: 'PKR/month' },
-  'MBBS Doctor':                { min: 80000, max: 300000, currency: 'PKR/month' },
-  'Chartered Accountant (CA)':  { min: 120000, max: 400000, currency: 'PKR/month' },
-  'ACCA Professional':          { min: 90000, max: 250000, currency: 'PKR/month' },
-  'Financial Analyst / CFA':    { min: 100000, max: 280000, currency: 'PKR/month' },
-  'Marketing Manager':          { min: 70000, max: 180000, currency: 'PKR/month' },
-  'CSS Officer (Civil Service)': { min: 60000, max: 180000, currency: 'PKR/month' },
-  'Lawyer / Advocate':          { min: 50000, max: 300000, currency: 'PKR/month' },
-  'Civil Engineer':             { min: 60000, max: 160000, currency: 'PKR/month' },
-  'Mechanical Engineer':        { min: 60000, max: 150000, currency: 'PKR/month' },
-  'Digital Freelancer':         { min: 50000, max: 500000, currency: 'PKR/month' },
-  'default':                    { min: 50000, max: 150000, currency: 'PKR/month' }
+  'Software Engineer':           { min: 80000,  max: 200000 },
+  'Data Scientist':              { min: 100000, max: 250000 },
+  'Cyber Security Analyst':      { min: 90000,  max: 220000 },
+  'Graphic/UI UX Designer':      { min: 60000,  max: 150000 },
+  'MBBS Doctor':                 { min: 80000,  max: 300000 },
+  'Dentist (BDS)':               { min: 70000,  max: 200000 },
+  'Pharmacist':                  { min: 50000,  max: 130000 },
+  'Physiotherapist':             { min: 45000,  max: 120000 },
+  'Clinical Psychologist':       { min: 50000,  max: 150000 },
+  'Chartered Accountant (CA)':   { min: 120000, max: 400000 },
+  'ACCA Professional':           { min: 90000,  max: 250000 },
+  'Financial Analyst / CFA':     { min: 100000, max: 280000 },
+  'Marketing Manager':           { min: 70000,  max: 180000 },
+  'HR Manager':                  { min: 60000,  max: 150000 },
+  'CSS Officer (Civil Service)': { min: 60000,  max: 180000 },
+  'Lawyer / Advocate':           { min: 50000,  max: 300000 },
+  'Journalist / Media':          { min: 35000,  max: 100000 },
+  'Civil Engineer':              { min: 60000,  max: 160000 },
+  'Mechanical Engineer':         { min: 60000,  max: 150000 },
+  'E-commerce Specialist (Amazon)': { min: 50000, max: 200000 },
+  'Digital Freelancer':          { min: 50000,  max: 500000 },
+  'default':                     { min: 50000,  max: 150000 }
 };
 
 let STATE = {
-  jobs: [],
-  loading: true,
-  error: null,
-  filter: 'all'
+  career:   urlParams.get('career')   || predictedCareer || '',
+  location: urlParams.get('location') || 'Pakistan',
+  jobs:     [],
+  loading:  false,
+  error:    null,
+  filter:   'all',
+  searched: false
 };
 
+// Auto-search if career came from URL param or predictor
+if (STATE.career) {
+  STATE.loading  = true;
+  STATE.searched = true;
+}
+
 async function fetchJobs() {
+  if (!STATE.career.trim()) return;
+  STATE.loading  = true;
+  STATE.error    = null;
+  STATE.searched = true;
+  render();
+
   try {
-    const res  = await fetch(`${API}/jobs/search?career=${encodeURIComponent(CAREER)}&location=${encodeURIComponent(LOCATION)}`);
+    const res  = await fetch(`${API}/jobs/search?career=${encodeURIComponent(STATE.career)}&location=${encodeURIComponent(STATE.location)}`);
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
     STATE.jobs    = data.jobs || [];
     STATE.loading = false;
-  } catch (e) {
+  } catch(e) {
     STATE.error   = e.message;
     STATE.loading = false;
   }
@@ -204,28 +256,42 @@ function timeAgo(dateStr) {
   const days = Math.floor((Date.now() - new Date(dateStr)) / 86400000);
   if (days === 0) return 'Today';
   if (days === 1) return 'Yesterday';
-  if (days < 7)  return `${days} days ago`;
-  if (days < 30) return `${Math.floor(days/7)}w ago`;
+  if (days < 7)   return `${days} days ago`;
+  if (days < 30)  return `${Math.floor(days/7)}w ago`;
   return `${Math.floor(days/30)}mo ago`;
 }
 
 function formatSalary(job) {
   if (!job.salary_min && !job.salary_max) return null;
   const fmt    = n => n >= 1000 ? `$${(n/1000).toFixed(0)}k` : `$${n}`;
-  const period = job.salary_period ? `/${job.salary_period.toLowerCase().replace('yearly','yr').replace('monthly','mo')}` : '/yr';
+  const period = job.salary_period
+    ? `/${job.salary_period.toLowerCase().replace('yearly','yr').replace('monthly','mo')}`
+    : '/yr';
   if (job.salary_min && job.salary_max) return `${fmt(job.salary_min)} – ${fmt(job.salary_max)}${period}`;
   if (job.salary_max) return `Up to ${fmt(job.salary_max)}${period}`;
   return `From ${fmt(job.salary_min)}${period}`;
 }
 
 function getPKSalary() {
-  return SALARY_ESTIMATES[CAREER] || SALARY_ESTIMATES['default'];
+  return SALARY_ESTIMATES[STATE.career] || SALARY_ESTIMATES['default'];
 }
 
 function filteredJobs() {
-  if (STATE.filter === 'remote') return STATE.jobs.filter(j => j.remote);
+  if (STATE.filter === 'remote')   return STATE.jobs.filter(j => j.remote);
   if (STATE.filter === 'fulltime') return STATE.jobs.filter(j => j.type?.toLowerCase().includes('full'));
   return STATE.jobs;
+}
+
+function handleSearch() {
+  const careerInput  = document.getElementById('careerInput');
+  const locationInput = document.getElementById('locationInput');
+  if (careerInput)   STATE.career   = careerInput.value.trim();
+  if (locationInput) STATE.location = locationInput.value.trim() || 'Pakistan';
+  fetchJobs();
+}
+
+function handleKeydown(e) {
+  if (e.key === 'Enter') handleSearch();
 }
 
 function setFilter(f) {
@@ -238,78 +304,95 @@ function render() {
   const jobs     = filteredJobs();
   const remote   = STATE.jobs.filter(j => j.remote).length;
   const fulltime = STATE.jobs.filter(j => j.type?.toLowerCase().includes('full')).length;
+  const thisWeek = STATE.jobs.filter(j => Math.floor((Date.now()-new Date(j.posted))/86400000) <= 7).length;
 
   document.getElementById('root').innerHTML = `
 
-    <!-- Page Header -->
     <div class="page-head">
       <a href="careerpredictor.html" class="back-link">
-        <i data-lucide="arrow-left"></i> Back to results
+        <i data-lucide="arrow-left"></i> Back to predictor
       </a>
-      <h1 class="page-title"><span class="grad">${CAREER}</span> Jobs</h1>
-      <p class="page-sub">
-        ${STATE.loading ? 'Searching live jobs…' :
-          STATE.error   ? 'Could not load jobs' :
-          `${STATE.jobs.length} live listings found · ${LOCATION}`}
-      </p>
+      <h1 class="page-title">Find <span class="grad">Live Jobs</span></h1>
+      <p class="page-sub">Search real job listings with direct apply links</p>
     </div>
 
-    <!-- Pakistan Salary Insight -->
+    <!-- Search Box -->
+    <div class="search-box">
+      <div class="search-box-title">
+        <i data-lucide="search"></i> Search Jobs
+      </div>
+
+      ${fromPredictor && STATE.career ? `
+        <div style="margin-bottom:10px">
+          <span class="predicted-tag">
+            <i data-lucide="sparkles"></i>
+            Autofilled from your career prediction
+          </span>
+        </div>
+      ` : ''}
+
+      <div class="search-row">
+        <div class="search-field">
+          <label>Job Title / Career</label>
+          <input
+            id="careerInput"
+            class="inp"
+            type="text"
+            value="${STATE.career}"
+            placeholder="e.g. Software Engineer"
+            onkeydown="handleKeydown(event)"
+          />
+        </div>
+        <div class="search-field">
+          <label>Location</label>
+          <input
+            id="locationInput"
+            class="inp"
+            type="text"
+            value="${STATE.location}"
+            placeholder="e.g. Pakistan, Karachi"
+            onkeydown="handleKeydown(event)"
+          />
+        </div>
+        <button class="btn-search" onclick="handleSearch()" ${STATE.loading ? 'disabled' : ''}>
+          ${STATE.loading
+            ? `<i data-lucide="loader-2" class="spin"></i> Searching…`
+            : `<i data-lucide="search"></i> Search`}
+        </button>
+      </div>
+
+      ${!STATE.searched ? `
+        <p style="font-size:12px;color:var(--t3);margin-top:12px">
+          <i data-lucide="info" style="width:12px;height:12px;display:inline;vertical-align:middle"></i>
+          ${predictedCareer
+            ? `Your predicted career <strong style="color:var(--blue2)">${predictedCareer}</strong> has been autofilled. Hit Search to find live jobs.`
+            : 'Complete the career predictor to autofill your best match, or type any job title above.'}
+        </p>
+      ` : ''}
+    </div>
+
+    ${STATE.searched && !STATE.loading && !STATE.error && STATE.career ? `
+    <!-- Pakistan Salary Estimate -->
     <div class="salary-box">
       <div class="salary-box-title">
         <i data-lucide="trending-up"></i>
-        Pakistan Salary Estimate — ${CAREER}
+        Pakistan Salary Estimate — ${STATE.career}
       </div>
       <div class="salary-range">
         <div class="salary-range-item">
           <div class="salary-range-val">PKR ${(pkSalary.min/1000).toFixed(0)}k</div>
-          <div class="salary-range-lbl">Entry level</div>
+          <div class="salary-range-lbl">Entry level /mo</div>
         </div>
         <div class="salary-divider">→</div>
         <div class="salary-range-item">
           <div class="salary-range-val">PKR ${(pkSalary.max/1000).toFixed(0)}k</div>
-          <div class="salary-range-lbl">Senior level</div>
+          <div class="salary-range-lbl">Senior level /mo</div>
         </div>
         <div class="salary-divider">·</div>
-        <div class="salary-range-item">
-          <div class="salary-range-val" style="font-size:14px;color:var(--t1)">${pkSalary.currency}</div>
-          <div class="salary-range-lbl">Local market</div>
+        <div class="salary-range-item" style="text-align:left">
+          <div style="font-size:12px;color:var(--t2);line-height:1.6">Based on Pakistani<br>market data 2024</div>
         </div>
       </div>
-    </div>
-
-    ${!STATE.loading && !STATE.error ? `
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-val">${STATE.jobs.length}</div>
-        <div class="stat-lbl">Total jobs</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val">${remote}</div>
-        <div class="stat-lbl">Remote</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val">${fulltime}</div>
-        <div class="stat-lbl">Full-time</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-val">${STATE.jobs.filter(j => {const d=Math.floor((Date.now()-new Date(j.posted))/86400000);return d<=7}).length}</div>
-        <div class="stat-lbl">This week</div>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="filters">
-      <button class="filter-btn ${STATE.filter==='all'?'active':''}" onclick="setFilter('all')">
-        <i data-lucide="list"></i> All (${STATE.jobs.length})
-      </button>
-      <button class="filter-btn ${STATE.filter==='remote'?'active':''}" onclick="setFilter('remote')">
-        <i data-lucide="wifi"></i> Remote (${remote})
-      </button>
-      <button class="filter-btn ${STATE.filter==='fulltime'?'active':''}" onclick="setFilter('fulltime')">
-        <i data-lucide="clock"></i> Full-time (${fulltime})
-      </button>
     </div>
     ` : ''}
 
@@ -322,34 +405,86 @@ function render() {
           <p style="font-size:13px">Searching across LinkedIn, Indeed & Glassdoor</p>
         </div>
       </div>
+
     ` : STATE.error ? `
       <div class="alert alert-danger">
         <i data-lucide="alert-circle"></i>
-        <div><strong>Failed to load jobs:</strong> ${STATE.error}<br>
-        <span style="font-size:12px;margin-top:4px;display:block">Make sure your backend is running on port 3000 and RAPIDAPI_KEY is set.</span></div>
+        <div>
+          <strong>Failed to load jobs:</strong> ${STATE.error}<br>
+          <span style="font-size:12px;margin-top:4px;display:block">Make sure your backend is running and RAPIDAPI_KEY is set in .env</span>
+        </div>
       </div>
-    ` : jobs.length === 0 ? `
-      <div class="alert alert-info">
-        <i data-lucide="info"></i>
-        <div>No jobs found for <strong>${CAREER}</strong> with this filter. Try switching to "All".</div>
+
+    ` : !STATE.searched ? `
+      <div class="empty">
+        <i data-lucide="briefcase"></i>
+        <p style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:6px">Ready to search</p>
+        <p style="font-size:13px">${predictedCareer ? `Your predicted career is autofilled above — just hit Search.` : `Enter a job title above and click Search.`}</p>
       </div>
+
+    ` : STATE.jobs.length === 0 ? `
+      <div class="empty">
+        <i data-lucide="search-x"></i>
+        <p style="font-size:15px;font-weight:700;color:var(--t1);margin-bottom:6px">No jobs found</p>
+        <p style="font-size:13px">Try a different job title or location.</p>
+      </div>
+
     ` : `
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val">${STATE.jobs.length}</div>
+          <div class="stat-lbl">Total jobs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${remote}</div>
+          <div class="stat-lbl">Remote</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${fulltime}</div>
+          <div class="stat-lbl">Full-time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">${thisWeek}</div>
+          <div class="stat-lbl">This week</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <button class="filter-btn ${STATE.filter==='all'?'active':''}" onclick="setFilter('all')">
+          <i data-lucide="list"></i> All (${STATE.jobs.length})
+        </button>
+        <button class="filter-btn ${STATE.filter==='remote'?'active':''}" onclick="setFilter('remote')">
+          <i data-lucide="wifi"></i> Remote (${remote})
+        </button>
+        <button class="filter-btn ${STATE.filter==='fulltime'?'active':''}" onclick="setFilter('fulltime')">
+          <i data-lucide="clock"></i> Full-time (${fulltime})
+        </button>
+      </div>
+
+      <!-- Job Cards -->
       <div class="jobs-list">
-        ${jobs.map(job => `
+        ${jobs.length === 0 ? `
+          <div class="alert alert-info">
+            <i data-lucide="info"></i>
+            <div>No jobs match this filter. Try switching to "All".</div>
+          </div>
+        ` : jobs.map(job => `
           <div class="job-card">
             <div class="job-logo">
               ${job.logo
-                ? `<img src="${job.logo}" alt="${job.company}" onerror="this.parentElement.innerHTML='<i data-lucide=building-2></i>'">`
+                ? `<img src="${job.logo}" alt="${job.company}" onerror="this.style.display='none'">`
                 : `<i data-lucide="building-2"></i>`}
             </div>
             <div class="job-body">
               <div class="job-top">
                 <div>
                   <div class="job-title">${job.title}</div>
-                  <div class="job-company">${job.company} · ${job.location || LOCATION}</div>
+                  <div class="job-company">${job.company} · ${job.location || STATE.location}</div>
                 </div>
                 <div>
-                  <div class="job-salary">${formatSalary(job) || `PKR ${(pkSalary.min/1000).toFixed(0)}k–${(pkSalary.max/1000).toFixed(0)}k/mo`}</div>
+                  <div class="job-salary-val">${formatSalary(job) || `PKR ${(pkSalary.min/1000).toFixed(0)}k–${(pkSalary.max/1000).toFixed(0)}k/mo`}</div>
                   <div class="job-posted">${timeAgo(job.posted)}</div>
                 </div>
               </div>
@@ -357,7 +492,7 @@ function render() {
               <div class="job-pills">
                 ${job.type ? `<span class="pill pill-default"><i data-lucide="clock"></i> ${job.type}</span>` : ''}
                 ${job.remote ? `<span class="pill pill-green"><i data-lucide="wifi"></i> Remote</span>` : ''}
-                <span class="pill pill-blue"><i data-lucide="briefcase"></i> ${CAREER}</span>
+                <span class="pill pill-blue"><i data-lucide="briefcase"></i> ${STATE.career}</span>
                 ${job.publisher ? `<span class="pill pill-default">${job.publisher}</span>` : ''}
               </div>
 
@@ -377,11 +512,17 @@ function render() {
   `;
 
   lucide.createIcons();
-  window.setFilter = setFilter;
+  window.handleSearch  = handleSearch;
+  window.handleKeydown = handleKeydown;
+  window.setFilter     = setFilter;
 }
 
 render();
-fetchJobs();
+
+// Auto-fetch if career is pre-filled
+if (STATE.career && STATE.searched) {
+  fetchJobs();
+}
 </script>
 </body>
 </html>

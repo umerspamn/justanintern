@@ -707,13 +707,144 @@ select option{background:var(--s2);color:var(--t0)}
   padding:11px 18px;border-radius:var(--r12);font-size:12px;font-weight:700;
   background:var(--s2);border:1.5px solid rgba(34,197,94,.4);color:var(--green);
   box-shadow:var(--shadow-lg),0 0 0 1px rgba(34,197,94,.1);
-  transform:translateY(60px) scale(.94);opacity:0;
-  transition:all .4s var(--spring);pointer-events:none;
+  opacity:0;transform:translateY(60px) scale(.9);
+  pointer-events:none;
   display:flex;align-items:center;gap:8px;
   backdrop-filter:blur(10px);
 }
-#notif.show{transform:translateY(0) scale(1);opacity:1}
+#notif.show{animation:notif-bounce .5s var(--spring) forwards}
 #notif.err-notif{border-color:rgba(239,68,68,.4);color:var(--red)}
+@keyframes notif-bounce{
+  0%  {opacity:0;transform:translateY(60px) scale(.9)}
+  65% {opacity:1;transform:translateY(-7px) scale(1.02)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ─────────────────────────────────────
+   PANEL + PREVIEW ENTRANCE
+───────────────────────────────────── */
+#panel{animation:panel-slide-in .5s var(--ease) both}
+@keyframes panel-slide-in{
+  from{opacity:0;transform:translateX(-18px)}
+  to{opacity:1;transform:translateX(0)}
+}
+#cv-preview{animation:cv-fade-in .65s .2s var(--ease) both}
+@keyframes cv-fade-in{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+#ats-ruler{animation:cv-fade-in .55s .1s var(--ease) both}
+
+/* ─────────────────────────────────────
+   SECTION BLOCKS STAGGER IN
+───────────────────────────────────── */
+.sb{animation:sb-in .4s var(--ease) both;opacity:0}
+.sb:nth-child(1){animation-delay:.06s}
+.sb:nth-child(2){animation-delay:.12s}
+.sb:nth-child(3){animation-delay:.18s}
+.sb:nth-child(4){animation-delay:.24s}
+.sb:nth-child(5){animation-delay:.30s}
+.sb:nth-child(6){animation-delay:.36s}
+@keyframes sb-in{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ─────────────────────────────────────
+   CARD ITEMS POP IN
+───────────────────────────────────── */
+.ci{animation:ci-pop .3s var(--spring) both}
+@keyframes ci-pop{
+  from{opacity:0;transform:scale(.95) translateY(8px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* ─────────────────────────────────────
+   SKILL BLOCK POP IN
+───────────────────────────────────── */
+.skill-block{animation:skill-in .35s var(--spring) both}
+@keyframes skill-in{
+  from{opacity:0;transform:scale(.94) translateY(10px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* ─────────────────────────────────────
+   TAB PANEL FADE
+───────────────────────────────────── */
+.tpanel.active{animation:tab-fade .25s var(--ease) both}
+@keyframes tab-fade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ─────────────────────────────────────
+   REJECTION PANEL SHAKE
+───────────────────────────────────── */
+#rejection-panel.shake{animation:rej-shake .45s var(--ease)}
+@keyframes rej-shake{
+  0%,100%{transform:translateX(0)}
+  18%    {transform:translateX(-7px)}
+  36%    {transform:translateX(6px)}
+  54%    {transform:translateX(-4px)}
+  72%    {transform:translateX(3px)}
+  90%    {transform:translateX(-2px)}
+}
+
+/* ─────────────────────────────────────
+   SAVE STATUS PULSE DOT
+───────────────────────────────────── */
+@keyframes as-pulse{
+  0%,100%{opacity:1;transform:scale(1)}
+  50%    {opacity:.35;transform:scale(.65)}
+}
+
+/* ─────────────────────────────────────
+   ATS RULER CHIPS STAGGER
+───────────────────────────────────── */
+.rchip{animation:chip-in .3s var(--ease) both}
+.rchip:nth-child(1){animation-delay:.05s}
+.rchip:nth-child(2){animation-delay:.10s}
+.rchip:nth-child(3){animation-delay:.15s}
+.rchip:nth-child(4){animation-delay:.20s}
+.rchip:nth-child(5){animation-delay:.25s}
+.rchip:nth-child(6){animation-delay:.30s}
+.rchip:nth-child(7){animation-delay:.35s}
+@keyframes chip-in{
+  from{opacity:0;transform:scale(.8) translateY(4px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+
+/* ─────────────────────────────────────
+   CHECKLIST ITEMS STAGGER (ATS tab)
+───────────────────────────────────── */
+.chk{animation:chk-in .3s var(--ease) both}
+@keyframes chk-in{
+  from{opacity:0;transform:translateX(-8px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
+/* ─────────────────────────────────────
+   BULLET ANALYZER ROWS STAGGER
+───────────────────────────────────── */
+.ba-bullet-row{animation:ba-row-in .25s var(--ease) both}
+.ba-bullet-row:nth-child(1){animation-delay:.03s}
+.ba-bullet-row:nth-child(2){animation-delay:.07s}
+.ba-bullet-row:nth-child(3){animation-delay:.11s}
+.ba-bullet-row:nth-child(4){animation-delay:.15s}
+.ba-bullet-row:nth-child(5){animation-delay:.19s}
+@keyframes ba-row-in{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ─────────────────────────────────────
+   TOPBAR SLIDE DOWN ON LOAD
+───────────────────────────────────── */
+#topbar{animation:topbar-in .4s var(--ease) both}
+@keyframes topbar-in{
+  from{opacity:0;transform:translateY(-100%)}
+  to{opacity:1;transform:translateY(0)}
+}
 
 /* ─────────────────────────────────────
    CV DOCUMENT — ATS-CORRECT
@@ -950,6 +1081,105 @@ select option{background:var(--s2);color:var(--t0)}
 /* ─────────────────────────────────────
    KEYWORDS CHIP DISPLAY
 ───────────────────────────────────── */
+/* ─────────────────────────────────────
+   AI TAB STYLES
+───────────────────────────────────── */
+.ai-tab{color:var(--blue2) !important;position:relative}
+.ai-tab.active{border-color:var(--blue) !important}
+.ai-tab::after{
+  content:'NEW';position:absolute;top:6px;right:2px;
+  font-size:7px;font-weight:800;letter-spacing:.4px;
+  background:var(--blue);color:#fff;padding:1px 4px;border-radius:3px;
+}
+
+.ai-hero{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 15px;margin-bottom:14px;
+  background:linear-gradient(135deg,rgba(79,122,255,.12) 0%,rgba(167,139,250,.08) 100%);
+  border:1.5px solid rgba(79,122,255,.25);border-radius:var(--r12);
+}
+.ai-hero-icon{font-size:28px;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(79,122,255,.5))}
+.ai-hero-title{font-size:15px;font-weight:800;color:var(--t0);letter-spacing:-.2px}
+.ai-hero-sub{font-size:10px;color:var(--blue2);font-weight:600;margin-top:2px;letter-spacing:.2px}
+
+.ai-action-grid{display:flex;flex-direction:column;gap:7px}
+.ai-action-btn{
+  width:100%;display:flex;align-items:center;gap:11px;
+  padding:11px 12px;border-radius:var(--r10);
+  background:var(--s1);border:1.5px solid var(--b1);
+  cursor:pointer;transition:all .18s var(--ease);text-align:left;
+  font-family:var(--font);
+}
+.ai-action-btn:hover{
+  background:var(--s2);border-color:rgba(79,122,255,.35);
+  transform:translateX(3px);
+  box-shadow:0 4px 16px rgba(79,122,255,.1);
+}
+.ai-action-btn:active{transform:translateX(1px)}
+.ai-action-btn.ai-loading-btn{opacity:.6;pointer-events:none}
+.ai-action-ico{
+  width:36px;height:36px;border-radius:var(--r8);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  border:1px solid transparent;transition:transform .2s var(--spring);
+}
+.ai-action-btn:hover .ai-action-ico{transform:scale(1.12)}
+.ai-action-text strong{display:block;font-size:12.5px;font-weight:700;color:var(--t0);margin-bottom:2px}
+.ai-action-text span{font-size:11px;color:var(--t2);line-height:1.4}
+
+.ai-output-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;background:var(--s2);border:1.5px solid var(--bd);
+  border-bottom:none;border-radius:var(--r10) var(--r10) 0 0;
+  font-size:11px;font-weight:700;color:var(--blue2);letter-spacing:.3px;text-transform:uppercase;
+  position:relative;z-index:2;
+}
+.ai-output-body{
+  padding:13px 14px;
+  background:var(--s1);border:1.5px solid var(--bd);border-top:1px solid var(--b1);
+  border-radius:0 0 var(--r10) var(--r10);
+  font-size:12.5px;color:var(--t1);line-height:1.7;
+  max-height:340px;overflow-y:auto;
+  animation:tab-fade .25s var(--ease) both;
+}
+.ai-output-body strong{color:var(--t0)}
+.ai-output-body .ai-section-head{
+  font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--blue2);margin:10px 0 5px;
+}
+.ai-output-body .ai-chip{
+  display:inline-flex;margin:2px 3px;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;
+  background:var(--bg_blue);color:var(--blue2);border:1px solid var(--bd);
+}
+.ai-output-body .ai-bullet{
+  display:flex;gap:7px;padding:5px 0;border-bottom:1px solid var(--b0);
+}
+.ai-output-body .ai-bullet:last-child{border-bottom:none}
+.ai-output-body .ai-bullet-num{
+  flex-shrink:0;width:18px;height:18px;border-radius:50%;
+  background:var(--bg_blue);color:var(--blue2);font-size:9px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin-top:2px;
+}
+
+.ai-loading-wrap{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 14px;margin-top:16px;
+  background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r10);
+}
+.ai-spinner{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  border:2.5px solid rgba(79,122,255,.2);
+  border-top-color:var(--blue2);
+  animation:ai-spin .7s linear infinite;
+}
+@keyframes ai-spin{to{transform:rotate(360deg)}}
+.ai-loading-text{font-size:12px;font-weight:600;color:var(--t2)}
+.ai-loading-text::after{
+  content:'';animation:ai-dots 1.4s steps(4,end) infinite;
+}
+@keyframes ai-dots{
+  0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} 100%{content:''}
+}
+
 .kw-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 .kw-chip{
   padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;
@@ -1127,6 +1357,7 @@ select option{background:var(--s2);color:var(--t0)}
     <div class="tab active" onclick="switchTab('edit')">Edit</div>
     <div class="tab" onclick="switchTab('skills')">Skills</div>
     <div class="tab" onclick="switchTab('ats')">ATS</div>
+    <div class="tab ai-tab" onclick="switchTab('ai')">✨ AI</div>
     <div class="tab" onclick="switchTab('cfg')">Settings</div>
   </div>
 
@@ -1427,6 +1658,120 @@ select option{background:var(--s2);color:var(--t0)}
     </button>
   </div>
 
+  <!-- ─── AI ENHANCE TAB ─── -->
+  <div class="tpanel" id="tab-ai">
+
+    <!-- Hero banner -->
+    <div class="ai-hero">
+      <div class="ai-hero-icon">✨</div>
+      <div>
+        <div class="ai-hero-title">AI CV Enhancer</div>
+        <div class="ai-hero-sub">Powered by Groq · llama-3.3-70b-versatile</div>
+      </div>
+    </div>
+
+    <!-- Job description input for context -->
+    <div class="sb" id="sb-ai-jd">
+      <div class="sbh" onclick="toggleBlock(this)">
+        <div class="sbhl"><div class="sbico" style="background:var(--bg_blue)">📋</div>Target Job Description <span style="font-size:9px;font-weight:600;color:var(--t3);margin-left:4px">(optional but recommended)</span></div>
+        <button class="ib" onclick="event.stopPropagation();toggleBlock(this.parentElement)">−</button>
+      </div>
+      <div class="sbbody">
+        <div class="fg">
+          <label class="fl">Paste Job Description</label>
+          <textarea id="ai-jd" rows="5" placeholder="Paste the job posting here. The AI will tailor your CV to match this specific role's keywords and requirements…" style="font-size:12px"></textarea>
+          <div class="fhint">AI will extract key requirements and align your CV language to match.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Actions grid -->
+    <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);margin:14px 0 9px">Choose an Enhancement</div>
+
+    <div class="ai-action-grid">
+
+      <button class="ai-action-btn" onclick="aiEnhance('summary')" id="aibtn-summary">
+        <div class="ai-action-ico" style="background:rgba(79,122,255,.12);border-color:rgba(79,122,255,.2)">📝</div>
+        <div class="ai-action-text">
+          <strong>Rewrite Summary</strong>
+          <span>Generate a punchy 60-word professional summary</span>
+        </div>
+      </button>
+
+      <button class="ai-action-btn" onclick="aiEnhance('bullets')" id="aibtn-bullets">
+        <div class="ai-action-ico" style="background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.18)">🎯</div>
+        <div class="ai-action-text">
+          <strong>Improve All Bullets</strong>
+          <span>Rewrite every experience bullet with action verbs + metrics</span>
+        </div>
+      </button>
+
+      <button class="ai-action-btn" onclick="aiEnhance('skills')" id="aibtn-skills">
+        <div class="ai-action-ico" style="background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2)">🚀</div>
+        <div class="ai-action-text">
+          <strong>Suggest Skills</strong>
+          <span>Get missing skills based on your role and JD</span>
+        </div>
+      </button>
+
+      <button class="ai-action-btn" onclick="aiEnhance('title')" id="aibtn-title">
+        <div class="ai-action-ico" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.18)">🏷️</div>
+        <div class="ai-action-text">
+          <strong>Optimise Job Title</strong>
+          <span>Make your title ATS-friendly and role-specific</span>
+        </div>
+      </button>
+
+      <button class="ai-action-btn" onclick="aiEnhance('keywords')" id="aibtn-keywords">
+        <div class="ai-action-ico" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.18)">🔑</div>
+        <div class="ai-action-text">
+          <strong>Extract Keywords</strong>
+          <span>Pull must-have keywords from the job description</span>
+        </div>
+      </button>
+
+      <button class="ai-action-btn" onclick="aiEnhance('full')" id="aibtn-full">
+        <div class="ai-action-ico" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.18)">⚡</div>
+        <div class="ai-action-text">
+          <strong>Full CV Review</strong>
+          <span>Get a complete critique + priority fixes list</span>
+        </div>
+      </button>
+
+    </div>
+
+    <!-- Output area -->
+    <div id="ai-output-wrap" style="display:none;margin-top:16px">
+      <div class="ai-output-header">
+        <span id="ai-output-label">AI Output</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn btn-ghost btn-xs" onclick="aiCopyOutput()">Copy</button>
+          <button class="ib" onclick="document.getElementById('ai-output-wrap').style.display='none'" title="Close">✕</button>
+        </div>
+      </div>
+      <div id="ai-output-body" class="ai-output-body"></div>
+      <div id="ai-apply-row" style="display:none;padding:10px 12px;background:var(--s2);border:1.5px solid var(--bd);border-top:none;border-radius:0 0 var(--r10) var(--r10)">
+        <button class="btn btn-primary" style="width:100%;justify-content:center;font-size:12px" onclick="aiApplyOutput()" id="ai-apply-btn">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8"/></svg>
+          Apply to CV
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="ai-loading" style="display:none" class="ai-loading-wrap">
+      <div class="ai-spinner"></div>
+      <div id="ai-loading-text" class="ai-loading-text">Contacting Groq…</div>
+    </div>
+
+    <!-- Info box -->
+    <div class="infobox info" style="margin-top:16px">
+      <div class="infobox-title">💡 How it works</div>
+      <div class="infobox-body">The AI reads your current CV data and the job description (if provided), then generates targeted improvements. You review first — click <strong>Apply to CV</strong> to update your data. Nothing changes until you approve it.</div>
+    </div>
+
+  </div><!-- /tab-ai -->
+
 </div><!-- /panel -->
 
 <!-- ═══════════ PREVIEW ═══════════ -->
@@ -1714,7 +2059,7 @@ function notif(msg,t='g'){
    TABS
 ══════════════════════════════════════════ */
 function switchTab(id){
-  const ids=['edit','skills','ats','cfg'];
+  const ids=['edit','skills','ats','ai','cfg'];
   document.querySelectorAll('.tab').forEach((t,i)=>{
     t.classList.toggle('active',ids[i]===id);
     g('tab-'+ids[i]).classList.toggle('active',ids[i]===id);
@@ -2412,6 +2757,26 @@ function rCV(){
 }
 
 /* ══════════════════════════════════════════
+   ANIMATE COUNT HELPER
+   Smoothly counts a number element up/down
+   to a target value (ease-out cubic).
+══════════════════════════════════════════ */
+function animateCount(el,target,duration=700){
+  if(!el)return;
+  const start=parseInt(el.textContent)||0;
+  if(start===target){el.textContent=target;return}
+  const startTime=performance.now();
+  function step(now){
+    const p=Math.min((now-startTime)/duration,1);
+    const eased=1-Math.pow(1-p,3);
+    el.textContent=Math.round(start+(target-start)*eased);
+    if(p<1)requestAnimationFrame(step);
+    else el.textContent=target;
+  }
+  requestAnimationFrame(step);
+}
+
+/* ══════════════════════════════════════════
    ATS SCORING
 ══════════════════════════════════════════ */
 function calcScore(){
@@ -2445,7 +2810,7 @@ function uATS(){
   const c=182.2//(2*Math.PI*29)
   const ring=g('a-ring');
   if(ring){ring.style.strokeDashoffset=(c-c*sc/100).toFixed(1);ring.style.stroke=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
-  g('a-num').textContent=sc;
+  animateCount(g('a-num'),sc);
   const gr=sc>=85?{t:'Excellent',s:'ATS-ready — well done!'}:sc>=70?{t:'Good',s:'Minor tweaks needed'}:sc>=50?{t:'Fair',s:'Several gaps to address'}:{t:'Needs Work',s:'Fill in missing sections'};
   g('a-grade').textContent=gr.t;g('a-gsub').textContent=gr.s;
   const bf=g('a-bfill');if(bf){bf.style.width=sc+'%';bf.style.background=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
@@ -2473,7 +2838,7 @@ function updateRuler(){
   const c=131.9;
   const r=g('r-ring');
   if(r){r.style.strokeDashoffset=(c-c*sc/100).toFixed(1);r.style.stroke=sc>=75?'var(--green)':sc>=50?'var(--amber)':'var(--red)'}
-  g('r-num').textContent=sc;
+  animateCount(g('r-num'),sc);
   const gr=sc>=85?'Excellent':sc>=70?'Good':sc>=50?'Fair':'Needs Work';
   g('r-grade').textContent=gr+' — ATS Score';
   g('r-sub').textContent=sc>=75?'Passes most ATS systems':sc>=50?'Gaps to address':'Fill in more details';
@@ -2866,6 +3231,10 @@ function updateRejectionWarnings(){
   }
 
   panel.classList.remove('hidden');
+  // trigger shake to draw attention each time warnings appear/change
+  panel.classList.remove('shake');
+  void panel.offsetWidth; // force reflow so animation restarts
+  panel.classList.add('shake');
   count.textContent=`${warnings.length} issue${warnings.length>1?'s':''}`;
   body.innerHTML=warnings.map(w=>`
     <div class="rej-item">
@@ -3034,6 +3403,354 @@ window.addEventListener('load', () => {
         hideEcosystemHome();
     }
 });
+
+/* ══════════════════════════════════════════
+   AI ENHANCE ENGINE — Groq via /api/ai/groq/generate
+   ──────────────────────────────────────────
+   Modes:
+     summary  → rewrites professional summary
+     bullets  → improves all experience bullets
+     skills   → suggests missing skills
+     title    → optimises job title for ATS
+     keywords → extracts JD keywords
+     full     → full CV review + priority list
+══════════════════════════════════════════ */
+
+let _aiLastMode = null;   // tracks current mode so Apply knows what to do
+let _aiLastData = null;   // parsed AI result for Apply button
+
+async function aiEnhance(mode) {
+  sync(); // pull latest form values into S
+
+  // Build context snapshot from current CV state
+  const cvContext = buildCVContext();
+  const jd = (g('ai-jd')?.value || '').trim();
+
+  const prompts = {
+    summary: `You are an expert CV writer for Pakistan's job market. Based on the CV data below, write a professional summary of exactly 55-70 words. Use first person. Include the job title, years of experience, 3 key skills, and a value statement. Output ONLY the summary text, no labels, no quotes.
+
+CV Data:
+Name: ${S.name}
+Title: ${S.title}
+Skills: ${S.skills.map(s=>s.name).filter(Boolean).join(', ')}
+Experience: ${S.exp.map(e=>`${e.role} at ${e.company}`).join('; ')}
+${jd ? `\nTarget Job Description:\n${jd.slice(0,800)}` : ''}`,
+
+    bullets: `You are an expert CV writer. Rewrite the experience bullets below using strong action verbs, past tense, and quantified results. Keep each bullet under 20 words. If no number exists, suggest a realistic placeholder like "[X%]".
+
+Return ONLY a JSON array in this exact format, no extra text:
+[{"role": "Job Title", "company": "Company", "bullets": ["Bullet 1", "Bullet 2"]}]
+
+Experience to rewrite:
+${S.exp.map(e=>`Role: ${e.role} at ${e.company}\nBullets:\n${e.bullets}`).join('\n\n')}
+${jd ? `\nTarget Job:\n${jd.slice(0,500)}` : ''}`,
+
+    skills: `You are a tech recruiter. Based on this candidate's profile, suggest 6-10 additional skills they are likely missing that would improve their ATS score for their target role.
+
+Return ONLY a JSON array of skill name strings: ["Skill 1", "Skill 2", ...]
+
+Candidate profile:
+Title: ${S.title}
+Current skills: ${S.skills.map(s=>s.name).filter(Boolean).join(', ')}
+Experience: ${S.exp.map(e=>`${e.role} at ${e.company}`).join(', ')}
+${jd ? `\nJob Description:\n${jd.slice(0,600)}` : ''}`,
+
+    title: `You are an ATS optimization expert. Suggest 3 improved job title variations for this candidate. Titles should be specific, use standard industry terminology, and match the job description if provided.
+
+Return ONLY a JSON array: ["Title 1", "Title 2", "Title 3"]
+
+Current title: ${S.title}
+Skills: ${S.skills.map(s=>s.name).filter(Boolean).join(', ')}
+${jd ? `\nJob Description:\n${jd.slice(0,500)}` : ''}`,
+
+    keywords: `Extract the 15 most important ATS keywords from this job description. Focus on technical skills, tools, and role-specific terms recruiters would search for.
+
+Return ONLY a JSON array of keyword strings: ["keyword1", "keyword2", ...]
+
+Job Description:
+${jd || 'No job description provided. Extract keywords from this CV instead:\n' + cvContext}`,
+
+    full: `You are a senior CV reviewer for the Pakistan job market. Review this CV and provide structured feedback.
+
+Return ONLY valid JSON in this exact format:
+{
+  "score": 72,
+  "verdict": "One sentence overall verdict",
+  "strengths": ["Strength 1", "Strength 2", "Strength 3"],
+  "critical_fixes": ["Fix 1 (most important)", "Fix 2", "Fix 3"],
+  "quick_wins": ["Quick improvement 1", "Quick improvement 2"]
+}
+
+CV Data:
+${cvContext}
+${jd ? `\nTarget Job:\n${jd.slice(0,600)}` : ''}`
+  };
+
+  const labels = {
+    summary:  '📝 Rewritten Summary',
+    bullets:  '🎯 Improved Bullets',
+    skills:   '🚀 Suggested Skills',
+    title:    '🏷️ Optimised Job Titles',
+    keywords: '🔑 Extracted Keywords',
+    full:     '⚡ Full CV Review'
+  };
+
+  const loadingMessages = {
+    summary:  'Writing your summary…',
+    bullets:  'Rewriting bullets with impact…',
+    skills:   'Scanning for skill gaps…',
+    title:    'Optimising your job title…',
+    keywords: 'Extracting JD keywords…',
+    full:     'Running full CV review…'
+  };
+
+  // Guard: keywords mode requires a JD
+  if (mode === 'keywords' && !jd) {
+    showAiOutput('🔑 Keywords', '<div style="color:var(--amber);font-size:12px;padding:4px 0">⚠ Please paste a job description above to extract keywords from it.<br>Without a JD, general CV keywords have been used instead.</div>\n\n' + S.skills.map(s=>s.name).filter(Boolean).join(', '), null);
+    return;
+  }
+
+  // Show loading state
+  setAiLoading(true, loadingMessages[mode]);
+  hideAiOutput();
+  setAiButtonLoading(mode, true);
+
+  try {
+    const res = await fetch(`${API}/ai/groq/generate`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ prompt: prompts[mode] })
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'AI generation failed');
+
+    const rawText = (data.text || data.result || '').trim();
+    _aiLastMode = mode;
+    _aiLastData = null;
+
+    // Parse and display based on mode
+    if (mode === 'summary') {
+      _aiLastData = rawText;
+      showAiOutput(labels[mode], renderAiSummary(rawText), true);
+
+    } else if (mode === 'bullets') {
+      const parsed = parseJSON(rawText);
+      _aiLastData = parsed;
+      showAiOutput(labels[mode], renderAiBullets(parsed), !!parsed);
+
+    } else if (mode === 'skills') {
+      const parsed = parseJSON(rawText);
+      _aiLastData = parsed;
+      showAiOutput(labels[mode], renderAiSkills(parsed), !!parsed);
+
+    } else if (mode === 'title') {
+      const parsed = parseJSON(rawText);
+      _aiLastData = parsed;
+      showAiOutput(labels[mode], renderAiTitles(parsed), !!parsed);
+
+    } else if (mode === 'keywords') {
+      const parsed = parseJSON(rawText);
+      _aiLastData = parsed;
+      showAiOutput(labels[mode], renderAiKeywords(parsed), false);
+
+    } else if (mode === 'full') {
+      const parsed = parseJSON(rawText);
+      _aiLastData = parsed;
+      showAiOutput(labels[mode], renderAiFullReview(parsed), false);
+    }
+
+  } catch (err) {
+    console.error('[AI Enhance]', err);
+    showAiOutput('⚠ Error', `<span style="color:var(--red)">${err.message}</span>\n\nMake sure:\n• Backend is running\n• GROQ_API_KEY is set in .env\n• You are logged in`, false);
+  } finally {
+    setAiLoading(false);
+    setAiButtonLoading(mode, false);
+  }
+}
+
+/* ── Helpers ── */
+function buildCVContext() {
+  return `Name: ${S.name}
+Title: ${S.title}
+Summary: ${S.summary}
+Skills: ${S.skills.map(s=>s.name+' ('+(['','Beginner','Elementary','Intermediate','Proficient','Expert'][s.level]||'')+')')
+  .filter(s=>s).join(', ')}
+Experience:
+${S.exp.map(e=>`  ${e.role} at ${e.company}\n  ${e.bullets}`).join('\n')}
+Education: ${S.edu.map(e=>`${e.degree} from ${e.school}`).join(', ')}
+Projects: ${S.proj.map(p=>`${p.name} (${p.tech})`).join(', ')}
+Certifications: ${S.cert.map(c=>c.name).join(', ')}`;
+}
+
+function parseJSON(text) {
+  try {
+    // Strip markdown code fences if present
+    const clean = text.replace(/```json\n?/gi,'').replace(/```\n?/gi,'').trim();
+    return JSON.parse(clean);
+  } catch {
+    // Try extracting the first JSON array or object
+    const arrMatch = text.match(/\[[\s\S]*\]/);
+    const objMatch = text.match(/\{[\s\S]*\}/);
+    try { if (arrMatch) return JSON.parse(arrMatch[0]); } catch {}
+    try { if (objMatch) return JSON.parse(objMatch[0]); } catch {}
+    return null;
+  }
+}
+
+function renderAiSummary(text) {
+  return `<div class="ai-section-head">Generated Summary</div><div style="padding:10px 12px;background:var(--s2);border-radius:var(--r8);border:1px solid var(--b1);line-height:1.75;font-size:12.5px;color:var(--t0)">${text}</div>\n<div style="font-size:10px;color:var(--t3);margin-top:8px">Click <strong style="color:var(--blue2)">Apply to CV</strong> to replace your current summary.</div>`;
+}
+
+function renderAiBullets(parsed) {
+  if (!parsed || !Array.isArray(parsed)) return '<span style="color:var(--amber)">Could not parse bullet suggestions. Raw output below.</span>';
+  return parsed.map((entry, ei) => `
+    <div class="ai-section-head">${entry.role || 'Role'} — ${entry.company || ''}</div>
+    ${(entry.bullets||[]).map((b,bi)=>`<div class="ai-bullet"><div class="ai-bullet-num">${bi+1}</div><div>${b}</div></div>`).join('')}
+  `).join('');
+}
+
+function renderAiSkills(parsed) {
+  if (!parsed || !Array.isArray(parsed)) return '<span style="color:var(--amber)">Could not parse skill suggestions.</span>';
+  return `<div class="ai-section-head">Suggested Skills to Add</div>` +
+    parsed.map(s=>`<span class="ai-chip">${s}</span>`).join('') +
+    `<div style="font-size:10px;color:var(--t3);margin-top:10px">Click <strong style="color:var(--blue2)">Apply to CV</strong> to add these as new skill groups.</div>`;
+}
+
+function renderAiTitles(parsed) {
+  if (!parsed || !Array.isArray(parsed)) return '<span style="color:var(--amber)">Could not parse title suggestions.</span>';
+  return `<div class="ai-section-head">Recommended Job Titles</div>` +
+    parsed.map((t,i)=>`<div class="ai-bullet"><div class="ai-bullet-num">${i+1}</div><div style="font-weight:700;color:var(--t0)">${t}</div></div>`).join('') +
+    `<div style="font-size:10px;color:var(--t3);margin-top:8px">Click <strong style="color:var(--blue2)">Apply to CV</strong> to use the first suggestion as your job title.</div>`;
+}
+
+function renderAiKeywords(parsed) {
+  if (!parsed || !Array.isArray(parsed)) return '<span style="color:var(--amber)">Could not parse keywords.</span>';
+  return `<div class="ai-section-head">ATS Keywords Found in JD</div>` +
+    parsed.map(k=>`<span class="ai-chip">${k}</span>`).join('') +
+    `<div style="font-size:10px;color:var(--t3);margin-top:10px">Make sure these words appear naturally in your summary, skills, and bullets.</div>`;
+}
+
+function renderAiFullReview(parsed) {
+  if (!parsed || typeof parsed !== 'object') return '<span style="color:var(--amber)">Could not parse review. Check console.</span>';
+  const scoreColor = parsed.score>=75?'var(--green)':parsed.score>=50?'var(--amber)':'var(--red)';
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px 12px;background:var(--s2);border-radius:var(--r8);border:1px solid var(--b1)">
+      <div style="font-size:28px;font-weight:800;color:${scoreColor};line-height:1">${parsed.score||'?'}</div>
+      <div><div style="font-size:9px;color:var(--t3)">AI Score /100</div><div style="font-size:12px;color:var(--t1);margin-top:2px">${parsed.verdict||''}</div></div>
+    </div>
+    <div class="ai-section-head">✅ Strengths</div>
+    ${(parsed.strengths||[]).map(s=>`<div class="ai-bullet"><div class="ai-bullet-num" style="background:var(--gd);color:var(--green)">✓</div><div>${s}</div></div>`).join('')}
+    <div class="ai-section-head" style="margin-top:10px">🚨 Critical Fixes</div>
+    ${(parsed.critical_fixes||[]).map((f,i)=>`<div class="ai-bullet"><div class="ai-bullet-num" style="background:var(--rd);color:var(--red)">${i+1}</div><div>${f}</div></div>`).join('')}
+    <div class="ai-section-head" style="margin-top:10px">⚡ Quick Wins</div>
+    ${(parsed.quick_wins||[]).map(w=>`<div class="ai-bullet"><div class="ai-bullet-num" style="background:var(--ad);color:var(--amber)">→</div><div>${w}</div></div>`).join('')}
+  `;
+}
+
+function showAiOutput(label, html, showApply) {
+  const wrap     = g('ai-output-wrap');
+  const body     = g('ai-output-body');
+  const lbl      = g('ai-output-label');
+  const applyRow = g('ai-apply-row');
+  if (!wrap||!body) return;
+  lbl.textContent = label;
+  body.innerHTML  = html;
+  if (applyRow) applyRow.style.display = showApply ? 'block' : 'none';
+  wrap.style.display = 'block';
+  wrap.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function hideAiOutput() {
+  const wrap = g('ai-output-wrap');
+  if (wrap) wrap.style.display = 'none';
+}
+
+function setAiLoading(on, text='') {
+  const el = g('ai-loading');
+  const txt = g('ai-loading-text');
+  if (!el) return;
+  el.style.display = on ? 'flex' : 'none';
+  if (txt && text) txt.textContent = text;
+}
+
+function setAiButtonLoading(mode, on) {
+  const btn = g(`aibtn-${mode}`);
+  if (!btn) return;
+  btn.classList.toggle('ai-loading-btn', on);
+}
+
+function aiCopyOutput() {
+  const body = g('ai-output-body');
+  if (!body) return;
+  const text = body.innerText || body.textContent;
+  navigator.clipboard.writeText(text).then(()=>notif('Copied to clipboard!')).catch(()=>notif('Copy failed','r'));
+}
+
+/* Apply AI result back into the CV state */
+function aiApplyOutput() {
+  if (!_aiLastMode || !_aiLastData) { notif('Nothing to apply','r'); return; }
+
+  if (_aiLastMode === 'summary') {
+    S.summary = _aiLastData;
+    const ta = g('f-summary');
+    if (ta) ta.value = _aiLastData;
+    live();
+    notif('Summary updated! ✓');
+
+  } else if (_aiLastMode === 'bullets') {
+    if (!Array.isArray(_aiLastData)) { notif('Could not apply — data error','r'); return; }
+    _aiLastData.forEach(entry => {
+      const exp = S.exp.find(e =>
+        (e.role||'').toLowerCase().includes((entry.role||'').toLowerCase()) ||
+        (e.company||'').toLowerCase().includes((entry.company||'').toLowerCase())
+      );
+      if (exp && Array.isArray(entry.bullets)) {
+        exp.bullets = entry.bullets.map(b=>'• '+b.replace(/^[•\-\*]\s*/,'')).join('\n');
+        const ta = g(`bta-${exp.id}`);
+        if (ta) ta.value = exp.bullets;
+      }
+    });
+    renderExpList();
+    renderAllBulletAnalyzers();
+    live();
+    notif('Bullets updated! ✓');
+
+  } else if (_aiLastMode === 'skills') {
+    if (!Array.isArray(_aiLastData)) { notif('Could not apply — data error','r'); return; }
+    const existing = new Set(S.skills.map(s=>(s.name||'').toLowerCase()));
+    let added = 0;
+    _aiLastData.forEach(skillName => {
+      if (!existing.has((skillName||'').toLowerCase())) {
+        const id = uid('skill');
+        S.skills.push({ id, name: skillName, color: SKILL_COLORS[S.skills.length % SKILL_COLORS.length], level: 3, pids: [] });
+        added++;
+      }
+    });
+    renderSkillList();
+    live();
+    notif(`${added} new skill${added!==1?'s':''} added! ✓`);
+
+  } else if (_aiLastMode === 'title') {
+    if (!Array.isArray(_aiLastData) || !_aiLastData[0]) { notif('Could not apply','r'); return; }
+    S.title = _aiLastData[0];
+    const inp = g('f-title');
+    if (inp) inp.value = _aiLastData[0];
+    live();
+    notif('Job title updated! ✓');
+  }
+
+  // Hide Apply row after applying
+  const applyRow = g('ai-apply-row');
+  if (applyRow) applyRow.style.display = 'none';
+  _aiLastData = null;
+  _aiLastMode = null;
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </body>
