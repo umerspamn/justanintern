@@ -19,7 +19,7 @@ const pool = new Pool({
   // Connection pool settings
   max:             20,    // max simultaneous connections
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000,
 });
 
 // Log connection errors (don't crash the app)
