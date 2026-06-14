@@ -169,7 +169,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <script>
 const API = localStorage.getItem('cvforge_api_base')
   ? localStorage.getItem('cvforge_api_base') + '/api'
-  : 'http://localhost:3000/api';
+  : 'https://justanintern.vercel.app/api';
 
 // ── Read career from URL param OR from career predictor saved state ──
 const urlParams  = new URLSearchParams(window.location.search);

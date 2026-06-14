@@ -9,13 +9,13 @@ docker compose up --build
 ## URLs
 
 - Frontend (CV builder, auth, recruiter, career predictor): `http://localhost:8080`
-- API: `http://localhost:3000`
+- API: `https://justanintern.vercel.app`
 - DB exposed on host: `localhost:5433`
 
 ## Notes
 
 - The Postgres schema is initialized automatically from `cvforge-backend/sql/auth_schema.sql` on first run.
-- Auth pages use `http://localhost:3000` by default for API calls.
+- Auth pages use `https://justanintern.vercel.app` by default for API calls.
 - To point frontend auth/recruiter pages to another API, set in browser console:
 
 ```js

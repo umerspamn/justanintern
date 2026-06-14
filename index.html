@@ -1845,7 +1845,7 @@ select option{background:var(--s2);color:var(--t0)}
 /* ══════════════════════════════════════════
    API CONFIG + AUTH HELPERS
 ══════════════════════════════════════════ */
-const API_BASE = localStorage.getItem('cvforge_api_base') || 'http://localhost:3000';
+const API_BASE = localStorage.getItem('cvforge_api_base') || 'https://justanintern.vercel.app';
 const API = `${API_BASE}/api`;
 
 function getAuthHeaders() {
