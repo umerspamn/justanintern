@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Course — Just An Intern</title>
+<script>
+(() => {
+  const token = localStorage.getItem('cvforge_token');
+  if (!token) window.location.href = 'auth.html?redirect=course.html' + location.search;
+})();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#090B0F;--s0:#0D1018;--s1:#131720;--s2:#181D28;--s3:#1E2433;--s4:#242A3A;
+  --b0:rgba(255,255,255,.04);--b1:rgba(255,255,255,.07);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.17);
+  --t0:#F0F2F8;--t1:#B8BECC;--t2:#7A8299;--t3:#4A5166;
+  --blue:#4F7AFF;--blue2:#6B93FF;--blue3:#3A62E8;--bd:rgba(79,122,255,.15);--bg_blue:rgba(79,122,255,.08);
+  --green:#22C55E;--gd:rgba(34,197,94,.12);
+  --amber:#F59E0B;--ad:rgba(245,158,11,.12);
+  --red:#EF4444;--rd:rgba(239,68,68,.12);
+  --purple:#A78BFA;
+  --r8:8px;--r10:10px;--r12:12px;--r16:16px;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+  --th:54px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --shadow-lg:0 16px 40px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+html,body{font-family:var(--font);background:var(--bg);color:var(--t0);font-size:14px;line-height:1.5;height:100%;overflow:hidden}
+a{color:var(--blue2);text-decoration:none}
+
+#topbar{position:fixed;top:0;left:0;right:0;height:var(--th);z-index:400;background:rgba(9,11,15,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.brand-logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#3A62E8,#6B93FF);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff}
+.brand-name{font-size:14px;font-weight:800;color:var(--t0)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r8);font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;border:1px solid transparent;transition:all .15s}
+.btn-ghost{background:transparent;color:var(--t1);border-color:var(--b2)}
+.btn-ghost:hover{background:var(--s2);color:var(--t0)}
+.btn-primary{background:linear-gradient(135deg,#3A62E8,#5B87FF);color:#fff;border-color:rgba(79,122,255,.4);box-shadow:0 2px 8px rgba(79,122,255,.3)}
+.btn-primary:hover{background:linear-gradient(135deg,#4B73F9,#6B97FF)}
+.btn-green{background:linear-gradient(135deg,#16A34A,#22C55E);color:#fff;border-color:rgba(34,197,94,.4);box-shadow:0 2px 8px rgba(34,197,94,.25)}
+.btn-green:hover{background:linear-gradient(135deg,#15803D,#16A34A)}
+
+/* LAYOUT */
+#app{display:flex;height:100vh;padding-top:var(--th);overflow:hidden}
+#sidebar{width:320px;flex-shrink:0;background:var(--s0);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+#content{flex:1;overflow-y:auto;background:var(--bg);padding:24px}
+
+/* SIDEBAR */
+.sb-head{padding:16px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.sb-course-title{font-size:13px;font-weight:800;color:var(--t0);line-height:1.3;margin-bottom:6px}
+.progress-bar{height:4px;background:var(--b1);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue3),var(--blue2));border-radius:2px;transition:width .6s var(--ease)}
+.progress-text{font-size:10px;color:var(--t2);display:flex;justify-content:space-between}
+.sb-list{overflow-y:auto;flex:1;padding:8px}
+.vid-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px;border-radius:var(--r10);cursor:pointer;
+  transition:all .15s;margin-bottom:4px;border:1.5px solid transparent;
+}
+.vid-item:hover{background:var(--s2);border-color:var(--b1)}
+.vid-item.active{background:var(--bg_blue);border-color:var(--bd)}
+.vid-item.watched .vid-num{background:var(--green);color:#fff;border-color:var(--green)}
+.vid-num{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--t3);flex-shrink:0;margin-top:1px;transition:all .2s}
+.vid-title{font-size:11.5px;font-weight:600;color:var(--t1);line-height:1.4;flex:1}
+.vid-item.active .vid-title{color:var(--blue2)}
+.sb-quiz-box{padding:14px;border-top:1px solid var(--b1);flex-shrink:0}
+.quiz-ready{background:linear-gradient(135deg,rgba(79,122,255,.1),rgba(167,139,250,.07));border:1.5px solid var(--bd);border-radius:var(--r12);padding:14px;text-align:center}
+.quiz-ready h3{font-size:13px;font-weight:800;color:var(--t0);margin-bottom:4px}
+.quiz-ready p{font-size:11px;color:var(--t2);margin-bottom:12px;line-height:1.5}
+
+/* VIDEO PLAYER */
+.player-wrap{background:#000;border-radius:var(--r16);overflow:hidden;aspect-ratio:16/9;margin-bottom:20px;max-width:860px}
+.player-wrap iframe{width:100%;height:100%;border:none;display:block}
+.player-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--t3);font-size:13px}
+.player-placeholder .big-ico{font-size:48px}
+
+/* VIDEO INFO */
+.video-info{max-width:860px;margin-bottom:20px}
+.video-title{font-size:18px;font-weight:800;color:var(--t0);margin-bottom:8px;line-height:1.3}
+.video-meta{display:flex;align-items:center;gap:14px;font-size:11px;color:var(--t2);margin-bottom:14px;flex-wrap:wrap}
+.video-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* AI GENERATE PANEL */
+.ai-panel{max-width:860px;background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r16);padding:20px;margin-bottom:20px}
+.ai-panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ai-panel-title{font-size:14px;font-weight:800;color:var(--t0);display:flex;align-items:center;gap:8px}
+.ai-status{font-size:11px;color:var(--t2)}
+.ai-steps{display:flex;flex-direction:column;gap:10px}
+.ai-step{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-radius:var(--r10);background:var(--s2);border:1px solid var(--b1)}
+.ai-step-num{width:22px;height:22px;border-radius:50%;background:var(--bg_blue);color:var(--blue2);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-step-num.done{background:var(--gd);color:var(--green)}
+.ai-step-num.active{background:var(--blue);color:#fff;animation:pulse-ring .8s ease-in-out infinite}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(79,122,255,.4)}50%{box-shadow:0 0 0 6px rgba(79,122,255,0)}}
+.ai-step-body strong{display:block;font-size:12px;font-weight:700;color:var(--t0);margin-bottom:2px}
+.ai-step-body span{font-size:11px;color:var(--t2)}
+
+/* NOTIF */
+#notif{position:fixed;bottom:22px;right:22px;z-index:999;padding:11px 18px;border-radius:var(--r12);font-size:12px;font-weight:700;background:var(--s2);border:1.5px solid rgba(34,197,94,.4);color:var(--green);box-shadow:var(--shadow-lg);opacity:0;transform:translateY(60px) scale(.9);pointer-events:none;display:flex;align-items:center;gap:8px}
+#notif.show{animation:nb .5s var(--spring) forwards}
+#notif.err{border-color:rgba(239,68,68,.4);color:var(--red)}
+@keyframes nb{0%{opacity:0;transform:translateY(60px) scale(.9)}65%{opacity:1;transform:translateY(-7px) scale(1.02)}100%{opacity:1;transform:translateY(0) scale(1)}}
+
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(79,122,255,.2);border-top-color:var(--blue2);animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.infobox{border-radius:var(--r10);padding:11px 13px;border:1px solid transparent;margin-bottom:12px;font-size:12px;line-height:1.6}
+.infobox.info{background:var(--bg_blue);border-color:var(--bd);color:var(--t1)}
+.infobox.pass{background:var(--gd);border-color:rgba(34,197,94,.2);color:var(--green)}
+
+@media(max-width:768px){
+  #sidebar{display:none}
+  #content{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="brand" onclick="location.href='courses.html'">
+    <div class="brand-logo">CV</div>
+    <span class="brand-name">Just An Intern</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px">
+    <span id="topbar-course-title" style="font-size:11px;color:var(--t2);max-width:200px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></span>
+    <button class="btn btn-ghost" onclick="location.href='courses.html'">← Courses</button>
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- SIDEBAR — video list -->
+  <div id="sidebar">
+    <div class="sb-head">
+      <div class="sb-course-title" id="sb-title">Loading…</div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="progress-text"><span id="prog-text">0 of 0 watched</span><span id="prog-pct">0%</span></div>
+    </div>
+    <div class="sb-list" id="sb-list"></div>
+    <div class="sb-quiz-box" id="sb-quiz-box" style="display:none">
+      <div class="quiz-ready">
+        <h3>📝 Quiz Ready</h3>
+        <p id="quiz-box-desc">Pass with 80% to earn your certificate.</p>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="goToQuiz()" id="quiz-btn">Take the Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="content">
+
+    <!-- VIDEO PLAYER -->
+    <div class="player-wrap" id="player-wrap">
+      <div class="player-placeholder">
+        <div class="big-ico">🎬</div>
+        <div>Select a video to start watching</div>
+      </div>
+    </div>
+
+    <!-- VIDEO INFO -->
+    <div class="video-info" id="video-info" style="display:none">
+      <div class="video-title" id="cur-video-title"></div>
+      <div class="video-meta">
+        <span id="cur-course-cat"></span>
+        <span id="cur-course-channel"></span>
+      </div>
+      <div class="video-actions">
+        <button class="btn btn-green" onclick="markWatched()" id="mark-btn">✓ Mark as Watched</button>
+        <a id="yt-link" target="_blank" class="btn btn-ghost">
+          <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm3.28 8.28l-4.5 2.5A.5.5 0 016 10.5v-5a.5.5 0 01.78-.41l4.5 2.5a.5.5 0 010 .69z"/></svg>
+          Watch on YouTube
+        </a>
+      </div>
+    </div>
+
+    <!-- AI GENERATE PANEL -->
+    <div class="ai-panel" id="ai-panel" style="display:none">
+      <div class="ai-panel-hd">
+        <div class="ai-panel-title">✨ Generate Quiz with AI <span style="font-size:9px;font-weight:600;background:var(--bg_blue);color:var(--blue2);padding:2px 7px;border-radius:20px;border:1px solid var(--bd)">Gemini + Groq</span></div>
+        <div class="ai-status" id="ai-status-lbl"></div>
+      </div>
+      <div class="ai-steps" id="ai-steps">
+        <div class="ai-step" id="step-transcript">
+          <div class="ai-step-num" id="sn-1">1</div>
+          <div class="ai-step-body">
+            <strong>Fetch Transcript</strong>
+            <span>Pull auto-captions from YouTube for the selected video</span>
+          </div>
+        </div>
+        <div class="ai-step" id="step-generate">
+          <div class="ai-step-num" id="sn-2">2</div>
+          <div class="ai-step-body">
+            <strong>Generate Questions</strong>
+            <span>AI reads the transcript and creates 10-15 MCQs</span>
+          </div>
+        </div>
+        <div class="ai-step" id="step-save">
+          <div class="ai-step-num" id="sn-3">3</div>
+          <div class="ai-step-body">
+            <strong>Save to Quiz Bank</strong>
+            <span>Questions stored in database — quiz is live for all students</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="generateQuiz()" id="gen-btn">✨ Generate Quiz Now</button>
+        <div class="ai-status" id="gen-status" style="display:flex;align-items:center;gap:7px"></div>
+      </div>
+      <div class="infobox info" style="margin-top:12px;margin-bottom:0">
+        <strong>How it works:</strong> AI fetches this video's transcript, then uses Gemini (1M token context) to generate questions. Falls back to Groq if needed. Takes ~15-30 seconds.
+      </div>
+    </div>
+
+    <!-- CERT BANNER (shown if user already has cert) -->
+    <div id="cert-banner" style="display:none;max-width:860px" class="infobox pass">
+      🏆 You've already earned a certificate for this course! <a href="#" id="cert-link" style="color:var(--green);font-weight:700">View Certificate →</a>
+    </div>
+
+  </div>
+</div>
+
+<div id="notif"></div>
+
+<script>
+const API_BASE = localStorage.getItem('cvforge_api_base') || 'http://localhost:3000';
+const API = `${API_BASE}/api`;
+const getH = () => ({ 'Content-Type':'application/json', 'Authorization':`Bearer ${localStorage.getItem('cvforge_token')||''}` });
+
+const params = new URLSearchParams(location.search);
+const COURSE_ID = params.get('id');
+if (!COURSE_ID) location.href = 'courses.html';
+
+let course, videos, quiz;
+let currentVideoId = null;
+let watchedIds = new Set();
+
+function notif(msg, t='g') {
+  const n = document.getElementById('notif');
+  n.textContent = (t==='g'?'✓ ':'✗ ') + msg;
+  n.className = t==='r' ? 'err show' : 'show';
+  setTimeout(() => n.className = '', 2800);
+}
+
+function setStepState(n, state) {
+  const el = document.getElementById(`sn-${n}`);
+  if (!el) return;
+  el.className = `ai-step-num ${state}`;
+  if (state === 'done') el.textContent = '✓';
+  else el.textContent = n;
+}
+
+async function boot() {
+  try {
+    const res  = await fetch(`${API}/courses/${COURSE_ID}`, { headers: getH() });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    course = data.course;
+    videos = data.videos;
+    quiz   = data.quiz;
+
+    // Topbar
+    document.getElementById('topbar-course-title').textContent = course.title;
+    document.title = `${course.title} — Just An Intern`;
+
+    // Sidebar
+    document.getElementById('sb-title').textContent = course.title;
+    renderSidebar();
+
+    // Load user progress
+    const progRes  = await fetch(`${API}/courses/${COURSE_ID}/progress`, { headers: getH() });
+    const progData = await progRes.json();
+    if (progData.success) {
+      progData.watchedVideoIds.forEach(id => watchedIds.add(id));
+      updateProgress();
+      if (progData.certificate) {
+        document.getElementById('cert-banner').style.display = 'block';
+        document.getElementById('cert-link').href = `certificate.html?id=${progData.certificate.cert_uuid}`;
+      }
+    }
+
+    // Show quiz button if quiz exists
+    if (quiz) {
+      document.getElementById('sb-quiz-box').style.display = 'block';
+      document.getElementById('quiz-box-desc').textContent = `${quiz.question_count} questions · Pass with ${quiz.passing_score}% to get certified.`;
+    }
+
+    // Show AI generate panel
+    document.getElementById('ai-panel').style.display = 'block';
+
+    // Auto-play first video
+    if (videos.length) selectVideo(videos[0]);
+
+  } catch(e) {
+    document.getElementById('sb-title').textContent = 'Error loading course';
+    console.error(e);
+  }
+}
+
+function renderSidebar() {
+  const list = document.getElementById('sb-list');
+  list.innerHTML = videos.map((v,i) => `
+    <div class="vid-item${watchedIds.has(v.id)?' watched':''}" id="vi-${v.id}" onclick="selectVideo(${JSON.stringify(v).replace(/"/g,'&quot;')})">
+      <div class="vid-num">${watchedIds.has(v.id)?'✓':(i+1)}</div>
+      <div class="vid-title">${v.title}</div>
+    </div>`).join('');
+}
+
+function selectVideo(v) {
+  currentVideoId = v.id;
+
+  // Highlight
+  document.querySelectorAll('.vid-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById(`vi-${v.id}`);
+  if (el) { el.classList.add('active'); el.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
+
+  // Player
+  document.getElementById('player-wrap').innerHTML = `
+    <iframe src="https://www.youtube.com/embed/${v.youtube_id}?rel=0&modestbranding=1&autoplay=1"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen loading="lazy"></iframe>`;
+
+  // Info
+  document.getElementById('video-info').style.display = 'block';
+  document.getElementById('cur-video-title').textContent = v.title;
+  document.getElementById('cur-course-cat').textContent = `📂 ${course.category}`;
+  document.getElementById('cur-course-channel').textContent = course.channel_name ? `📺 ${course.channel_name}` : '';
+  document.getElementById('yt-link').href = `https://youtube.com/watch?v=${v.youtube_id}`;
+
+  const markBtn = document.getElementById('mark-btn');
+  if (watchedIds.has(v.id)) {
+    markBtn.textContent = '✓ Watched';
+    markBtn.className = 'btn btn-ghost';
+  } else {
+    markBtn.innerHTML = '✓ Mark as Watched';
+    markBtn.className = 'btn btn-green';
+  }
+}
+
+async function markWatched() {
+  if (!currentVideoId) return;
+  try {
+    await fetch(`${API}/courses/${COURSE_ID}/progress`, {
+      method: 'POST',
+      headers: getH(),
+      body: JSON.stringify({ videoId: currentVideoId })
+    });
+    watchedIds.add(currentVideoId);
+    updateProgress();
+    renderSidebar();
+
+    // Re-highlight active
+    const v = videos.find(v => v.id === currentVideoId);
+    if (v) selectVideo(v);
+
+    notif('Progress saved!');
+  } catch(e) { notif(e.message,'r'); }
+}
+
+function updateProgress() {
+  const total   = videos.length || 1;
+  const watched = watchedIds.size;
+  const pct     = Math.round((watched / total) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = `${watched} of ${total} watched`;
+  document.getElementById('prog-pct').textContent  = pct + '%';
+}
+
+function goToQuiz() {
+  if (!quiz) { notif('No quiz available yet. Generate one first!','r'); return; }
+  location.href = `quiz.html?courseId=${COURSE_ID}`;
+}
+
+async function generateQuiz() {
+  const btn = document.getElementById('gen-btn');
+  const status = document.getElementById('gen-status');
+  if (!currentVideoId) { notif('Select a video first','r'); return; }
+
+  const video = videos.find(v => v.id === currentVideoId);
+  if (!video) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Working…';
+
+  // Step 1: Fetch transcript
+  setStepState(1, 'active');
+  status.innerHTML = '<div class="spinner"></div> Fetching transcript…';
+
+  try {
+    const tRes  = await fetch(`${API}/courses/youtube/transcript/${video.youtube_id}`, { headers: getH() });
+    const tData = await tRes.json();
+
+    if (!tData.success || !tData.transcript) {
+      throw new Error('Could not fetch transcript. This video may not have captions enabled.');
+    }
+
+    setStepState(1, 'done');
+    status.innerHTML = `<div class="spinner"></div> Got ${tData.wordCount?.toLocaleString()||'?'} words · generating questions…`;
+
+    // Step 2: Generate questions
+    setStepState(2, 'active');
+
+    const gRes  = await fetch(`${API}/courses/${COURSE_ID}/generate-questions`, {
+      method: 'POST',
+      headers: getH(),
+      body: JSON.stringify({ transcript: tData.transcript, videoTitle: video.title })
+    });
+    const gData = await gRes.json();
+    if (!gRes.ok || !gData.success) throw new Error(gData.error || 'Generation failed');
+
+    setStepState(2, 'done');
+    setStepState(3, 'active');
+    status.innerHTML = `<div class="spinner"></div> Saving ${gData.count} questions…`;
+
+    // Brief pause so user sees step 3
+    await new Promise(r => setTimeout(r, 600));
+    setStepState(3, 'done');
+
+    status.innerHTML = `<span style="color:var(--green)">✓ ${gData.count} questions ready · Provider: ${gData.provider}</span>`;
+    notif(`Quiz generated with ${gData.count} questions! 🎉`);
+
+    // Show quiz button
+    document.getElementById('sb-quiz-box').style.display = 'block';
+    document.getElementById('quiz-box-desc').textContent = `${gData.count} questions · Pass with 80% to get certified.`;
+    quiz = { id: gData.quizId };
+
+  } catch(e) {
+    setStepState(1, '1');
+    setStepState(2, '2');
+    setStepState(3, '3');
+    status.innerHTML = `<span style="color:var(--red)">✗ ${e.message}</span>`;
+    notif(e.message, 'r');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✨ Generate Quiz Now';
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
