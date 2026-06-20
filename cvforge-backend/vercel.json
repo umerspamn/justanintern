@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30
+    },
+    "api/cron/fetch-courses.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/fetch-courses",
+      "schedule": "0 19 * * *"
+    }
+  ]
+}
